@@ -48,3 +48,6 @@ Now it's just straight forward. Go back to the check detail.
 And right on the `Alerts` tab, select the alert you just created. And save the form.
 
 Now you get a notification to the Teams channel when the check fails.
+
+<img src="/docs/img/quick-start/teams-alert-critical.png" alt="image" width="450" />
+<!-- <img src="/docs/img/quick-start/teams-alert-ok.png" alt="image" width="450" /> -->
