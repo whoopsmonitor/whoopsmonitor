@@ -4,6 +4,7 @@ const logSymbols = require('log-symbols')
 const ejs = require('ejs')
 const generatePassword = require('generate-password')
 const fs = require('fs')
+const path = require('path')
 
 const APP_NAME = 'whoopsmonitor'
 const outputDir = '../output'
@@ -77,19 +78,16 @@ let BASIC_AUTH_PASSWORD = generatePassword.generate({
 })
 
 let questions = []
-if (fs.existsSync(composeFile)) {
-  questions.push({
-    type: 'confirm',
-    name: 'overrideComposeFile',
-    message: 'Docker Compose file for production environment already exists in this directory. Would you like to override this file?'
-  })
-}
 
-if (fs.existsSync(composeDevFile)) {
+const composeFilePath = path.join(outputDir, composeFile)
+const composeDevFilePath = path.join(outputDir, composeDevFile)
+
+if (fs.existsSync(composeFilePath) || fs.existsSync(composeDevFilePath)) {
   questions.push({
     type: 'confirm',
-    name: 'overrideDevComposeFile',
-    message: 'Docker Compose file for development environment already exists in this directory. Would you like to override this file?'
+    name: 'overrideComposeFiles',
+    message: 'Docker Compose files already exists. Would you like to override those files?',
+    default: false
   })
 }
 
@@ -106,30 +104,35 @@ questions.push({
 questions.push({
   type: 'confirm',
   name: 'baseAuth',
+  default: false,
   message: 'Would like to protect the entire administration panel on production with base auth credentials?'
 })
 
 inquirer.prompt(questions).then((answers) => {
-  if (fs.existsSync(composeFile)) {
-    if (answers.overrideComposeFile) {
-      fs.unlinkSync(composeFile)
-    } else {
-      console.log(logSymbols.success, 'Done. Nothing happened.')
-      return false
-    }
-  }
-
-  if (fs.existsSync(composeDevFile)) {
-    if (answers.overrideDevComposeFile) {
-      fs.unlinkSync(composeDevFile)
-    } else {
-      console.log(logSymbols.success, 'Done. Nothing happened.')
-      return false
-    }
-  }
-
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir)
+  }
+
+  var terminate = false
+  if (fs.existsSync(composeFilePath)) {
+    if (answers.overrideComposeFiles) {
+      fs.unlinkSync(composeFilePath)
+    } else {
+      terminate = true
+    }
+  }
+
+  if (fs.existsSync(composeDevFilePath)) {
+    if (answers.overrideComposeFiles) {
+      fs.unlinkSync(composeDevFilePath)
+    } else {
+      terminate = true
+    }
+  }
+
+  if (terminate) {
+    console.log(logSymbols.info, 'Process terminated. Nothing happened.')
+    process.exit(0)
   }
 
   if (!answers.baseAuth) {
@@ -155,7 +158,7 @@ inquirer.prompt(questions).then((answers) => {
       if (err) {
         console.error(err)
         console.error(logSymbols.error, `It is not possible to generate compose file from ${file} file.`)
-        return false
+        process.exit(0)
       }
 
       const filename = file.replace('.ejs', '')
@@ -165,10 +168,10 @@ inquirer.prompt(questions).then((answers) => {
       } catch (error) {
         console.error(error)
         console.error(logSymbols.error, `It is not possible to generate ${filename} file.`)
-        return false
+        process.exit(0)
       }
 
-      console.log(logSymbols.success, `File ${filename} sucessfully created.`)
+      console.log(logSymbols.success, `File ${outputDir}/${filename} sucessfully created.`)
     })
   }
 
