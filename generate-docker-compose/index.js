@@ -10,6 +10,8 @@ const outputDir = '../output'
 const composeFile = 'docker-compose.yml'
 const composeDevFile = 'docker-compose-dev.yml'
 
+const versions = require('./package.json').appVersions
+
 console.log(
   boxen(
     `
@@ -91,6 +93,15 @@ if (fs.existsSync(composeDevFile)) {
   })
 }
 
+// app version
+questions.push({
+  type: 'list',
+  choices: versions,
+  name: 'version',
+  message: 'Application version',
+  default: 0
+})
+
 // base auth
 questions.push({
   type: 'confirm',
@@ -128,6 +139,7 @@ inquirer.prompt(questions).then((answers) => {
 
   for (const file of [`${composeFile}.ejs`, `${composeDevFile}.ejs`]) {
     ejs.renderFile(file, {
+      APP_VERSION: answers.version,
       APP_NAME,
       APP_PASSWORD,
       APP_REDIS_PASSWORD,
