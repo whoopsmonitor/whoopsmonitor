@@ -1,0 +1,16 @@
+FROM node:14.11.0-alpine3.12
+LABEL MAINTAINER="Daniel Rataj <daniel.rataj@mall.cz>"
+LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
+
+RUN apk add --no-cache openssl=1.1.1g-r0 \
+  && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+# copy required app files
+COPY generate-docker-compose/ .
+RUN npm install --quiet
+
+VOLUME .:/output/
+
+CMD [ "npm", "start" ]

@@ -1,0 +1,51 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#   ╔╦╗╦═╗╔═╗╦  ╦╦╔═╗ ┬ ┬┌┬┐┬                           #
+#    ║ ╠╦╝╠═╣╚╗╔╝║╚═╗ └┬┘││││                           #
+#  o ╩ ╩╚═╩ ╩ ╚╝ ╩╚═╝o ┴ ┴ ┴┴─┘                         #
+#                                                       #
+# This file configures Travis CI.                       #
+# (i.e. how we run the tests... mainly)                 #
+#                                                       #
+# https://docs.travis-ci.com/user/customizing-the-build #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+language: node_js
+
+services:
+  - mongodb
+
+dist: trusty
+sudo: required
+
+node_js:
+  - "10"
+
+branches:
+  only:
+    - master
+
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
+  - export PATH="$HOME/.yarn/bin:$PATH"
+  - cd api
+  - npm install
+  - cd ../admin
+  - yarn install
+
+script:
+  - cd ..
+  - cd api
+  - npm test
+  - cd ../admin
+  - yarn test
+  - cd ..
+  - sonar-scanner
+
+jdk:
+  - oraclejdk8
+
+cache:
+  yarn: true
+  npm: true
+  directories:
+    - "$HOME/.sonar/cache"

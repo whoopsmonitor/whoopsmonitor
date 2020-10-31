@@ -1,0 +1,66 @@
+RESULT=$(<%- partial('./partials/mongo-connect').trim() -%> \
+--eval "
+    var status = {};
+    status.alive = db.runCommand('ping').ok || 0
+
+    if (status.alive) {
+        status.rsState = rs.status().myState || false
+
+        var serverStatus = db.runCommand('serverStatus')
+        if (serverStatus) {
+            status.uptime = serverStatus.uptime || 0
+            status.asserts = serverStatus.asserts || 0
+            status.connections = serverStatus.connections || 0
+            status.opcounters = serverStatus.opcounters || 0
+            status.globalLock = {
+                activeClients: {
+                    readers: serverStatus.globalLock.activeClients.readers || 0,
+                    writers: serverStatus.globalLock.activeClients.writers || 0
+                }
+            };
+        }
+
+        if (rs.status().ok) {
+            var getReplicationInfo = db.getReplicationInfo()
+
+            if (getReplicationInfo && !getReplicationInfo.errmsg) {
+                status.getReplicationInfo = {}
+
+                if (getReplicationInfo.logSizeMB) {
+                    status.getReplicationInfo.logSizeMB = getReplicationInfo.logSizeMB
+                }
+
+                if (getReplicationInfo.timeDiff) {
+                    status.getReplicationInfo.timeDiff = getReplicationInfo.timeDiff
+                }
+            }
+
+            var rsStatus = rs.status()
+            if (rsStatus.set) {
+                status.rsName = rsStatus.set
+            }
+
+            var rsConfig = rs.config()
+
+            if (rsConfig) {
+                var members = rsConfig.members.filter((member) => member.host === '<%= HOSTNAME %>:<%= MONGO_PORT%>')
+
+                if (members.length) {
+                    status.rsConfig = {
+                        priority: members[0].priority,
+                        votes: members[0].votes
+                    }
+                }
+            }
+        }
+    }
+
+    status
+
+") &> /dev/null
+
+if [ "$?" -eq 1 ]; then
+    echo "<%= status.error(errors.NODE_INFO.message) %>" && exit 1
+fi
+
+echo "<%= status.success(`$RESULT`) %>"

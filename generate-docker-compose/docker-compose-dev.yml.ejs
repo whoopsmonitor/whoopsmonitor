@@ -1,0 +1,145 @@
+version: '3'
+
+services:
+  api:
+    container_name: api
+    restart: always
+    ports:
+      - "1337:1337"
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    command: npm run dev
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    environment:
+      NODE_ENV: development
+      CONFIG_CORS_ALLOW_ORIGINS: '*'
+      APP_PASSWORD: <%= APP_PASSWORD %>
+      MONGO_CONNECTION: mongodb://<%= MONGODB_USERNAME %>:<%= MONGODB_PASSWORD %>@mongo:27017/<%= MONGODB_DATABASE %>?authSource=<%= APP_NAME %>
+      APP_DATA_ENCRYPTION_KEY: <%= APP_DATA_ENCRYPTION_KEY %>
+      APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
+      APP_REDIS_CONNECTION_HOST: redis
+      APP_REDIS_CONNECTION_PORT: 6379
+      APP_TOKEN: <%= APP_TOKEN %>
+      APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
+      APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - app-tier
+
+  worker:
+    container_name: worker
+    restart: always
+    volumes:
+      - ./worker:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - worker_data:/<%= APP_NAME %>-worker
+    command: npm run dev
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    environment:
+      NODE_ENV: development
+      APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
+      APP_REDIS_HOST: redis
+      APP_REDIS_PORT: 6379
+      APP_API_URL: http://api:1337
+      APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
+      APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
+      APP_QUEUE_NAME_ALERTING: alerting
+      APP_TOKEN: <%= APP_TOKEN %>
+    depends_on:
+      - mongodb
+      - redis
+      - api
+    networks:
+      - app-tier
+
+  alerting:
+    container_name: alerting
+    restart: always
+    volumes:
+      - ./worker:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    command: npm run dev
+    build:
+      context: .
+      dockerfile: Dockerfile-alerting
+    environment:
+      NODE_ENV: development
+      APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
+      APP_REDIS_HOST: redis
+      APP_REDIS_PORT: 6379
+      APP_API_URL: http://api:1337
+      APP_QUEUE_NAME_ALERTING: alerting
+      APP_TOKEN: <%= APP_TOKEN %>
+    depends_on:
+      - mongodb
+      - redis
+      - api
+    networks:
+      - app-tier
+
+  image-metadata:
+    container_name: image-metadata
+    restart: always
+    volumes:
+      - ./image-metadata:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    command: npm run dev
+    build:
+      context: .
+      dockerfile: Dockerfile-image-metadata
+    environment:
+      NODE_ENV: development
+      API_URL: http://api:1337
+      APP_TOKEN: <%= APP_TOKEN %>
+    depends_on:
+      - api
+    networks:
+      - app-tier
+
+  mongodb:
+    container_name: mongo
+    image: bitnami/mongodb:4.4.1-debian-10-r8
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/bitnami
+    environment:
+      MONGODB_ROOT_PASSWORD: <%= MONGODB_ROOT_PASSWORD %>
+      MONGODB_DATABASE: <%= MONGODB_DATABASE %>
+      MONGODB_USERNAME: <%= MONGODB_USERNAME %>
+      MONGODB_PASSWORD: <%= MONGODB_PASSWORD %>
+    networks:
+      - app-tier
+
+  redis:
+    container_name: redis
+    image: 'bitnami/redis:6.0.8-debian-10-r6'
+    environment:
+      REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
+    volumes:
+      - redis_data:/bitnami
+    networks:
+      - app-tier
+
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+  worker_data:
+    driver: local
+
+networks:
+  app-tier:
+    driver: bridge

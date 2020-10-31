@@ -1,0 +1,26 @@
+FROM node:14.11.0-alpine3.12
+LABEL MAINTAINER="Daniel Rataj <daniel.rataj@mall.cz>"
+LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
+
+RUN apk add --no-cache openssl=1.1.1g-r0 docker-cli=19.03.12-r0 \
+  && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+COPY api/package.json .
+RUN npm install --quiet
+
+# copy required app files
+COPY api/api ./api
+COPY api/config/ ./config
+COPY api/static/ ./static
+COPY api/views/ ./views
+COPY api/test/ ./test
+COPY api/app.js ./app.js
+COPY api/.sailsrc ./.sailsrc
+
+# start Sails app
+CMD [ "npm", "start" ]
+
+# expose port for Node
+EXPOSE 1337
