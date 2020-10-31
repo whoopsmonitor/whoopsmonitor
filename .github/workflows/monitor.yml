@@ -34,7 +34,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           # keep only the major.minor release, no patch
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/\.[0-9]*$//'
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/\.[0-9]*$//')
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
