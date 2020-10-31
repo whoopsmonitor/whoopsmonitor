@@ -13,4 +13,4 @@ RUN npm install --quiet
 
 VOLUME .:/output/
 
-CMD [ "npm", "start" ]
+ENTRYPOINT [ "npm" ]

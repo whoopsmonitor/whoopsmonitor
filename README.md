@@ -29,7 +29,7 @@ You need
 The easiest way is to run this project with `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords etc.). Run it with this command:
 
 ```bash
-docker run --rm -it -v $(pwd):/output ghcr.io/whoopsmonitor/whoopsmonitor/generate-docker-compose:latest
+docker run --rm -it -v $(pwd):/output ghcr.io/whoopsmonitor/whoopsmonitor/generate-docker-compose:latest run create
 ```
 
 This will ask for some simple questions and generate a `docker-compose.yml` file right in the directory you are in. It will also generate a file for development. But you can simply ignore that file.
