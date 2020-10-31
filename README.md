@@ -1,3 +1,5 @@
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/whoopsmonitor/whoopsmonitor)
+
 <img src="/docs/img/logo_1024_1024.png" alt="logo" width="150" height="150" align="right"
  />
 
