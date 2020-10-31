@@ -64,33 +64,46 @@ queue.process(async (job, done) => {
       }).then(response => response.data)
 
       // get alert status as well
-      const latestStatus = await axiosInstance.get(`/v1/alertstatus`, {
+      const latestStatuses = await axiosInstance.get(`/v1/alertstatus`, {
         params: {
           select: 'createdAt',
-          limit: 1, // only 1 should be enough
+          limit: 2, // only 2 latests
           where: {
             alert: alertId
           },
           populate: false,
           sort: 'createdAt desc'
         }
-      }).then(response => response.data[0]) // just the first item in array
+      }).then(response => response.data) // just the first item in array
 
-      if (latestStatus) {
+      if (latestStatuses.length) {
+        const lastStatus = latestStatus[0]
+        const previousStatus = latestStatus[1]
+
+        // compare exit codes - in case they differ, send message even the repeat interval is not yet completed
+        let checkAlsoForInterval = false
+        if (previousStatus) {
+          if (previousStatus.status === lastStatus.status) {
+            checkAlsoForInterval = true
+          }
+        }
+
         // check repeat interval
-        const start = DateTime.fromMillis(latestStatus.createdAt)
-        const end = DateTime.local()
+        if (checkAlsoForInterval) {
+          const start = DateTime.fromMillis(lastStatus.createdAt)
+          const end = DateTime.local()
 
-        const diffInMinutes = Interval.fromDateTimes(start, end).toDuration('minutes').minutes
+          const diffInMinutes = Interval.fromDateTimes(start, end).toDuration('minutes').minutes
 
-        if (alert.repeat > diffInMinutes) {
-          const nextRun = alert.repeat - Math.round(diffInMinutes)
+          if (alert.repeat > diffInMinutes) {
+            const nextRun = alert.repeat - Math.round(diffInMinutes)
 
-          // stop notification, already notified
-          console.log(
-            `${logSymbols.info} Alert "${alert.name}" already sent. Waiting for the next interval (${nextRun <= 1 ? 'in a minute' : 'in ' + nextRun + ' minutes'}).
-          `)
-          continue
+            // stop notification, already notified
+            console.log(
+              `${logSymbols.info} Alert "${alert.name}" already sent. Waiting for the next interval (${nextRun <= 1 ? 'in a minute' : 'in ' + nextRun + ' minutes'}).
+            `)
+            continue
+          }
         }
       }
 
