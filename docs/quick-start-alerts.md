@@ -38,3 +38,13 @@ Now you can configure environmental variables that the alert container use. In o
 #### Teams Incoming Webhook
 
 You can obtain a webhook URL in the Teams configuration of the channel (connectors option).
+
+## Check Configuration
+
+Now it's just straight forward. Go back to the check detail.
+
+<img src="/docs/img/quick-start/update-check-details-alerts.png" alt="image" width="410" />
+
+And right on the `Alerts` tab, select the alert you just created. And save the form.
+
+Now you get a notification to the Teams channel when the check fails.
