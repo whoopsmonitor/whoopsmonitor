@@ -23,6 +23,7 @@
             checked-icon="check"
             color="green"
             unchecked-icon="clear"
+            label="Published"
           />
 
           <q-input
