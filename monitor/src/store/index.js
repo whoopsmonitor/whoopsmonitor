@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import VuexPersistence from 'vuex-persist'
 
 import auth from './auth'
+import guide from './guide'
 
 Vue.use(Vuex)
 
@@ -22,7 +23,8 @@ const vuexLocal = new VuexPersistence({
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      auth
+      auth,
+      guide
     },
     plugins: [
       vuexLocal.plugin

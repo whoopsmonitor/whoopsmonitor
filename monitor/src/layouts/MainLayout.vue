@@ -21,9 +21,11 @@
           @click="$router.push({ name: 'dashboard' })"
         />
 
-        <q-toolbar-title>
-          Whoops Monitor
-        </q-toolbar-title>
+        <q-toolbar-title>Whoops Monitor</q-toolbar-title>
+
+        <q-btn v-if="loggedIn && guide" @click="goToHelp" flat round dense icon="support">
+          <q-tooltip>show guide in new window</q-tooltip>
+        </q-btn>
 
         <q-btn v-if="loggedIn" @click="logout" flat round dense icon="exit_to_app">
           <q-tooltip>click to logout</q-tooltip>
@@ -82,7 +84,9 @@
           </q-item-section>
 
           <q-item-section>
-            <q-item-label>Checks</q-item-label>
+            <q-item-label ref="guide-checks">
+              Checks
+            </q-item-label>
             <q-item-label caption>
               list all checks
             </q-item-label>
@@ -168,6 +172,9 @@ export default {
   computed: {
     loggedIn () {
       return this.$store.getters['auth/loggedIn']
+    },
+    guide () {
+      return this.$store.state.guide.docs
     }
   },
   async created () {
@@ -206,6 +213,15 @@ export default {
       } catch (error) {
         console.error(error)
       }
+    },
+
+    goToHelp () {
+      if (this.guide) {
+        window.open(this.guide, '_blank')
+        return true
+      }
+
+      console.error('No URL specified.')
     }
   }
 }
