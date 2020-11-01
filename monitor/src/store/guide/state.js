@@ -1,6 +1,6 @@
 export default function () {
   return {
-    guide: true,
-    allowGuide: false
+    active: false,
+    route: ''
   }
 }

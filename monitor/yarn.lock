@@ -3448,6 +3448,11 @@ dot-prop@^5.2.0:
   dependencies:
     is-obj "^2.0.0"
 
+driver.js@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/driver.js/-/driver.js-0.8.1.tgz#e356e314dcfb56c5c369f34121075ac9f063cc2b"
+  integrity sha512-CQ5cG6QMPooZq5P6jNQtWVu1oselYSgbY3vQsDJtmC2STKvX4pbrd0aOxRFOpXptMReUIJOJhyBnP4Udt4c+4Q==
+
 duplexer3@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/duplexer3/-/duplexer3-0.1.4.tgz#ee01dd1cac0ed3cbc7fdbea37dc0a8f1ce002ce2"
@@ -9361,6 +9366,13 @@ vue-apexcharts@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/vue-apexcharts/-/vue-apexcharts-1.6.0.tgz#c7d3afd93f712433d404e5ceeb4e3aa65f422af2"
   integrity sha512-sT6tuVTLBwfH3TA7azecDNS/W70bmz14ZJI7aE7QIqcG9I6OywyH7x3hcOeY1v1DxttI8Svc5RuYj4Dd+A5F4g==
+
+vue-driver.js@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/vue-driver.js/-/vue-driver.js-1.0.3.tgz#0b4195196a8f8ca369d0a7058ce80d5a606a9a00"
+  integrity sha512-ugsGk7gcIYnx/xz4ig839R+scjx8l/MLPPJajTuvv/MwY2DTUsjwy2XnYpf5UgdipD1jF/4lgKlR9fV6lt3Gvg==
+  dependencies:
+    driver.js "^0.8.1"
 
 vue-eslint-parser@^7.0.0:
   version "7.1.0"

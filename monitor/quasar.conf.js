@@ -74,12 +74,6 @@ module.exports = function (/* ctx */) {
           loader: 'eslint-loader',
           exclude: /node_modules/
         })
-
-        cfg.plugins.push(
-          new webpack.ProvidePlugin({
-            introJs: ['intro.js']
-          })
-        )
       }
     },
 

@@ -49,6 +49,14 @@ const routes = [
   },
 
   {
+    path: '/guide',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: 'check/form', name: 'guide.check.form', component: () => import('pages/guide/check/Form.vue'), meta: { auth: true } }
+    ]
+  },
+
+  {
     path: '/server-error',
     component: () => import('pages/Error500.vue'),
     name: 'error.500',

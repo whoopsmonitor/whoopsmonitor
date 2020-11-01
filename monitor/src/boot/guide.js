@@ -1,13 +1,9 @@
-import 'intro.js/introjs.css'
-import VueIntro from 'vue-introjs'
-
-export default ({ app, Vue, store, router }) => {
-  Vue.use(VueIntro)
-
+export default ({ store, router }) => {
   // always close the guide when navigation changed
   router.beforeEach((from, to, next) => {
-    store.commit('configuration/hideGuide')
-    store.commit('configuration/disallowGuide')
+    store.commit('guide/route', '')
+    store.commit('guide/active', false)
+
     return next()
   })
 }

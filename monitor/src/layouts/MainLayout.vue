@@ -21,13 +21,10 @@
           @click="$router.push({ name: 'dashboard' })"
         />
 
-        <q-toolbar-title>
-          Whoops Monitor
-        </q-toolbar-title>
+        <q-toolbar-title>Whoops Monitor</q-toolbar-title>
 
-        <q-btn v-if="loggedIn && allowGuide" @click="toggleGuide" flat round dense icon="info" :color="guide ? 'secondary': ''">
-          <q-tooltip v-if="!guide">show guide</q-tooltip>
-          <q-tooltip v-if="guide">hide guide</q-tooltip>
+        <q-btn v-if="loggedIn && guideActive" @click="goToHelp" flat round dense icon="support">
+          <q-tooltip>show guide for this page in new window</q-tooltip>
         </q-btn>
 
         <q-btn v-if="loggedIn" @click="logout" flat round dense icon="exit_to_app">
@@ -87,7 +84,9 @@
           </q-item-section>
 
           <q-item-section>
-            <q-item-label>Checks</q-item-label>
+            <q-item-label ref="guide-checks">
+              Checks
+            </q-item-label>
             <q-item-label caption>
               list all checks
             </q-item-label>
@@ -174,29 +173,14 @@ export default {
     loggedIn () {
       return this.$store.getters['auth/loggedIn']
     },
-    allowGuide () {
-      return this.$store.state.configuration.allowGuide
+    guideState () {
+      return this.$store.state.guide.state
     },
-    guide () {
-      return this.$store.state.configuration.guide
-    }
-  },
-  watch: {
-    guide: {
-      immediate: true,
-      handler (state) {
-        if (state) {
-          this.$nextTick(() => {
-            this.$intro().start()
-            this.$intro().showHints()
-          })
-        } else {
-          this.$nextTick(() => {
-            this.$intro().exit()
-            this.$intro().hideHints()
-          })
-        }
-      }
+    guideActive () {
+      return this.$store.state.guide.active
+    },
+    guideRoute () {
+      return this.$store.state.guide.route
     }
   },
   async created () {
@@ -208,18 +192,10 @@ export default {
 
     await this.getFailedCheck()
   },
-  mounted () {
-    this.$intro().addHints().onhintclose(() => {
-      this.$store.commit('configuration/toggleGuide')
-    })
-  },
   destroyed () {
     clearInterval(this.interval)
   },
   methods: {
-    toggleGuide () {
-      this.$store.commit('configuration/toggleGuide')
-    },
     login () {
       this.$router.push({
         name: 'auth.login'
@@ -243,6 +219,14 @@ export default {
       } catch (error) {
         console.error(error)
       }
+    },
+
+    goToHelp () {
+      const routeData = this.$router.resolve({
+        name: this.guideRoute
+      })
+
+      window.open(routeData.href, '_blank')
     }
   }
 }
