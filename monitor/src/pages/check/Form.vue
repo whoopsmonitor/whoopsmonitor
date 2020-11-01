@@ -165,7 +165,6 @@ export default {
   },
   data () {
     return {
-      helpRoute: 'guide.check.form',
       form: {
         enabled: false,
         name: '',
@@ -213,9 +212,6 @@ export default {
     }
   },
   async created () {
-    // this.$store.commit('guide/route', this.helpRoute)
-    // this.$store.commit('guide/active', true)
-
     if (this.edit) {
       await this.fetchData()
     }

@@ -22,7 +22,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', name: 'check.index', component: () => import('pages/check/Index.vue'), meta: { auth: true } },
-      { path: 'create', name: 'check.create', component: () => import('pages/check/Form.vue'), meta: { auth: true } },
+      { path: 'create', name: 'check.create', component: () => import('pages/check/Form.vue'), meta: { auth: true, docs: 'https://github.com/whoopsmonitor/whoopsmonitor/blob/master/docs/quick-start.md#ready-to-create-a-new-check' } },
       { path: ':id', name: 'check.detail', component: () => import('pages/check/Form.vue'), meta: { auth: true, edit: true } },
       { path: ':id/dashboard', name: 'check.dashboard', component: () => import('pages/check/Dashboard.vue'), meta: { auth: false } }
     ]
@@ -45,14 +45,6 @@ const routes = [
       { path: '', name: 'image.index', component: () => import('pages/image/Index.vue'), meta: { auth: true } },
       { path: 'create', name: 'image.create', component: () => import('pages/image/Form.vue'), meta: { auth: true } },
       { path: ':id', name: 'image.detail', component: () => import('pages/image/Form.vue'), meta: { auth: true, edit: true } }
-    ]
-  },
-
-  {
-    path: '/guide',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: 'check/form', name: 'guide.check.form', component: () => import('pages/guide/check/Form.vue'), meta: { auth: true } }
     ]
   },
 

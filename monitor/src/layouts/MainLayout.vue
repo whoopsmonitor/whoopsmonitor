@@ -23,8 +23,8 @@
 
         <q-toolbar-title>Whoops Monitor</q-toolbar-title>
 
-        <q-btn v-if="loggedIn && guideActive" @click="goToHelp" flat round dense icon="support">
-          <q-tooltip>show guide for this page in new window</q-tooltip>
+        <q-btn v-if="loggedIn && guide" @click="goToHelp" flat round dense icon="support">
+          <q-tooltip>show guide in new window</q-tooltip>
         </q-btn>
 
         <q-btn v-if="loggedIn" @click="logout" flat round dense icon="exit_to_app">
@@ -173,14 +173,8 @@ export default {
     loggedIn () {
       return this.$store.getters['auth/loggedIn']
     },
-    guideState () {
-      return this.$store.state.guide.state
-    },
-    guideActive () {
-      return this.$store.state.guide.active
-    },
-    guideRoute () {
-      return this.$store.state.guide.route
+    guide () {
+      return this.$store.state.guide.docs
     }
   },
   async created () {
@@ -222,11 +216,12 @@ export default {
     },
 
     goToHelp () {
-      const routeData = this.$router.resolve({
-        name: this.guideRoute
-      })
+      if (this.guide) {
+        window.open(this.guide, '_blank')
+        return true
+      }
 
-      window.open(routeData.href, '_blank')
+      console.error('No URL specified.')
     }
   }
 }
