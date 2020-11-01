@@ -13,7 +13,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       // dashboard does not need a login to view the page
-      { path: '', name: 'dashboard', component: () => import('pages/Dashboard.vue'), meta: { auth: false } }
+      { path: '', name: 'dashboard', component: () => import('pages/Dashboard.vue'), meta: { auth: false, docs: 'https://github.com/whoopsmonitor/whoopsmonitor/blob/master/docs/quick-start.md' } }
     ]
   },
 
@@ -33,7 +33,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', name: 'alert.index', component: () => import('pages/alert/Index.vue'), meta: { auth: true } },
-      { path: 'create', name: 'alert.create', component: () => import('pages/alert/Form.vue'), meta: { auth: true } },
+      { path: 'create', name: 'alert.create', component: () => import('pages/alert/Form.vue'), meta: { auth: true, docs: 'https://github.com/whoopsmonitor/whoopsmonitor/blob/master/docs/quick-start-alerts.md' } },
       { path: ':id', name: 'alert.detail', component: () => import('pages/alert/Form.vue'), meta: { auth: true, edit: true } }
     ]
   },
