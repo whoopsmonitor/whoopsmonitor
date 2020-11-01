@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+
 /*
  * This file runs in a Node context (it's NOT transpiled by Babel), so use only
  * the ES6 features that are supported by your Node version. https://node.green/
@@ -21,7 +23,8 @@ module.exports = function (/* ctx */) {
     boot: [
       'auth',
       'axios',
-      'notify'
+      'notify',
+      'guide'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -71,6 +74,12 @@ module.exports = function (/* ctx */) {
           loader: 'eslint-loader',
           exclude: /node_modules/
         })
+
+        cfg.plugins.push(
+          new webpack.ProvidePlugin({
+            introJs: ['intro.js']
+          })
+        )
       }
     },
 

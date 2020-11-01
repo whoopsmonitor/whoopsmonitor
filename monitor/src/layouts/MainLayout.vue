@@ -25,6 +25,11 @@
           Whoops Monitor
         </q-toolbar-title>
 
+        <q-btn v-if="loggedIn && allowGuide" @click="toggleGuide" flat round dense icon="info" :color="guide ? 'secondary': ''">
+          <q-tooltip v-if="!guide">show guide</q-tooltip>
+          <q-tooltip v-if="guide">hide guide</q-tooltip>
+        </q-btn>
+
         <q-btn v-if="loggedIn" @click="logout" flat round dense icon="exit_to_app">
           <q-tooltip>click to logout</q-tooltip>
         </q-btn>
@@ -168,6 +173,30 @@ export default {
   computed: {
     loggedIn () {
       return this.$store.getters['auth/loggedIn']
+    },
+    allowGuide () {
+      return this.$store.state.configuration.allowGuide
+    },
+    guide () {
+      return this.$store.state.configuration.guide
+    }
+  },
+  watch: {
+    guide: {
+      immediate: true,
+      handler (state) {
+        if (state) {
+          this.$nextTick(() => {
+            this.$intro().start()
+            this.$intro().showHints()
+          })
+        } else {
+          this.$nextTick(() => {
+            this.$intro().exit()
+            this.$intro().hideHints()
+          })
+        }
+      }
     }
   },
   async created () {
@@ -179,10 +208,18 @@ export default {
 
     await this.getFailedCheck()
   },
+  mounted () {
+    this.$intro().addHints().onhintclose(() => {
+      this.$store.commit('configuration/toggleGuide')
+    })
+  },
   destroyed () {
     clearInterval(this.interval)
   },
   methods: {
+    toggleGuide () {
+      this.$store.commit('configuration/toggleGuide')
+    },
     login () {
       this.$router.push({
         name: 'auth.login'
