@@ -4,6 +4,7 @@
  />
 
 # Whoops Monitor
+
 I guess you have your own monitoring solution running at your company. Maybe not. However, you can always try Whoops Monitor to achieve some clarity on your systems. It is an excellent tool for helpdesk operators or even for the managers when configured adequately by your IT department.
 
 What Whoops Monitor does is dead simple. It runs any Docker image at regular cron interval and then saves the result. That's it!
@@ -21,89 +22,49 @@ Everything displays on the main dashboard where you can see the results of all o
 ## Prerequisities
 
 You need
- * [Docker](https://www.docker.com/) to run all required images.
- * [Docker Compose](https://docs.docker.com/compose/) to run all containers at once.
+
+-   [Docker](https://www.docker.com/) to run all required images.
+-   [Docker Compose](https://docs.docker.com/compose/) to run all containers at once.
 
 ## Installation
-The easiest way is to run this project with `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords etc.). Run it with this command:
+
+The easiest way is to run this project with the `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords, etc.). Run it with this command:
 
 ```bash
 docker run --rm -it -v $(pwd):/output ghcr.io/whoopsmonitor/whoopsmonitor/generate-docker-compose:1.0 run create
 ```
 
-This will ask for some simple questions and generate a `docker-compose.yml` file right in the directory you are in. It will also generate a file for development. But you can simply ignore that file.
+It will ask for some simple questions and generate a `docker-compose.yml` file right in the current directory. You also get a file for local development (feel free to ignore that file).
 
-Now you can run the project on background.
+Now you can run the project in the background.
 
 ```bash
 docker-compose -p whoopsmonitor up -d
 ```
 
-`-p` means project name so you can have have a unified volume names etc.
+`-p` means project name so you can have unified volume names, etc.
 
-Now you can access the monitor right from url http://localhost:8080
+Now you can access the monitor right from URL <http://localhost:8080>.
 
 ## Quick Start
+
 Please read our [quick start manual](/docs/quick-start.md).
 
-## Docker volumes
-Mongo and Redis containers have both a volume that is mounted locally. You can list all volumes with command:
+## Useful links
 
-```bash
-docker volume ls
-```
+-   [How to create a my own alert](./docs/custom-alert.md)
+-   [How to create a my own check](./docs/custom-check.md)
+-   [Local Development](/docs/development.md)
+-   [Docker volumes and loosing data](/docs/volumes.md)
 
-### Loosing data
-When you delete a volume, you loose data. So in case you consider to run this app on production, you should mount volumes to some other location.
+## Ready to contribute?
 
-### Change volumes
-In case you remove volumes, you also lose the data you saved earlier. So it might be useful to map Mongo volume to some other location on your disk.
+You can always:
 
-#### Mongo
-Open `docker-compose` file (development or production) and replace this line:
-
-```yaml
-volumes:
-  - mongodb_data:/bitnami
-```
-
-with content like:
-
-```yaml
-volumes:
-  - ./my_local_db_folder:/bitnami
-```
-
-#### Redis
-Open `docker-compose` file (development or production) and replace this line:
-
-```yaml
-volumes:
-  - redis_data:/bitnami
-```
-
-with content like:
-
-```yaml
-volumes:
-  - ./my_local_redis_folder:/bitnami
-```
-
-## Local development
-You can read [further details here](/docs/development.md).
-
-Howerver you can always:
-
-- raise a [new issue](https://github.com/whoopsmonitor/whoopsmonitor/issues) or
-- consider to implement some change on your own and then create a [pull request](https://github.com/whoopsmonitor/whoopsmonitor/pulls).
+-   raise a [new issue](https://github.com/whoopsmonitor/whoopsmonitor/issues) or
+Consider implementing some change on your own and then creating a [pull request](https://github.com/whoopsmonitor/whoopsmonitor/pulls).
 
 We appreciate any help or opinion.
-
-## Create a custom check
-If you are interested in creating of your own check, [read details here](./docs/custom-check.md)
-
-## Create a custom alert
-If you are interested in creating of your own alert, [read details here](./docs/custom-alert.md)
 
 ## License
 
