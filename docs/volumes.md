@@ -1,14 +1,14 @@
 # Docker volumes
 
-Mongo and Redis containers have both a volume that is mounted locally. You can list all volumes with command:
+Mongo and Redis containers have both a volume that is mounted locally. You can list all volumes with the command:
 
 ```bash
 docker volume ls
 ```
 
-## Loosing data
+## Losing data
 
-When you delete a volume, you loose data. So in case you consider to run this app on production, you should mount volumes to some other location.
+When you delete a volume, you lose data. So in case you consider running this app on production, you should mount volumes to some other location.
 
 ## Change volumes
 
