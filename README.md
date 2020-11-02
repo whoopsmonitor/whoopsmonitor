@@ -21,7 +21,6 @@ Everything displays on the main dashboard where you can see the results of all o
 ## Prerequisities
 
 You need
- * GIT (to be able to download this repository),
  * [Docker](https://www.docker.com/) to run all required images.
  * [Docker Compose](https://docs.docker.com/compose/) to run all containers at once.
 
@@ -29,7 +28,7 @@ You need
 The easiest way is to run this project with `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords etc.). Run it with this command:
 
 ```bash
-docker run --rm -it -v $(pwd):/output ghcr.io/whoopsmonitor/whoopsmonitor/generate-docker-compose:latest run create
+docker run --rm -it -v $(pwd):/output ghcr.io/whoopsmonitor/whoopsmonitor/generate-docker-compose:1.0 run create
 ```
 
 This will ask for some simple questions and generate a `docker-compose.yml` file right in the directory you are in. It will also generate a file for development. But you can simply ignore that file.
