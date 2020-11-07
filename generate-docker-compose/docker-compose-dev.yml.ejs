@@ -103,6 +103,8 @@ services:
       API_URL: http://api:1337
       APP_TOKEN: <%= APP_TOKEN %>
     depends_on:
+      - mongodb
+      - redis
       - api
     networks:
       - app-tier

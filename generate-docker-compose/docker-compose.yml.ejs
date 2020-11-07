@@ -79,10 +79,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:rw
     image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/image-metadata:<%= APP_VERSION %>
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       API_URL: http://api:1337
       APP_TOKEN: <%= APP_TOKEN %>
     depends_on:
+      - mongodb
+      - redis
       - api
     networks:
       - app-tier
@@ -106,7 +108,6 @@ services:
       - mongodb
       - redis
       - api
-      - worker
     networks:
       - app-tier
 
