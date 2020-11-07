@@ -128,8 +128,8 @@ caproverOneClickApp:
       defaultValue: '1.0'
       id: $$cap_APP_VERSION
 
-    - label: External API URL
-      description: API URL that is availaible from outside, like via browser.
+    - label: '* External API URL'
+      description: API URL that is availaible from outside, like via browser. You can re-enter this value later but it is mandatory for "monitor" service.
       defaultValue: 'https://'
       id: $$cap_APP_API_URL
 
