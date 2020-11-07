@@ -130,7 +130,7 @@ caproverOneClickApp:
 
     - label: External API URL
       description: API URL that is availaible from outside, like via browser.
-      defaultValue: '1.0'
+      defaultValue: 'https://'
       id: $$cap_APP_API_URL
 
     - label: Redis Password
