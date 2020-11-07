@@ -7,7 +7,7 @@ if (process.env.APP_API_URL) {
   url = process.env.APP_API_URL
 }
 
-url = `${baseUrl}:1337`
+url = `${url}:1337`
 
 export const baseUrl = url
 
