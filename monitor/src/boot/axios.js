@@ -1,17 +1,8 @@
 import axios from 'axios'
 import { Cookies } from 'quasar'
 
-let url = `${window.location.protocol}//${window.location.hostname}`
-
-if (process.env.APP_API_URL) {
-  url = process.env.APP_API_URL
-}
-
-url = `${url}:1337`
-
-export const baseUrl = url
-
 const client = (async function () {
+  let url = `${window.location.protocol}//${window.location.hostname}:1337` // used mostly for localhost
   let token = ''
 
   if (process.env.NODE_ENV !== 'development') {
@@ -22,6 +13,10 @@ const client = (async function () {
       if (config.API_TOKEN) {
         token = config.API_TOKEN
       }
+
+      if (config.APP_API_URL) {
+        url = config.APP_API_URL
+      }
     } catch (error) {
       console.error(error)
     }
@@ -31,7 +26,7 @@ const client = (async function () {
   }
 
   const client = axios.create({
-    baseURL: baseUrl,
+    baseURL: url,
     timeout: 30000,
     headers: {
       Authorization: `Bearer ${token}`
