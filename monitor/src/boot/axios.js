@@ -1,6 +1,15 @@
 import axios from 'axios'
 import { Cookies } from 'quasar'
-export const baseUrl = `${window.location.protocol}//${window.location.hostname}:1337`
+
+let baseUrl = `${window.location.protocol}//${window.location.hostname}`
+
+if (process.env.APP_API_URL) {
+  baseUrl = process.env.APP_API_URL
+}
+
+baseUrl = `${baseUrl}:1337`
+
+export const baseUrl = baseUrl
 
 const client = (async function () {
   let token = ''

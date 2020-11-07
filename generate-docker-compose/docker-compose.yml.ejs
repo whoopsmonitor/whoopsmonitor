@@ -130,7 +130,7 @@ services:
     container_name: redis
     image: 'bitnami/redis:6.0.8-debian-10-r6'
     environment:
-      - REDIS_PASSWORD=<%= APP_REDIS_PASSWORD %>
+      REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
     volumes:
       - redis_data:/bitnami
     networks:

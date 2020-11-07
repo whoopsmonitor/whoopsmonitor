@@ -5,9 +5,9 @@ services:
       notExposeAsWebApp: 'true'
     image: 'bitnami/redis:6.0.8-debian-10-r6'
     environment:
-      - REDIS_PASSWORD=$$cap_APP_REDIS_PASSWORD
+      REDIS_PASSWORD: $$cap_APP_REDIS_PASSWORD
     volumes:
-      - $$cap_appname-redis_data:/bitnami
+      - $$cap_appname-redis-data:/bitnami
 
   $$cap_appname-mongodb:
     caproverExtra:
@@ -16,7 +16,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - $$cap_appname-mongodb_data:/bitnami
+      - $$cap_appname-mongodb-data:/bitnami
     environment:
       MONGODB_ROOT_PASSWORD: $$cap_APP_MONGODB_ROOT_PASSWORD
       MONGODB_DATABASE: $$cap_APP_MONGODB_DATABASE
@@ -45,12 +45,10 @@ services:
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
       APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
     depends_on:
-      - srv-captain--$$cap_appname-mongodb
-      - srv-captain--$$cap_appname-redis
+      - $$cap_appname-mongodb
+      - $$cap_appname-redis
 
   $$cap_appname-monitor:
-    caproverExtra:
-      containerHttpPort: 8080
     restart: always
     image: ghcr.io/whoopsmonitor/whoopsmonitor/monitor:$$cap_APP_VERSION
     ports:
@@ -58,10 +56,11 @@ services:
     environment:
       NODE_ENV: production
       API_TOKEN: $$cap_APP_TOKEN
+      APP_API_URL: $$cap_APP_API_URL
     depends_on:
-      - srv-captain--$$cap_appname-mongodb
-      - srv-captain--$$cap_appname-redis
-      - srv-captain--$$cap_appname-api
+      - $$cap_appname-mongodb
+      - $$cap_appname-redis
+      - $$cap_appname-api
 
   $$cap_appname-worker:
     caproverExtra:
@@ -69,22 +68,22 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-      - $$cap_appname-worker_data:/whoopsmonitor-worker
+      - $$cap_appname-worker-data:/whoopsmonitor-worker
     image: ghcr.io/whoopsmonitor/whoopsmonitor/worker:$$cap_APP_VERSION
     environment:
       NODE_ENV: production
       APP_REDIS_PASSWORD: $$cap_APP_REDIS_PASSWORD
-      APP_REDIS_HOST: srv-captan--$$cap_appname-redis
+      APP_REDIS_HOST: srv-captain--$$cap_appname-redis
       APP_REDIS_PORT: 6379
-      APP_API_URL: http://srv-captan--$$cap_appname-api:1337
+      APP_API_URL: http://srv-captain--$$cap_appname-api:1337
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
       APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
       APP_QUEUE_NAME_ALERTING: alerting
       APP_TOKEN: $$cap_APP_TOKEN
     depends_on:
-      - srv-captain--$$cap_appname-mongodb
-      - srv-captain--$$cap_appname-redis
-      - srv-captain--$$cap_appname-api
+      - $$cap_appname-mongodb
+      - $$cap_appname-redis
+      - $$cap_appname-api
 
   $$cap_appname-alerting:
     caproverExtra:
@@ -96,15 +95,15 @@ services:
     environment:
       NODE_ENV: production
       APP_REDIS_PASSWORD: $$cap_APP_REDIS_PASSWORD
-      APP_REDIS_HOST: srv-captan--$$cap_appname-redis
+      APP_REDIS_HOST: srv-captain--$$cap_appname-redis
       APP_REDIS_PORT: 6379
-      APP_API_URL: http://srv-captan--$$cap_appname-api:1337
+      APP_API_URL: http://srv-captain--$$cap_appname-api:1337
       APP_QUEUE_NAME_ALERTING: alerting
       APP_TOKEN: $$cap_APP_TOKEN
     depends_on:
-      - srv-captain--$$cap_appname-mongodb
-      - srv-captain--$$cap_appname-redis
-      - srv-captain--$$cap_appname-api
+      - $$cap_appname-mongodb
+      - $$cap_appname-redis
+      - $$cap_appname-api
 
   $$cap_appname-image-metadata:
     caproverExtra:
@@ -115,12 +114,12 @@ services:
     image: ghcr.io/whoopsmonitor/whoopsmonitor/image-metadata:1.0
     environment:
       NODE_ENV: production
-      API_URL: http://srv-captan--$$cap_appname-api:1337
+      API_URL: http://srv-captain--$$cap_appname-api:1337
       APP_TOKEN: $$cap_APP_TOKEN
     depends_on:
-      - srv-captain--$$cap_appname-mongodb
-      - srv-captain--$$cap_appname-redis
-      - srv-captain--$$cap_appname-api
+      - $$cap_appname-mongodb
+      - $$cap_appname-redis
+      - $$cap_appname-api
 
 caproverOneClickApp:
   variables:
@@ -128,6 +127,11 @@ caproverOneClickApp:
       description: Application version, currently 1.0
       defaultValue: '1.0'
       id: $$cap_APP_VERSION
+
+    - label: External API URL
+      description: API URL that is availaible from outside, like via browser.
+      defaultValue: '1.0'
+      id: $$cap_APP_API_URL
 
     - label: Redis Password
       description: Redis password.
