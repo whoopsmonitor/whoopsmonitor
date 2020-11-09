@@ -49,6 +49,14 @@ const routes = [
   },
 
   {
+    path: '/issue',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', name: 'issue.index', component: () => import('pages/issue/Index.vue'), meta: { auth: true } }
+    ]
+  },
+
+  {
     path: '/server-error',
     component: () => import('pages/Error500.vue'),
     name: 'error.500',

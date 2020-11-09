@@ -63,12 +63,12 @@ updateDockerMetadata = async function() {
             healthyStatusOutput: 'image is fine'
           })
 
-          console.log(`[${logSymbols.success}][image-metadata] Image's metadata (ID: ${image.id}) updated.`)
+          console.log(`[${logSymbols.success}][image-metadata] Image's metadata (${image.image}) updated.`)
         } else {
-          console.log(`[${logSymbols.success}][image-metadata] Image's metadata (ID: ${image.id}) are the same. No need for update.`)
+          console.log(`[${logSymbols.success}][image-metadata] Image's metadata (${image.image}) are the same. No need for update.`)
         }
       } catch (err) {
-        console.log(`[${logSymbols.error}][image-metadata] Image's metadata (ID: ${image.id}) not updated due to error.`)
+        console.log(`[${logSymbols.error}][image-metadata] Image's metadata (${image.image}) not updated due to error.`)
 
         // issue with image, update the status
         if (err.exitCode > 0 && err.stderr) {
