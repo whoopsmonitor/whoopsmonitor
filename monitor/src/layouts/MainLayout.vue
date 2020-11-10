@@ -23,6 +23,10 @@
 
         <q-toolbar-title>Whoops Monitor</q-toolbar-title>
 
+        <q-btn tag="a" v-if="loggedIn && issues" :to="{ name: 'issue.index' }" flat round dense icon="error" color="red">
+          <q-tooltip>application errors - click for details</q-tooltip>
+        </q-btn>
+
         <q-btn v-if="loggedIn && guide" @click="goToHelp" flat round dense icon="support">
           <q-tooltip>show guide in new window</q-tooltip>
         </q-btn>
@@ -166,7 +170,10 @@ export default {
     return {
       leftDrawerOpen: false,
       documentTitle: '',
-      interval: undefined
+      interval: {
+        failedCheck: undefined,
+        issues: undefined
+      }
     }
   },
   computed: {
@@ -175,19 +182,29 @@ export default {
     },
     guide () {
       return this.$store.state.guide.docs
+    },
+    issues () {
+      return this.$store.state.issue.count > 0
     }
   },
   async created () {
     this.documentTitle = document.title
 
-    this.interval = setInterval(async () => {
+    this.interval.failedCheck = setInterval(async () => {
       await this.getFailedCheck()
     }, 10000)
 
     await this.getFailedCheck()
+
+    this.interval.issue = setInterval(async () => {
+      await this.findIssues()
+    }, 10000)
+
+    await this.findIssues()
   },
   destroyed () {
-    clearInterval(this.interval)
+    clearInterval(this.interval.failedCheck)
+    clearInterval(this.interval.issues)
   },
   methods: {
     login () {
@@ -209,6 +226,26 @@ export default {
           document.title = `[✖] ${document.title}`
         } else {
           document.title = this.documentTitle
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    async findIssues () {
+      try {
+        const overall = await this.$axios.get('/').then(result => result.data.data.overall)
+
+        if (overall.issues) {
+          this.$store.commit('issue/setCount', overall.issues)
+        } else {
+          this.$store.commit('issue/setCount', 0)
+        }
+
+        if (overall.output) {
+          this.$store.commit('issue/setOutput', overall.output)
+        } else {
+          this.$store.commit('issue/setOutput', [])
         }
       } catch (error) {
         console.error(error)

@@ -36,11 +36,23 @@ module.exports = {
       alerting: 0
     }
 
+    let overall = {}
+
+    try {
+      overall = await sails.helpers.overallStatus()
+    } catch (error) {
+      if (error) {
+        // do nothing here
+      }
+    }
+
     try {
       await sails.hooks.bull.statusQueue.add()
       queue.check = await sails.hooks.bull.executeCheck.count()
       queue.alerting = await sails.hooks.bull.alertingQueue.count()
       redis = true
+
+
     } catch (err) {
       if (err) {
         // do nothing
@@ -49,6 +61,7 @@ module.exports = {
     }
 
     let status = {
+      overall,
       db,
       redis,
       queue
