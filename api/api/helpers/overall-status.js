@@ -67,7 +67,6 @@ module.exports = {
 
             // get where the check has been created but + duration as well
             const didRunDateTime = DateTime.fromMillis(checkStatus.createdAt).plus(checkStatus.duration, 'ms')
-            lastRunShouldStartDatetimeTime.plus(checkStatus.duration, 'ms')
 
             // check is late for some reason
             if (lastRunShouldStartDatetimeTime >= didRunDateTime) {
