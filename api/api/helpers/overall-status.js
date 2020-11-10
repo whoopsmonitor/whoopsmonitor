@@ -50,7 +50,7 @@ module.exports = {
       if (checks.length) {
         for (const check of checks) {
           const cron = parser.parseExpression(check.cron)
-          const lastRunShouldStartDatetimeTime = DateTime.fromISO(cron.prev().toISOString())
+          const lastRunShouldStartDatetimeTime = DateTime.fromISO(cron.prev().toISOString()).minus(5, 'minutes') // adding 5 minutes default
 
           // find last status
           let checkStatus = await CheckStatus.find({
