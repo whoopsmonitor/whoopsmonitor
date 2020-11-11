@@ -46,7 +46,7 @@
             filled
             v-model="form.image"
             label="Docker image *"
-            hint="Enter full path to the docker image. You an insert the tag as well."
+            hint="Enter full path to the docker image. You can use the tag as well."
             lazy-rules
             :rules="[ val => val && val.length > 0 || 'Please enter the path to the image.']"
             @input="updateDockerImagePath"
