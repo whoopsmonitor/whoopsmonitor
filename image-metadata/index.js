@@ -57,7 +57,7 @@ updateDockerMetadata = async function() {
         }
 
         // patch metadata in case the image is not correct or the metadata are different
-        if (image.healthyStatus > -1 || metadata !== image.metadata) {
+        if ((image.healthyStatus === -1 || image.healthyStatus > 0) || metadata !== image.metadata) {
           await axiosInstance.patch(`/v1/dockerimage/${image.id}`, {
             metadata,
             healthyStatus: 0,
