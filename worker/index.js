@@ -1,4 +1,5 @@
-var Queue = require('bull')
+require( 'console-stamp' )( console )
+const Queue = require('bull')
 const execa = require('execa')
 const axios = require('axios')
 const logSymbols = require('log-symbols')

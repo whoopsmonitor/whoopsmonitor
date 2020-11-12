@@ -19,7 +19,8 @@
     "sails-hook-mongoat2": "^2.0.0",
     "luxon": "^1.25.0",
     "execution-time": "^1.4.1",
-    "cron-parser": "^2.16.3"
+    "cron-parser": "^2.16.3",
+    "console-stamp": "^3.0.0-rc4.2"
   },
   "devDependencies": {
     "@sailshq/eslint": "^4.19.3",

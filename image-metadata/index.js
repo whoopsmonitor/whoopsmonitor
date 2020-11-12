@@ -1,8 +1,8 @@
+require( 'console-stamp' )( console )
 const execa = require('execa')
 const cron = require('node-cron')
 const axios = require('axios')
 const logSymbols = require('log-symbols')
-const perf = require('execution-time')()
 const API_URL = process.env.API_URL
 const APP_TOKEN = process.env.APP_TOKEN
 
@@ -56,7 +56,8 @@ updateDockerMetadata = async function() {
           metadata = JSON.stringify(metadata)
         }
 
-        if (image.healthyStatus === -1 || metadata !== image.metadata) {
+        // patch metadata in case the image is not correct or the metadata are different
+        if ((image.healthyStatus === -1 || image.healthyStatus > 0) || metadata !== image.metadata) {
           await axiosInstance.patch(`/v1/dockerimage/${image.id}`, {
             metadata,
             healthyStatus: 0,
@@ -69,6 +70,7 @@ updateDockerMetadata = async function() {
         }
       } catch (err) {
         console.log(`[${logSymbols.error}][image-metadata] Image's metadata (${image.image}) not updated due to error.`)
+        console.error('More info: ', err)
 
         // issue with image, update the status
         if (err.exitCode > 0 && err.stderr) {

@@ -10,7 +10,8 @@ module.exports = {
   attributes: {
     image: {
       type: 'string',
-      required: true
+      required: true,
+      unique: true
     },
 
     username: {
