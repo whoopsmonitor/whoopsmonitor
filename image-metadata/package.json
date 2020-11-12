@@ -11,9 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.20.0",
+    "console-stamp": "^3.0.0-rc4.2",
     "execa": "^4.0.3",
-    "log-symbols": "^4.0.0",
     "execution-time": "^1.4.1",
+    "log-symbols": "^4.0.0",
     "node-cron": "^2.0.3"
   },
   "devDependencies": {
