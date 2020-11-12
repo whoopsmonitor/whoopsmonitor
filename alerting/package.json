@@ -16,7 +16,8 @@
     "execa": "^4.0.3",
     "log-symbols": "^4.0.0",
     "execution-time": "^1.4.1",
-    "luxon": "^1.25.0"
+    "luxon": "^1.25.0",
+    "console-stamp": "^3.0.0-rc4.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

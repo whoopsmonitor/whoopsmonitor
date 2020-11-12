@@ -1,3 +1,4 @@
+require( 'console-stamp' )( console )
 const execa = require('execa')
 const cron = require('node-cron')
 const axios = require('axios')

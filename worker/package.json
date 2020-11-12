@@ -16,7 +16,8 @@
     "encrypted-attr": "^1.1.0",
     "execa": "^4.0.3",
     "log-symbols": "^4.0.0",
-    "execution-time": "^1.4.1"
+    "execution-time": "^1.4.1",
+    "console-stamp": "^3.0.0-rc4.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
