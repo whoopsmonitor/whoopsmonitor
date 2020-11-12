@@ -136,7 +136,7 @@ export default {
         image: '',
         username: '',
         password: '',
-        type: '',
+        type: 'check',
         local: false
       },
       loading: {
