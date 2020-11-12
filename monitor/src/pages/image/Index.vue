@@ -32,15 +32,6 @@
             <q-item-section top side>
               <div class="text-grey-8 q-gutter-xs">
                 <q-btn
-                  @click="duplicate(image)"
-                  color="secondary"
-                  dense
-                  round
-                  icon="content_copy"
-                >
-                  <q-tooltip>click to duplicate</q-tooltip>
-                </q-btn>
-                <q-btn
                   @click="refreshMetadata(image)"
                   color="accent"
                   dense
@@ -185,33 +176,6 @@ export default {
         })
       } finally {
         this.destroyCancel()
-      }
-    },
-
-    async duplicate (image) {
-      const record = JSON.parse(JSON.stringify(image))
-      delete record.id
-      delete record.createdAt
-      delete record.healthyStatus
-      delete record.healthyStatusOutput
-      delete record.metadata
-
-      try {
-        await this.$axios.post('/v1/dockerimage', record)
-
-        this.$whoopsNotify.positive({
-          message: 'Image successfully duplicated.'
-        })
-
-        await this.fetchData({
-          verbose: false
-        })
-      } catch (error) {
-        console.error(error)
-
-        this.$whoopsNotify.error({
-          message: 'It is not possible to duplicate this image. Please try it again.'
-        })
       }
     },
 
