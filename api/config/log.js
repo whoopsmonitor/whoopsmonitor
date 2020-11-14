@@ -10,20 +10,42 @@
  * https://sailsjs.com/docs/concepts/logging
  */
 
+const { version } = require('../package');
+
+const { createLogger, format, transports } = require('winston');
+const { combine, timestamp, colorize, printf, align } = format;
+const { SPLAT } = require('triple-beam');
+const { isObject } = require('lodash');
+
+function formatObject(param) {
+  if (isObject(param)) {
+    return JSON.stringify(param);
+  }
+  return param;
+}
+
+// Ignore log messages if they have { private: true }
+const all = format((info) => {
+  const splat = info[SPLAT] || [];
+  const message = formatObject(info.message);
+  const rest = splat.map(formatObject).join(' ');
+  info.message = `${message} ${rest}`;
+  return info;
+});
+
+const customLogger = createLogger({
+  format: combine(
+    all(),
+    timestamp(),
+    colorize(),
+    align(),
+    printf(info => `${info.timestamp} ${info.level}: ${formatObject(info.message)}`)
+  ),
+  transports: [new transports.Console()]
+});
+
 module.exports.log = {
-
-  /***************************************************************************
-  *                                                                          *
-  * Valid `level` configs: i.e. the minimum log level to capture with        *
-  * sails.log.*()                                                            *
-  *                                                                          *
-  * The order of precedence for log levels from lowest to highest is:        *
-  * silly, verbose, info, debug, warn, error                                 *
-  *                                                                          *
-  * You may also set the level to "silent" to suppress all logs.             *
-  *                                                                          *
-  ***************************************************************************/
-
+  custom: customLogger,
+  inspect: false
   // level: 'info'
-
-};
+}

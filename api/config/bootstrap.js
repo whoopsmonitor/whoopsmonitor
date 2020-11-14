@@ -1,4 +1,3 @@
-require( 'console-stamp' )( console )
 const fs = require('fs')
 const cron = require('node-cron')
 
