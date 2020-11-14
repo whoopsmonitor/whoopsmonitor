@@ -46,6 +46,9 @@ docker-compose -p whoopsmonitor up -d
 
 Now you can access the monitor right from URL <http://localhost:8080>.
 
+### Install with Caprover
+You can also install Whoops Monitor with [CapRover](https://caprover.com/) on the One Click Apps page.
+
 ## Quick Start
 
 Please read our [quick start manual](/docs/quick-start.md).
