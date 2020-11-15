@@ -42,9 +42,35 @@
             <q-tooltip>Select if you have an image that is local and not remote.</q-tooltip>
           </q-toggle>
 
-          <q-input
+          <q-select
             filled
+            emit-value
             v-model="form.image"
+            :options="imagesFiltered"
+            use-input
+            @filter="filterImages"
+            label="Docker image *"
+            hint="Select Docker image you would like to use or enter a new one manually."
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please select a new image or enter a new one manually.']"
+          >
+            <template v-slot:option="scope">
+              <q-item
+                v-bind="scope.itemProps"
+                v-on="scope.itemEvents"
+              >
+                <q-item-section>
+                  <q-item-label v-html="scope.opt.label" />
+                  <q-item-label caption v-if="scope.opt.description">{{ scope.opt.description }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+
+          <q-input
+            v-if="imageManualInputState"
+            filled
+            v-model="form.imageManualInput"
             label="Docker image *"
             hint="Enter full path to the docker image. You can use the tag as well."
             lazy-rules
@@ -134,6 +160,7 @@ export default {
       tab: 'general',
       form: {
         image: '',
+        imageManualInput: '',
         username: '',
         password: '',
         type: 'check',
@@ -154,7 +181,10 @@ export default {
           label: 'Alert - send notification about the check status',
           value: 'alert'
         }
-      ]
+      ],
+      images: [],
+      imageManualInputState: false,
+      filterImagesString: ''
     }
   },
   computed: {
@@ -168,12 +198,47 @@ export default {
       }
 
       return ''
+    },
+    imagesFiltered () {
+      let images = this.images.filter(image => image.type === this.form.type)
+
+      if (this.filterImagesString.length) {
+        images = images
+          .filter(
+            input => input.label.toLowerCase().indexOf(
+              this.filterImagesString.toLowerCase()
+            ) > -1
+          )
+      }
+
+      images.push({
+        type: '',
+        label: '--- custom image ---',
+        value: 'custom'
+      })
+
+      return images
+    }
+  },
+  watch: {
+    'form.type' () {
+      // reset image
+      this.form.image = ''
+    },
+    'form.image' (val) {
+      if (val === 'custom') {
+        this.imageManualInputState = true
+      } else {
+        this.imageManualInputState = false
+      }
     }
   },
   async created () {
     if (this.edit) {
       await this.fetchData()
     }
+
+    await this.fetchImages()
   },
   methods: {
     async fetchData () {
@@ -202,6 +267,14 @@ export default {
       }
     },
 
+    async fetchImages () {
+      try {
+        this.images = await this.$axios.get('v1/dockerimage/list').then(res => res.data)
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
     async onSubmit () {
       const method = this.edit ? 'patch' : 'post'
       const form = JSON.parse(JSON.stringify(this.form))
@@ -221,8 +294,13 @@ export default {
         form.password = ''
       }
 
+      if (form.imageManualInput) {
+        form.image = form.imageManualInput
+      }
+
       // delete metadata
       delete form.metadata
+      delete form.imageManualInput
 
       // reset healthcheck
       form.healthyStatus = -1
@@ -249,7 +327,18 @@ export default {
     },
 
     updateDockerImagePath (val) {
-      this.form.image = val.replace('docker pull ', '')
+      this.form.imageManualInput = val.replace('docker pull ', '')
+    },
+    filterImages (val, update) {
+      if (val === '') {
+        // do nothing here
+        update()
+        return false
+      }
+
+      update(() => {
+        this.filterImagesString = val
+      })
     }
   }
 }
