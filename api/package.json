@@ -20,7 +20,8 @@
     "luxon": "^1.25.0",
     "execution-time": "^1.4.1",
     "cron-parser": "^2.16.3",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "node-cache": "^5.1.2"
   },
   "devDependencies": {
     "@sailshq/eslint": "^4.19.3",

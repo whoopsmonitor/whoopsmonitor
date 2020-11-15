@@ -53,6 +53,7 @@ module.exports.routes = {
   },
 
   'GET /v1/dockerimage/:id/envvars': 'v1/dockerimage/envvars',
+  'GET /v1/dockerimage/list': 'v1/dockerimage/list',
 
   // clear records in all queues
   'DELETE /v1/queue': 'v1/queue/clean'
