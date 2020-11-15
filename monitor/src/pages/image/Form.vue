@@ -25,12 +25,27 @@
           <q-select
             v-model="form.type"
             :options="imageTypes"
+            map-options
             label="Type *"
             hint="Select image type."
             emit-value
             lazy-rules
             :rules="[ val => val && Object.keys(val).length > 0 || 'Please select image type.']"
-          />
+          >
+            <template v-slot:option="scope">
+              <q-item
+                v-bind="scope.itemProps"
+                v-on="scope.itemEvents"
+              >
+                <q-item-section avatar>
+                  <q-icon :name="scope.opt.icon" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label v-html="scope.opt.label" />
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
 
           <q-toggle
             v-model="form.local"
@@ -42,17 +57,25 @@
             <q-tooltip>Select if you have an image that is local and not remote.</q-tooltip>
           </q-toggle>
 
+          <q-input
+            filled
+            v-model="form.image"
+            label="Docker image *"
+            hint="Enter full path to the docker image. You can use the tag as well."
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please enter the path to the image.']"
+            @input="updateDockerImagePath"
+          />
+
           <q-select
+            :disable="form.image.length > 0 || form.local"
             filled
             emit-value
-            v-model="form.image"
+            v-model="officialImage"
             :options="imagesFiltered"
             use-input
             @filter="filterImages"
-            label="Docker image *"
-            hint="Select Docker image you would like to use or enter a new one manually."
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please select a new image or enter a new one manually.']"
+            label="or select Whoops Monitor image"
           >
             <template v-slot:option="scope">
               <q-item
@@ -66,17 +89,6 @@
               </q-item>
             </template>
           </q-select>
-
-          <q-input
-            v-if="imageManualInputState"
-            filled
-            v-model="form.imageManualInput"
-            label="Docker image *"
-            hint="Enter full path to the docker image. You can use the tag as well."
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please enter the path to the image.']"
-            @input="updateDockerImagePath"
-          />
 
           <q-banner class="bg-secondary text-white q-mt-xl" dense>
             <template v-slot:avatar>
@@ -160,12 +172,12 @@ export default {
       tab: 'general',
       form: {
         image: '',
-        imageManualInput: '',
         username: '',
         password: '',
         type: 'check',
         local: false
       },
+      officialImage: '',
       loading: {
         update: false
       },
@@ -175,15 +187,16 @@ export default {
       imageTypes: [
         {
           label: 'Check - this image runs check on regular interval',
-          value: 'check'
+          value: 'check',
+          icon: 'fact_check'
         },
         {
           label: 'Alert - send notification about the check status',
-          value: 'alert'
+          value: 'alert',
+          icon: 'notifications'
         }
       ],
       images: [],
-      imageManualInputState: false,
       filterImagesString: ''
     }
   },
@@ -211,12 +224,6 @@ export default {
           )
       }
 
-      images.push({
-        type: '',
-        label: '--- custom image ---',
-        value: 'custom'
-      })
-
       return images
     }
   },
@@ -225,12 +232,13 @@ export default {
       // reset image
       this.form.image = ''
     },
-    'form.image' (val) {
-      if (val === 'custom') {
-        this.imageManualInputState = true
-      } else {
-        this.imageManualInputState = false
+    officialImage (val) {
+      if (val) {
+        this.form.image = val
       }
+
+      // and reset selected image
+      this.officialImage = ''
     }
   },
   async created () {
@@ -294,13 +302,8 @@ export default {
         form.password = ''
       }
 
-      if (form.imageManualInput) {
-        form.image = form.imageManualInput
-      }
-
       // delete metadata
       delete form.metadata
-      delete form.imageManualInput
 
       // reset healthcheck
       form.healthyStatus = -1
@@ -327,7 +330,7 @@ export default {
     },
 
     updateDockerImagePath (val) {
-      this.form.imageManualInput = val.replace('docker pull ', '')
+      this.form.image = val.replace('docker pull ', '')
     },
     filterImages (val, update) {
       if (val === '') {
