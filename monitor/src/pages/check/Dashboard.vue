@@ -66,13 +66,16 @@
         <q-card flat bordered dense>
           <q-card-section>
             <div class="text-h6">
-              Latest Logs - {{ logsStatusOnlyFailed ? 'errors' : 'all' }} (50)
+              Latest Results <span class="text-caption">(50 records)</span>
+            </div>
+            <div>
               <q-toggle
                 v-model="logsStatusOnlyFailed"
                 @input="fetchLatestLogs"
                 checked-icon="check"
                 color="green"
                 unchecked-icon="clear"
+                label="errors only"
               >
                 <q-tooltip v-if="logsStatusOnlyFailed">all logs</q-tooltip>
                 <q-tooltip v-else>only failed records</q-tooltip>
