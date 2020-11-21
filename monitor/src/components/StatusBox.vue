@@ -1,7 +1,12 @@
 <template>
   <q-card flat bordered>
     <q-card-section>
-      <div class="text-h6">Last 24 hours</div>
+      <div class="text-h6">
+        Results
+        <div class="text-caption">
+          in last 24 hours
+        </div>
+      </div>
     </q-card-section>
 
     <q-separator inset />

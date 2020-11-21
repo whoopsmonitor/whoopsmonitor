@@ -5,6 +5,7 @@ import VuexPersistence from 'vuex-persist'
 import auth from './auth'
 import guide from './guide'
 import issue from './issue'
+import healthindex from './healthindex'
 
 Vue.use(Vuex)
 
@@ -26,7 +27,8 @@ export default function (/* { ssrContext } */) {
     modules: {
       auth,
       guide,
-      issue
+      issue,
+      healthindex
     },
     plugins: [
       vuexLocal.plugin

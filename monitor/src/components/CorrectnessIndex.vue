@@ -12,13 +12,21 @@
           >
             <q-tooltip>click to update thresholds</q-tooltip>
           </q-icon>
+          <div class="text-caption">
+            {{ lastText }}
+          </div>
         </div>
       </q-card-section>
 
       <q-separator inset />
 
       <q-card-section class="text-center">
-        <div class="text-h4" :class="colorize">{{ index }}%</div>
+        <div class="text-h4" :class="colorize" v-if="!loading">
+          {{ index }}<span v-if="aggregatedResults.length">%</span>
+        </div>
+        <div v-if="loading" class="row justify-center">
+          <q-skeleton type="QAvatar" />
+        </div>
       </q-card-section>
     </q-card>
 
@@ -71,37 +79,53 @@
 </template>
 
 <script>
+import { DateTime } from 'luxon'
+
 export default {
   name: 'HealthIndex',
   props: {
-    data: {
-      type: Array,
+    hours: {
+      type: Number,
+      required: true
+    },
+    check: {
+      type: String,
+      default: null
+    },
+    lastText: {
+      type: String,
       required: true
     }
   },
   data () {
     return {
-      thresholds: {
-        warning: 90,
-        critical: 50
-      },
+      aggregatedResults: [],
       dialog: false,
       form: {
         threshold: {
           warning: {
             id: '',
-            value: 90
+            value: 90,
+            check: this.check,
+            hours: this.hours
           },
           critical: {
             id: '',
-            value: 50
+            value: 50,
+            check: this.check,
+            hours: this.hours
           }
         }
-      }
+      },
+      loading: false
     }
   },
   computed: {
     index () {
+      if (!this.aggregatedResults.length) {
+        return 'no data'
+      }
+
       const okCount = Math.round(this.findStatusById(0).total)
       const errorCount = Math.round((this.findStatusById(1).total || 0) + (this.findStatusById(2).total || 0))
       const totalCount = okCount + errorCount
@@ -110,8 +134,12 @@ export default {
       return Math.round(result) || 0
     },
     colorize () {
-      const thresholdWarning = this.thresholds.warning
-      const thresholdCritical = this.thresholds.critical
+      if (!this.aggregatedResults.length) {
+        return 'text-gray'
+      }
+
+      const thresholdWarning = this.form.threshold.warning.value
+      const thresholdCritical = this.form.threshold.critical.value
 
       if (this.index >= thresholdWarning) {
         return 'text-green'
@@ -129,32 +157,66 @@ export default {
     },
     loggedIn () {
       return this.$store.getters['auth/loggedIn']
+    },
+    thresholdsRaw () {
+      return this.$store.state.healthindex.thresholds.filter(item => item.check === this.check && item.hours === this.hours)
+    },
+    thresholds () {
+      const thresholds = {}
+
+      for (const item of this.thresholdsRaw) {
+        thresholds[item.option] = item.value
+      }
+
+      return thresholds
     }
   },
-  created () {
-    this.fetchHealthIndex()
+
+  watch: {
+    thresholdsRaw: {
+      immediate: true,
+      handler (thresholds) {
+        // assign to form
+        for (const key in thresholds) {
+          const threshold = thresholds[key]
+
+          const option = {
+            id: threshold.id,
+            value: threshold.value || 0,
+            hours: threshold.hours || this.hours,
+            check: threshold.check || this.check
+          }
+
+          this.$set(this.form.threshold, threshold.option, option)
+        }
+      }
+    }
+  },
+
+  async created () {
+    await this.fetchData()
   },
 
   methods: {
-    async fetchHealthIndex () {
+    async fetchData () {
+      const date = DateTime.local()
+      const startOfInterval = date.minus({
+        hours: this.hours
+      })
+
+      this.loading = true
+
       try {
-        const thresholds = await this.$axios.get('/v1/healthindex', {
+        this.aggregatedResults = await this.$axios.get(`/v1/checkstatus/aggregate/${this.check || ''}`, {
           params: {
-            select: 'option,value'
+            from: startOfInterval.valueOf(),
+            to: date.valueOf()
           }
         }).then(result => result.data)
-
-        for (const threshold of thresholds) {
-          this.thresholds[threshold.option] = threshold.value
-        }
-
-        // assign to form
-        for (const threshold of thresholds) {
-          this.form.threshold[threshold.option].value = threshold.value || 0
-          this.form.threshold[threshold.option].id = threshold.id
-        }
       } catch (error) {
         console.error(error)
+      } finally {
+        this.loading = false
       }
     },
 
@@ -167,16 +229,36 @@ export default {
 
         if (level.value) {
           try {
-            await this.$axios.patch(`/v1/healthindex/${level.id}`, {
-              value: level.value || 0
-            })
-              .then(result => result.data)
+            if (!level.id) {
+              // create
+              delete level.id
+              level.option = levelKey // warning, critical...
+
+              const result = await this.$axios.post('/v1/healthindex', level)
+                .then(result => result.data)
+
+              // update model
+              this.$set(this.form.threshold, result.option, {
+                id: result.id,
+                value: result.value,
+                hours: result.hours,
+                check: result.check.id
+              })
+            } else {
+              // update
+              await this.$axios.patch(`/v1/healthindex/${level.id}`, {
+                value: level.value || 0
+              })
+            }
 
             ++updatedCount
           } catch (error) {
             hasError = true
             console.error(error)
           }
+
+          // re-set thresholds to update a view
+          this.$nextTick(() => this.$set(this.thresholds, levelKey, this.thresholds[levelKey]))
         }
       }
 
@@ -194,7 +276,7 @@ export default {
     },
 
     findStatusById (id) {
-      return this.data.filter(result => result.status === id)[0] || { total: 0, status: 0 }
+      return this.aggregatedResults.filter(result => result.status === id)[0] || { total: 0, status: 0 }
     }
   }
 }
