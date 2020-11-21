@@ -5,7 +5,7 @@ Or any other URL where you install Whoops Monitor.
 
 ## Login
 
-Now you can log in. Use the admin password you can read from the Docker Compose file, `APP_PASSWORD` variable. You might also click on the "Are you a guest?" link, allowing anonymous users to view dashboard data.
+Now you can log in. Use the admin password you can read from the Docker Compose file, the `APP_PASSWORD` variable. You might also click on the "Are you a guest?" link, allowing anonymous users to view dashboard data.
 
 <img src="/docs/img/quick-start/app-password-variable.png" alt="image" height="300" />
 
@@ -31,7 +31,8 @@ As we already said, Whoops Monitor is all about Docker images. There are two typ
 Click on the `New Image` button and go right to the form.
 There are some fields you have to configure. The first one is about the type of Docker image. So select the purpose of your image.
 
-Then fill the path to the Docker image. As you can see, the Docker image must be available in some registry, like Docker Hub, GitLab Registry, or even your private one. You can also enter some credentials in case your registry storage requires it to log in.
+### Select image
+You can either select one of the predefined images from the select box or enter the path of your own. Docker image must be available in some registries, like Docker Hub, GitLab Registry, or even your private one. You can also enter some credentials in case your registry storage requires it to log in.
 
 ### Existing images
 
@@ -51,11 +52,6 @@ To create your checks or alerts, follow our tutorials:
 
 You might have noticed the `local image` option in the form. This option is mostly used for local debugging. So you can even have a local image right on the server Whoops Monitoring is running on.
 
-Let's continue. I chose the check called [URL Alive](https://github.com/whoopsmonitor/whoopsmonitor-check-url-alive) for our test purpose.
-
-You can find all Whoops Monitor packages right in the specific repository you're just browsing.
-
-<img src="/docs/img/quick-start/github-packages.png" alt="image" width="316" />
 
 ## Saving Docker Image
 
@@ -77,7 +73,7 @@ Next, click on the `New Check` button, and you're right in the form you're about
 
 -   `Check Name` - Just enter the name of the check displayed on the dashboard.
 -   `Image` - Select the image we created earlier. In our case, the `URL Alive` image.
--   `Cron` - Enter interval (cron notation) how often the check will run. You can use [Crontab Guru](https://crontab.guru/) to help you to build a cron. Little helper bellow the field will show you the cron in the "human-readable" format.
+-   `Cron` - Enter interval (cron notation) how often the check will run. You can use [Crontab Guru](https://crontab.guru/) to help you to build a cron. Little helper below the field will show you the cron in the "human-readable" format.
 
 ### Tab: Env Variables
 
