@@ -12,8 +12,9 @@ module.exports = {
 
   fn: async function (_, exits) {
     await HealthIndex.findOrCreate({
+      check: null,
       option: 'warning',
-      type: HealthIndex.TYPE_GLOBAL
+      hours: 24
     }, {
       option: 'warning',
       value: 90,
@@ -21,8 +22,9 @@ module.exports = {
     })
 
     await HealthIndex.findOrCreate({
+      check: null,
       option: 'critical',
-      type: HealthIndex.TYPE_GLOBAL
+      hours: 24
     }, {
       option: 'critical',
       value: 50,
