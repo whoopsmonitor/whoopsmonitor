@@ -44,10 +44,7 @@ module.exports.routes = {
   // do login
   'POST /v1/auth/login': 'v1/auth/login',
 
-  // healthcheck - disable blueprint route
-  'POST /v1/healthindex': {
-    response: 'notFound'
-  },
+  // healthcheck - disable delete blueprint route
   'DELETE /v1/healthindex/:id': {
     response: 'notFound'
   },

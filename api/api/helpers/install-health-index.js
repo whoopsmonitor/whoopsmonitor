@@ -12,17 +12,21 @@ module.exports = {
 
   fn: async function (_, exits) {
     await HealthIndex.findOrCreate({
-      option: 'warning'
+      option: 'warning',
+      type: HealthIndex.TYPE_GLOBAL
     }, {
       option: 'warning',
-      value: 90
+      value: 90,
+      hours: 24
     })
 
     await HealthIndex.findOrCreate({
-      option: 'critical'
+      option: 'critical',
+      type: HealthIndex.TYPE_GLOBAL
     }, {
       option: 'critical',
-      value: 50
+      value: 50,
+      hours: 24
     })
 
     return exits.success(true)

@@ -5,7 +5,7 @@
         <list-of-checks />
       </div>
       <div class="col-3 col-md-3 col-sm-6 col-xs-12">
-        <correctness-index :data="statusData" />
+        <correctness-index :hours="24" last-text="last 24 hours" />
       </div>
       <div class="col-3 col-md-3 col-sm-6 col-xs-12">
         <status-box @ready="statusData = $event || []" />

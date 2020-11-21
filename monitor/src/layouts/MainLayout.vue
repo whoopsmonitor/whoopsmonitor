@@ -201,6 +201,8 @@ export default {
     }, 10000)
 
     await this.findIssues()
+
+    await this.getHealthIndexData()
   },
   destroyed () {
     clearInterval(this.interval.failedCheck)
@@ -259,6 +261,21 @@ export default {
       }
 
       console.error('No URL specified.')
+    },
+
+    async getHealthIndexData () {
+      try {
+        const thresholds = await this.$axios.get('/v1/healthindex', {
+          params: {
+            select: 'option,value,hours,check',
+            populate: false
+          }
+        }).then(result => result.data)
+
+        this.$store.commit('healthindex/items', thresholds)
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 }

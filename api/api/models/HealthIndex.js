@@ -12,6 +12,13 @@ module.exports = {
     value: {
       type: 'number',
       required: true
+    },
+    hours: {
+      type: 'number',
+      required: true
+    },
+    check: {
+      model: 'Check'
     }
   }
 }

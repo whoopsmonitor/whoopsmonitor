@@ -1,54 +1,66 @@
 <template>
   <q-page padding>
-    <div class="row q-gutter-md">
-      <div v-if="detail" class="col-12">
-        <q-card flat bordered>
-          <q-card-section>
-            <div class="text-h6">
-              {{ detail.name }}
-              <q-icon
-                v-if="loggedIn"
-                name="edit"
-                class="cursor-pointer"
-                @click="$router.push({ name: 'check.detail', params: { id: $route.params.id } })"
-              >
-                <q-tooltip>update details</q-tooltip>
-              </q-icon>
+    <div v-if="detail">
+      <div class="row q-col-gutter-md q-mb-md">
+        <div class="col-12">
+          <q-card flat bordered>
+            <q-card-section>
+              <div class="text-h6">
+                {{ detail.name }}
+                <q-icon
+                  v-if="loggedIn"
+                  name="edit"
+                  class="cursor-pointer"
+                  @click="$router.push({ name: 'check.detail', params: { id: $route.params.id } })"
+                >
+                  <q-tooltip>update details</q-tooltip>
+                </q-icon>
 
-              <q-chip
-                :color="detail.enabled ? 'green' : 'gray'"
-                :text-color="detail.enabled ? 'white' : 'black'">
-                {{ detail.enabled ? 'enabled' : 'disabled' }}
-              </q-chip>
+                <q-chip
+                  :color="detail.enabled ? 'green' : 'gray'"
+                  :text-color="detail.enabled ? 'white' : 'black'">
+                  {{ detail.enabled ? 'enabled' : 'disabled' }}
+                </q-chip>
 
-              <q-chip v-if="loggedIn">
-                <!-- <q-icon name="schedule" class="q-mr-sm" /> {{ detail.cron | translateCron }} -->
-                <q-icon name="schedule" class="q-mr-sm" /> {{ detail.cron | translateCron }}
-              </q-chip>
-            </div>
-          </q-card-section>
+                <q-chip v-if="loggedIn">
+                  <!-- <q-icon name="schedule" class="q-mr-sm" /> {{ detail.cron | translateCron }} -->
+                  <q-icon name="schedule" class="q-mr-sm" /> {{ detail.cron | translateCron }}
+                </q-chip>
+              </div>
+            </q-card-section>
 
-          <q-separator v-if="loggedIn" inset />
+            <q-separator v-if="loggedIn" inset />
 
-          <q-card-section v-if="loggedIn">
-            <div>
-              <q-icon name="wallpaper" /> {{ detail.image.image }}
-            </div>
-          </q-card-section>
-        </q-card>
+            <q-card-section v-if="loggedIn">
+              <div>
+                <q-icon name="wallpaper" /> {{ detail.image.image }}
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
+    </div>
+    <div class="row q-col-gutter-md q-mb-md">
       <div class="col-12">
-        <q-card flat bordered>
-          <q-card-section>
-            <div class="text-h6">Summary</div>
-          </q-card-section>
+        <div class="row q-col-gutter-md">
+          <div class="col-10">
+            <q-card flat bordered>
+              <q-card-section>
+                <div class="text-h6">Summary</div>
+              </q-card-section>
 
-          <q-separator inset />
+              <q-separator inset />
 
-          <q-card-section>
-            <apexchart type="bar" :options="chart" :series="chart.series" />
-          </q-card-section>
-        </q-card>
+              <q-card-section>
+                <apexchart type="bar" :options="chart" :series="chart.series" />
+              </q-card-section>
+            </q-card>
+          </div>
+          <div class="col-2 q-gutter-y-md">
+            <correctness-index :check="$route.params.id" :hours="24" last-text="last 24 hours" />
+            <correctness-index :check="$route.params.id" :hours="7 * 24" last-text="last 7 days" />
+          </div>
+        </div>
       </div>
       <div class="col-12">
         <q-card flat bordered dense>
@@ -101,11 +113,13 @@ import ini from 'ini'
 import VueApexCharts from 'vue-apexcharts'
 import timeAgo from '../../filters/timeAgo'
 import translateCron from '../../filters/translateCron'
+import CorrectnessIndex from '../../components/CorrectnessIndex'
 
 export default {
   name: 'PageCheckDashboard',
   components: {
-    apexchart: VueApexCharts
+    apexchart: VueApexCharts,
+    CorrectnessIndex
   },
   filters: {
     timeAgo,
