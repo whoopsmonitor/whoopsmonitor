@@ -17,7 +17,7 @@ You need [Docker Compose](https://docs.docker.com/compose/) installed on the mac
 Run this command to create a custom version of the `docker-compose-dev.yml` file. Switch to the root of this project first.
 
 ```bash
-docker run --rm -v $(pwd):/output docker.pkg.github.com/whoopsmonitor/whoopsmonitor/generate-docker-compose:latest
+docker run --rm -v $(pwd):/output docker.pkg.github.com/whoopsmonitor/whoopsmonitor/installer:latest
 ```
 
 It will generate a `docker-compose.yml` and `docker-compose-dev.yml` files right in the current directory. The first one is for production purposes, the second for development.
