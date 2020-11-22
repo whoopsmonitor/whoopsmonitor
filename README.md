@@ -31,7 +31,7 @@ You need
 The easiest way is to run this project with the `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords, etc.). Run it with this command:
 
 ```bash
-docker run --rm -it -v $(pwd):/output ghcr.io/whoopsmonitor/whoopsmonitor/generate-docker-compose:1.0 run create
+docker run --rm -it -v $(pwd):/output ghcr.io/whoopsmonitor/whoopsmonitor/installer:1.0 run create
 ```
 
 It will ask for some simple questions and generate a `docker-compose.yml` file right in the current directory. You also get a file for local development (feel free to ignore that file).
@@ -47,11 +47,16 @@ docker-compose -p whoopsmonitor up -d
 Now you can access the monitor right from URL <http://localhost:8080>.
 
 ### Install with Caprover
+
 You can also install Whoops Monitor with [CapRover](https://caprover.com/) on the One Click Apps page.
 
 ## Quick Start
 
 Please read our [quick start manual](/docs/quick-start.md).
+
+## Upgrade Guide
+
+Please read our [upgrade gruide](/docs/upgrade-guide.md).
 
 ## Useful links
 
@@ -65,7 +70,7 @@ Please read our [quick start manual](/docs/quick-start.md).
 You can always:
 
 -   raise a [new issue](https://github.com/whoopsmonitor/whoopsmonitor/issues) or
-Consider implementing some change on your own and then creating a [pull request](https://github.com/whoopsmonitor/whoopsmonitor/pulls).
+    Consider implementing some change on your own and then creating a [pull request](https://github.com/whoopsmonitor/whoopsmonitor/pulls).
 
 We appreciate any help or opinion.
 

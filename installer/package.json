@@ -1,12 +1,12 @@
 {
-  "name": "generate-docker-compose",
+  "name": "installer",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "create": "NODE_ENV=production node create.js",
     "change-version": "NODE_ENV=production node change-version.js",
-    "dev": "nodemon -L index.js"
+    "update": "NODE_ENV=production node update.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,10 +15,8 @@
     "ejs": "^3.1.5",
     "generate-password": "^1.5.1",
     "boxen": "^4.2.0",
-    "inquirer": "^7.3.3"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.4"
+    "inquirer": "^7.3.3",
+    "execa": "^4.0.3"
   },
   "appVersions": [
     "1.0"
