@@ -56,7 +56,7 @@ Please read our [quick start manual](/docs/quick-start.md).
 
 ## Upgrade Guide
 
-Please read our [upgrade gruide](/docs/upgrade-guide.md).
+Please read our [upgrade guide](/docs/upgrade-guide.md).
 
 ## Useful links
 
