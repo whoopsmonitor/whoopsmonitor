@@ -1,14 +1,18 @@
 <template>
   <q-page padding>
-    <div class="row q-col-gutter-md">
-      <div class="col-6 col-md-6 col-sm-12 col-xs-12">
+    <div class="row q-col-gutter-sm">
+      <div class="col-9 col-md-9 col-sm-12 col-xs-12">
         <list-of-checks />
       </div>
-      <div class="col-3 col-md-3 col-sm-6 col-xs-12">
-        <correctness-index :hours="24" last-text="last 24 hours" />
-      </div>
-      <div class="col-3 col-md-3 col-sm-6 col-xs-12">
-        <status-box @ready="statusData = $event || []" />
+      <div class="col-3 col-md-3 col-sm-12 col-xs-12">
+        <div class="row q-col-gutter-sm">
+          <div class="col-12">
+            <correctness-index :hours="24" last-text="last 24 hours" />
+          </div>
+          <div class="col-12">
+            <status-box @ready="statusData = $event || []" />
+          </div>
+        </div>
       </div>
     </div>
   </q-page>
