@@ -17,11 +17,18 @@
           <q-list bordered separator>
             <q-item v-ripple :to="{ name: 'check.dashboard', params: { id: check.id } }">
                 <q-item-section>
+                  <q-item-label caption>
+                    <span>
+                      {{ check.status.createdAt | timeAgo }}
+                      <q-tooltip>
+                        {{ check.status.createdAt | datetime }}
+                      </q-tooltip>
+                    </span>
+                  </q-item-label>
                   <q-item-label :lines="1">{{ check.name }}</q-item-label>
                   <q-item-label caption :lines="2">
                     <div v-if="check.status">
                       <div :class="colorizeTextClass(check.status)" v-html="truncate(check.status.output.replace(/\n/g, '<br />'), 100) || 'no output yet'" />
-                      ({{ check.status.createdAt | timeAgo }})
                     </div>
                     <div v-else>
                       <div v-if="!check.enabled">
@@ -61,13 +68,15 @@
 import truncate from 'truncate'
 import { sortBy } from 'lodash'
 import timeAgo from '../filters/timeAgo'
+import datetime from '../filters/datetime'
 import NoItemListHere from '../components/NoItemListHere'
 import SkeletonList from '../components/SkeletonList'
 
 export default {
   name: 'ListOfChecks',
   filters: {
-    timeAgo
+    timeAgo,
+    datetime
   },
   components: {
     SkeletonList,
