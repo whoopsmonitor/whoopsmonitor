@@ -1,62 +1,60 @@
 <template>
-  <div>
-    <q-card flat bordered>
-      <q-card-section>
-        <h3 class="text-h6 q-mt-none q-mb-sm">Latest Results</h3>
-        <div class="row q-col-gutter-sm" v-if="checks.length">
-          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-12" v-for="check in checks" :key="check.id">
-            <q-list bordered separator>
-              <q-item v-ripple :to="{ name: 'check.dashboard', params: { id: check.id } }">
-                  <q-item-section>
-                    <q-item-label :lines="1">{{ check.name }}</q-item-label>
-                    <q-item-label caption :lines="1">
-                      <div v-if="check.status">
-                        <div :class="colorizeTextClass(check.status)" v-html="truncate(check.status.output.replace(/\n/g, '<br />'), 100) || 'no output yet'" />
-                        ({{ check.status.createdAt | timeAgo }})
+  <q-card flat bordered>
+    <q-card-section>
+      <h3 class="text-h6 q-mt-none q-mb-sm">Latest Results</h3>
+      <skeleton-list v-if="loading && !checks.length" />
+
+      <no-item-list-here
+        v-if="!loading && !checks.length"
+        title="No checks here"
+        description="Currently there are no checks configured. Please try to add a new one."
+        :to="{ name: 'check.create' }"
+        to-title="new check"
+      />
+
+      <div class="row q-col-gutter-sm" v-if="checks.length">
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-12" v-for="check in checks" :key="check.id">
+          <q-list bordered separator>
+            <q-item v-ripple :to="{ name: 'check.dashboard', params: { id: check.id } }">
+                <q-item-section>
+                  <q-item-label :lines="1">{{ check.name }}</q-item-label>
+                  <q-item-label caption :lines="2">
+                    <div v-if="check.status">
+                      <div :class="colorizeTextClass(check.status)" v-html="truncate(check.status.output.replace(/\n/g, '<br />'), 100) || 'no output yet'" />
+                      ({{ check.status.createdAt | timeAgo }})
+                    </div>
+                    <div v-else>
+                      <div v-if="!check.enabled">
+                        not enabled
                       </div>
                       <div v-else>
-                        <div v-if="!check.enabled">
-                          not enabled
-                        </div>
-                        <div v-else>
-                          no output yet
-                        </div>
+                        no output yet
                       </div>
-                    </q-item-label>
-                    <q-item-label>
-                      <q-avatar
-                        v-for="status in check.statusHistory"
-                        :key="status.id"
-                        :color="colorizeCircleClass(status)"
-                        size="8px"
-                        class="q-mr-sm"
-                      />
-                    </q-item-label>
-                  </q-item-section>
-                  <q-item-section v-if="check.enabled" avatar>
-                    <q-avatar v-if="!check.progress" :color="colorizeCircleClass(check.status)" size="30px" />
-                    <q-skeleton v-if="check.progress" type="QAvatar" size="30px" />
-                  </q-item-section>
-                  <q-item-section v-else avatar>
-                    <q-badge color="grey">disabled</q-badge>
-                  </q-item-section>
-              </q-item>
-            </q-list>
-
-            <skeleton-list v-if="loading && !checks.length" />
-
-            <no-item-list-here
-              v-if="!loading && !checks.length"
-              title="No checks here"
-              description="Currently there are no checks configured. Please try to add a new one."
-              :to="{ name: 'check.create' }"
-              to-title="new check"
-            />
-          </div>
+                    </div>
+                  </q-item-label>
+                  <q-item-label>
+                    <q-avatar
+                      v-for="status in check.statusHistory"
+                      :key="status.id"
+                      :color="colorizeCircleClass(status)"
+                      size="8px"
+                      class="q-mr-sm"
+                    />
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section v-if="check.enabled" avatar>
+                  <q-avatar v-if="!check.progress" :color="colorizeCircleClass(check.status)" size="30px" />
+                  <q-skeleton v-if="check.progress" type="QAvatar" size="30px" />
+                </q-item-section>
+                <q-item-section v-else avatar>
+                  <q-badge color="grey">disabled</q-badge>
+                </q-item-section>
+            </q-item>
+          </q-list>
         </div>
-      </q-card-section>
-    </q-card>
-  </div>
+      </div>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script>
