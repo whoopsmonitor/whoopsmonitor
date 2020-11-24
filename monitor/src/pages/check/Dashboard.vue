@@ -97,7 +97,7 @@
                   no output
                 </div>
                 <q-item-label caption>
-                  {{ log.createdAt | timeAgo(log.createdAt) }}
+                  {{ log.createdAt | dateformat }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -114,7 +114,7 @@ import { DateTime } from 'luxon'
 import { sortBy } from 'lodash'
 import ini from 'ini'
 import VueApexCharts from 'vue-apexcharts'
-import timeAgo from '../../filters/timeAgo'
+import dateformat from '../../filters/datetime'
 import translateCron from '../../filters/translateCron'
 import CorrectnessIndex from '../../components/CorrectnessIndex'
 
@@ -125,8 +125,8 @@ export default {
     CorrectnessIndex
   },
   filters: {
-    timeAgo,
-    translateCron
+    translateCron,
+    dateformat
   },
   data () {
     return {
