@@ -30,7 +30,7 @@ jobs:
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/mongodb
           VERSION=4.4.1-debian-10-r8
-          PULL_IMAGE=bitnami/mongdob:$VERSION
+          PULL_IMAGE=bitnami/mongodb:$VERSION
 
           docker pull "$PULL_IMAGE"
 
