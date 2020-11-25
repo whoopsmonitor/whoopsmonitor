@@ -22,8 +22,24 @@ npm run create
 npm run change-version
 ```
 
-### Upgrade
+### Update
 
 ```bash
-npm run upgrade
+npm run update
+```
+
+## Docker
+
+### Build container
+
+```sh
+docker build -f Dockerfile-installer -t whoopsmonitor-installer .
+```
+
+### Run container
+
+```sh
+docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock whoopsmonitor-installer create
+docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock whoopsmonitor-installer update
+docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock whoopsmonitor-installer change-version
 ```

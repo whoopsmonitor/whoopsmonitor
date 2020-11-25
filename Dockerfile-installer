@@ -15,4 +15,7 @@ RUN npm install --quiet
 
 VOLUME .:/output/
 
-ENTRYPOINT [ "npm" ]
+COPY installer/entrypoint.sh /opt/whoopsmonitor/entrypoint.sh
+RUN chmod +x /opt/whoopsmonitor/entrypoint.sh
+
+ENTRYPOINT ["/opt/whoopsmonitor/entrypoint.sh"]

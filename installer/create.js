@@ -5,6 +5,7 @@ const ejs = require('ejs')
 const generatePassword = require('generate-password')
 const fs = require('fs')
 const path = require('path')
+const execa = require('execa')
 
 const APP_NAME = 'whoopsmonitor'
 const outputDir = '../output'
@@ -55,7 +56,7 @@ const MONGODB_ROOT_PASSWORD = generatePassword.generate({
   numbers: true
 })
 
-const MONGODB_DATABASE = 'whoopsmonitor'
+const MONGODB_DATABASE = APP_NAME
 
 const MONGODB_USERNAME = generatePassword.generate({
   length: 32,
@@ -175,23 +176,34 @@ inquirer.prompt(questions).then((answers) => {
     })
   }
 
-  console.log(
-    boxen(
-      `
-      ${logSymbols.success} Installation completed.
+  ; (async () => {
+    try {
+      console.log(`${logSymbols.info} Starting all containers on background.`)
+      await execa.command([
+        `cd ${outputDir} &&`,
+        `docker-compose -p ${APP_NAME} up -d`
+      ].join('\\'), {
+        shell: true
+      })
+    } catch (error) {
+      console.error(error)
+      process.exit(2)
+    }
 
-      Now you can start all Docker Containers on background with:
+    console.log(
+      boxen(
+        `
+        ${logSymbols.success} Installation completed.
 
-      docker-compose -p whoopsmonitor up -d
+        Don't forget your credentials:
 
-
-      Don't forget your credentials:
-      - Monitor Login: ${APP_PASSWORD}
-      ${BASIC_AUTH_USERNAME ? '- Basic Auth (username): ' + BASIC_AUTH_USERNAME : ''}
-      ${BASIC_AUTH_PASSWORD ? '- Basic Auth (password): ' + BASIC_AUTH_PASSWORD : ''}
-      `.trimRight(`
-      `),
-      { padding: 1 }
+        - Monitor Login: ${APP_PASSWORD}
+        ${BASIC_AUTH_USERNAME ? '- Basic Auth (username): ' + BASIC_AUTH_USERNAME : ''}
+        ${BASIC_AUTH_PASSWORD ? '- Basic Auth (password): ' + BASIC_AUTH_PASSWORD : ''}
+        `.trimRight(`
+        `),
+        { padding: 1 }
+      )
     )
-  )
+  })()
 })

@@ -31,7 +31,7 @@ const questions = []
 questions.push({
   type: 'confirm',
   name: 'confirm',
-  message: 'Would you like to start the upgrade?',
+  message: 'Would you like to start the update?',
   default: false
 })
 
