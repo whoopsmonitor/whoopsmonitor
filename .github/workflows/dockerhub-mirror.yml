@@ -15,7 +15,7 @@ jobs:
       - name: Push Redis
         run: |
           VERSION=6.0.8-debian-10-r6
-          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis:$VERSION
+          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis
 
           docker pull bitnami/redis:$VERSION
 
