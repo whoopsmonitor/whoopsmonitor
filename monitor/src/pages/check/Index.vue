@@ -119,7 +119,9 @@ export default {
     }
   },
   async created () {
-    await this.fetchData()
+    await this.fetchData({
+      verbose: true
+    })
 
     this.interval = setInterval(async () => {
       await this.fetchData()
