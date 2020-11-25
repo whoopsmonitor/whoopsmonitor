@@ -4,6 +4,14 @@
     <h1 v-else class="text-h4 q-mt-sm">New Check</h1>
 
     <q-form @submit="onSubmit">
+      <q-toggle
+        v-model="form.enabled"
+        checked-icon="check"
+        color="green"
+        unchecked-icon="clear"
+        label="Published"
+      />
+
       <q-tabs
         v-model="tab"
         align="left"
@@ -18,14 +26,6 @@
 
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="general" class="q-gutter-md">
-          <q-toggle
-            v-model="form.enabled"
-            checked-icon="check"
-            color="green"
-            unchecked-icon="clear"
-            label="Published"
-          />
-
           <q-input
             filled
             v-model="form.name"
