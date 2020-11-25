@@ -1,0 +1,30 @@
+name: dockerhub-mirror
+
+on: workflow_dispatch
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile-worker --tag image
+
+      - name: Log into registry
+        run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push Redis
+        run: |
+          VERSION=6.0.8-debian-10-r6
+          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis:$VERSION
+
+          docker pull bitnami/redis:$VERSION
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag image $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
