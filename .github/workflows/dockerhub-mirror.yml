@@ -14,13 +14,14 @@ jobs:
 
       - name: Push Redis
         run: |
-          VERSION=6.0.8-debian-10-r6
           IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis
+          VERSION=6.0.8-debian-10-r6
+          PULL_IMAGE=bitnami/redis:$VERSION
 
-          docker pull bitnami/redis:$VERSION
+          docker pull "$PULL_IMAGE"
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-          docker tag image $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
