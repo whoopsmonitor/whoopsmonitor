@@ -25,3 +25,17 @@ jobs:
 
           docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
           docker push "${IMAGE_ID}:${VERSION}"
+
+      - name: Push Mongo
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/mongodb
+          VERSION=4.4.1-debian-10-r8
+          PULL_IMAGE=bitnami/mongdob:$VERSION
+
+          docker pull "$PULL_IMAGE"
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
