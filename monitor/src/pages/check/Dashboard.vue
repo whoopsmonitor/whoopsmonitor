@@ -99,7 +99,7 @@
                   <q-item-label caption>
                     {{ log.createdAt | dateformat }}
                   </q-item-label>
-                  <q-item-label>
+                  <q-item-label v-if="loggedIn">
                     <q-btn
                       size="xs"
                       color="red"
@@ -109,9 +109,9 @@
                 </q-item-section>
               </q-item>
             </q-list>
-            <q-section v-if="!logs.length">
+            <q-item-section v-if="!logs.length">
               No logs here.
-            </q-section>
+            </q-item-section>
           </q-card-section>
         </q-card>
       </div>
@@ -341,6 +341,10 @@ export default {
     },
 
     async destroyConfirm () {
+      if (!this.loggedIn) {
+        return false
+      }
+
       this.loading.destroy = true
 
       try {
