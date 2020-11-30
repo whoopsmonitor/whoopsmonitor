@@ -7,6 +7,7 @@ const fs = require('fs')
 const packageJson = require('./package.json')
 const perf = require('execution-time')()
 const APP_TOKEN = process.env.APP_TOKEN
+const packageName = packageJson.name
 
 const markProgress = async (checkId, progressStatus) => {
   if (!checkId) {
@@ -42,7 +43,7 @@ const addToLog = async (checkId, status, output, duration) => {
 }
 
 const removeJobFromQueue = async (job) => {
-  console.log(`[${logSymbols.info}] [${job.opts.jobId}] Removing job from queue`)
+  console.log(`[${packageName}] [${logSymbols.info}] [${job.opts.jobId}] Removing job from queue`)
   await executeCheckQueue.removeRepeatable(job.opts.repeat, job.opts.jobId)
 }
 
@@ -144,14 +145,14 @@ executeCheckQueue.process(async (job, done) => {
   }
 
   if (!check.enabled) {
-    console.log(`Check ${checkId} not enabled.`)
+    console.log(`[${packageName}] [${logSymbols.info}] Check ${checkId} not enabled.`)
     return done(null, {
       check
     })
   }
 
   if (check.progress) {
-    console.log(`Check ${checkId} already in progress.`)
+    console.log(`[${packageName}] [${logSymbols.info}] Check ${checkId} already in progress.`)
     return done(null, {
       check
     })
@@ -159,8 +160,8 @@ executeCheckQueue.process(async (job, done) => {
 
   // image condition must be "0", that means image is probably fine
   if (check.image.healthyStatus !== 0) {
-    console.error(`[${check.image.image}] Docker image is not healthy, exitCode: ${check.image.healthyStatus}`)
-    console.error('Output: ', check.image.healthyStatusOutput)
+    console.error(`[${packageName}] [${logSymbols.error}] Docker image "${check.image.image}" is not healthy, exitCode: ${check.image.healthyStatus}`)
+    console.error(`[${packageName}] [${logSymbols.info}] Output:`, check.image.healthyStatusOutput)
     return done(null, {
       check
     })
@@ -237,6 +238,7 @@ executeCheckQueue.process(async (job, done) => {
     // debug purpose
     // console.log('Running commands: ', commands)
 
+    console.log(`[${packageName}] [${logSymbols.info}] Running check "${check.name}".`)
     const { stdout, exitCode } = await execa.command(commands.join('\\'), {
       shell: true
     })
@@ -264,8 +266,8 @@ executeCheckQueue.process(async (job, done) => {
     // remove job from the queue
     await removeJobFromQueue(job)
 
+    // also make sure the status code is 2 in case of the higher number
     try {
-      // also make sure the status code is 2 in case of the higher number
       await addToLog(check.id, (error.exitCode > 2 ? error.exitCode : error.exitCode), error.stdout || error.stderr, perfResult.time)
       await markProgress(check.id, false)
 
@@ -281,7 +283,7 @@ executeCheckQueue.process(async (job, done) => {
 
       return done(error)
     } catch (error) {
-      console.error(error)
+      console.error(`[${packageName}] [${logSymbols.error}]`, error)
 
       return done(error)
     }
@@ -289,16 +291,16 @@ executeCheckQueue.process(async (job, done) => {
 })
 
 executeCheckQueue.on('completed', async (job, { check }) => {
-  console.log(`[${logSymbols.success}] Job "${check.name}" done.`)
+  console.log(`[${packageName}] [${logSymbols.success}] Job "${check.name}" done.`)
 })
 
 executeCheckQueue.on('error', async (error) => {
-  console.error(`[${logSymbols.error} ${logSymbols.error} ${logSymbols.error}]`, error)
+  console.error(`[${packageName}] [${logSymbols.error} ${logSymbols.error} ${logSymbols.error}]`, error)
 })
 
 executeCheckQueue.on('failed', async (job, error) => {
   // remove job from the queue
   await removeJobFromQueue(job)
 
-  console.error(`[${logSymbols.error}]`, error.stdout || error.stderr || error)
+  console.error(`[${packageName}] [${logSymbols.error}]`, error.stdout || error.stderr || error)
 })

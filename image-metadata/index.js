@@ -5,6 +5,8 @@ const axios = require('axios')
 const logSymbols = require('log-symbols')
 const API_URL = process.env.API_URL
 const APP_TOKEN = process.env.APP_TOKEN
+const packageJson = require('./package.json')
+const packageName = packageJson.name
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
@@ -15,7 +17,7 @@ const axiosInstance = axios.create({
 })
 
 updateDockerMetadata = async function() {
-  console.log(`[${logSymbols.info}][image-metadata] Getting images from the API.`)
+  console.log(`[${packageName}] [${logSymbols.info}] Getting images from the API.`)
   try {
     const images = await axiosInstance.get('/v1/dockerimage').then(response => response.data)
 
@@ -64,13 +66,13 @@ updateDockerMetadata = async function() {
             healthyStatusOutput: 'image is fine'
           })
 
-          console.log(`[${logSymbols.success}][image-metadata] Image's metadata (${image.image}) updated.`)
+          console.log(`[${packageName}] [${logSymbols.success}] Image's metadata (${image.image}) updated.`)
         } else {
-          console.log(`[${logSymbols.success}][image-metadata] Image's metadata (${image.image}) are the same. No need for update.`)
+          console.log(`[${packageName}] [${logSymbols.success}] Image's metadata (${image.image}) are the same. No need for update.`)
         }
       } catch (err) {
-        console.log(`[${logSymbols.error}][image-metadata] Image's metadata (${image.image}) not updated due to error.`)
-        console.error('More info: ', err)
+        console.log(`[${packageName}] [${logSymbols.error}] Image's metadata (${image.image}) not updated due to error.`)
+        console.error(`[${packageName}] More info: `, err)
 
         // issue with image, update the status
         if (err.exitCode > 0 && err.stderr) {
@@ -82,7 +84,7 @@ updateDockerMetadata = async function() {
       }
     }
   } catch (err) {
-    console.error(`[${logSymbols.error}][image-metadata] Reloading docker images metadata - failed.`, `${err.code}`)
+    console.error(`[${packageName}] [${logSymbols.error}] Reloading docker images metadata - failed.`, `${err.code}`)
     // and silently die here, no place to report
   }
 
@@ -92,9 +94,9 @@ updateDockerMetadata = async function() {
 ;(async function main() {
   // run the process every minute
   cron.schedule('* * * * *', async () => {
-    console.log(`[${logSymbols.info}][image-metadata] Reloading docker images metadata - started.`)
+    console.log(`[${packageName}] [${logSymbols.info}] Reloading docker images metadata - started.`)
     await updateDockerMetadata()
-    console.log(`[${logSymbols.info}][image-metadata] Reloading docker images metadata - done.`)
+    console.log(`[${packageName}] [${logSymbols.info}] Reloading docker images metadata - done.`)
   })
 
   await updateDockerMetadata()
