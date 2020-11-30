@@ -99,13 +99,27 @@
                 <q-item-label caption>
                   {{ log.createdAt | dateformat }}
                 </q-item-label>
+                <q-item-label>
+                  <q-btn
+                    size="xs"
+                    color="red"
+                    @click="destroyDialog(log.id)"
+                  >delete</q-btn>
+                </q-item-label>
               </q-item-section>
-            </q-item>
-          </q-list>
+              </q-item>
+            </q-list>
           </q-card-section>
         </q-card>
       </div>
     </div>
+    <confirm-dialog
+      :open="dialog.destroy"
+      @cancel="destroyCancel"
+      @confirm="destroyConfirm"
+    >
+      Are you sure you want to delete this log?
+    </confirm-dialog>
   </q-page>
 </template>
 
@@ -117,12 +131,14 @@ import VueApexCharts from 'vue-apexcharts'
 import dateformat from '../../filters/datetime'
 import translateCron from '../../filters/translateCron'
 import CorrectnessIndex from '../../components/CorrectnessIndex'
+import ConfirmDialog from '../../components/ConfirmDialog'
 
 export default {
   name: 'PageCheckDashboard',
   components: {
     apexchart: VueApexCharts,
-    CorrectnessIndex
+    CorrectnessIndex,
+    ConfirmDialog
   },
   filters: {
     translateCron,
@@ -133,7 +149,14 @@ export default {
       items: [],
       logs: [],
       detail: undefined,
-      logsStatusOnlyFailed: true
+      logsStatusOnlyFailed: false,
+      destroyId: '',
+      dialog: {
+        destroy: false
+      },
+      loading: {
+        destroy: false
+      }
     }
   },
 
@@ -208,12 +231,15 @@ export default {
   },
 
   async created () {
-    await this.fetchDetails()
-    await this.fetchAggregates()
-    await this.fetchLatestLogs()
+    await this.fetchData()
   },
 
   methods: {
+    async fetchData () {
+      await this.fetchDetails()
+      await this.fetchAggregates()
+      await this.fetchLatestLogs()
+    },
     async fetchDetails () {
       try {
         this.detail = await this.$axios.get(`/v1/check/${this.$route.params.id}`, {
@@ -299,6 +325,39 @@ export default {
 
     iniStringify (properties) {
       return ini.stringify(properties)
+    },
+
+    destroyDialog (id) {
+      this.dialog.destroy = true
+      this.destroyId = id
+    },
+
+    destroyCancel () {
+      this.dialog.destroy = false
+      this.destroyId = ''
+    },
+
+    async destroyConfirm () {
+      this.loading.destroy = true
+
+      try {
+        await this.$axios.delete(`/v1/checkstatus/${this.destroyId}`)
+
+        this.$whoopsNotify.positive({
+          message: 'Log successfully deleted.'
+        })
+
+        await this.fetchData({
+          verbose: false
+        })
+      } catch (error) {
+        console.error(error)
+        this.$whoopsNotify.negative({
+          message: 'It is not possible to delete a log. Please try it again.'
+        })
+      } finally {
+        this.destroyCancel()
+      }
     }
   }
 }
