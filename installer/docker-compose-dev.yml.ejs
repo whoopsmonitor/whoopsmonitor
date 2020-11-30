@@ -111,7 +111,7 @@ services:
 
   mongodb:
     container_name: mongo
-    image: bitnami/mongodb:4.4.1-debian-10-r8
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/mongodb:4.4.1-debian-10-r8
     ports:
       - "27017:27017"
     volumes:
@@ -126,7 +126,7 @@ services:
 
   redis:
     container_name: redis
-    image: 'bitnami/redis:6.0.8-debian-10-r6'
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/redis:6.0.8-debian-10-r6
     environment:
       REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
     volumes:
