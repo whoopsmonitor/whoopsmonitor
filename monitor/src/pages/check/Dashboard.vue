@@ -87,28 +87,31 @@
 
           <q-card-section>
             <q-list v-if="logs.length" bordered separator>
-            <q-item v-for="log in logs" :key="log.id">
-              <q-item-section avatar>
-                <q-avatar :color="colorizeCircleClass(log)" size="30px" />
-              </q-item-section>
-              <q-item-section>
-                <div v-if="log.output" :class="colorizeTextClass(log)" v-html="log.output.replace(/\n/g, '<br />')" />
-                <div v-else>
-                  no output
-                </div>
-                <q-item-label caption>
-                  {{ log.createdAt | dateformat }}
-                </q-item-label>
-                <q-item-label>
-                  <q-btn
-                    size="xs"
-                    color="red"
-                    @click="destroyDialog(log.id)"
-                  >delete</q-btn>
-                </q-item-label>
-              </q-item-section>
+              <q-item v-for="log in logs" :key="log.id">
+                <q-item-section avatar>
+                  <q-avatar :color="colorizeCircleClass(log)" size="30px" />
+                </q-item-section>
+                <q-item-section>
+                  <div v-if="log.output" :class="colorizeTextClass(log)" v-html="log.output.replace(/\n/g, '<br />')" />
+                  <div v-else>
+                    no output
+                  </div>
+                  <q-item-label caption>
+                    {{ log.createdAt | dateformat }}
+                  </q-item-label>
+                  <q-item-label>
+                    <q-btn
+                      size="xs"
+                      color="red"
+                      @click="destroyDialog(log.id)"
+                    >delete</q-btn>
+                  </q-item-label>
+                </q-item-section>
               </q-item>
             </q-list>
+            <q-section v-if="!logs.length">
+              No logs here.
+            </q-section>
           </q-card-section>
         </q-card>
       </div>
