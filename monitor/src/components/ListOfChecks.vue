@@ -26,7 +26,7 @@
                     </span>
                   </q-item-label>
                   <q-item-label :lines="2">{{ check.name }}</q-item-label>
-                  <q-item-label caption :lines="2" v-if="check.display === null">
+                  <q-item-label caption :lines="2" v-if="!check.display || check.display === null">
                     <div v-if="check.status">
                       <div :class="colorizeTextClass(check.status)" v-html="truncate(check.status.output.replace(/\n/g, '<br />'), 100) || 'no output yet'" />
                     </div>
@@ -52,7 +52,7 @@
                     no output yet
                   </q-item-label>
                 </q-item-section>
-                <template v-if="check.display === null">
+                <template v-if="!check.display || check.display === null">
                   <q-item-section v-if="check.enabled" avatar>
                     <q-avatar v-if="check.status && !check.progress" :color="colorizeCircleClass(check.status)" size="30px" />
                     <q-skeleton v-if="check.progress" type="QAvatar" size="30px" />
