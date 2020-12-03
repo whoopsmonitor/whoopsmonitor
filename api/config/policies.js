@@ -39,6 +39,8 @@ module.exports.policies = {
   CheckController: blueprintTokenPolicy,
   CheckStatusController: blueprintTokenPolicy,
 
+  'v1/check/reorder-all': 'token',
+
   'v1/checkstatus/isfailing': 'token',
   'v1/checkstatus/aggregate': 'token',
   'v1/checkstatus/aggregate-by-day': 'token',

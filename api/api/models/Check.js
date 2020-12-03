@@ -48,6 +48,10 @@ module.exports = {
 
     display: {
       type: 'json'
+    },
+    order: {
+      type: 'number',
+      defaultsTo: 0
     }
   },
   customToJSON: function () {

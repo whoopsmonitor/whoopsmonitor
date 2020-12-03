@@ -37,6 +37,8 @@ module.exports.routes = {
   'GET /status': 'index',
   'GET /v1/status': 'index',
 
+  'POST /v1/check/reorder-all': 'v1/check/reorder-all',
+
   'GET /v1/checkstatus/aggregate/:checkId?': 'v1/checkstatus/aggregate',
   'GET /v1/checkstatus/aggregate-by-day/:checkId?': 'v1/checkstatus/aggregate-by-day',
   'GET /v1/checkstatus/isfailing': 'v1/checkstatus/isfailing',
