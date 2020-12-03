@@ -12,8 +12,17 @@
         to-title="new check"
       />
 
+      <q-toggle
+        v-if="hasFailingCheck"
+        v-model="onlyFailing"
+        checked-icon="check"
+        color="green"
+        unchecked-icon="clear"
+        label="only failing"
+      />
+
       <div class="row q-col-gutter-sm" v-if="checks.length">
-        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-12" v-for="check in checks" :key="check.id">
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-12" v-for="check in filteredChecks" :key="check.id">
           <q-list bordered separator>
             <q-item v-ripple :to="{ name: 'check.dashboard', params: { id: check.id } }">
                 <q-item-section>
@@ -78,7 +87,7 @@
 
 <script>
 import truncate from 'truncate'
-import { sortBy } from 'lodash'
+// import { sortBy } from 'lodash'
 import timeAgo from '../filters/timeAgo'
 import datetime from '../filters/datetime'
 import NoItemListHere from '../components/NoItemListHere'
@@ -98,12 +107,25 @@ export default {
     return {
       checks: [],
       interval: undefined,
-      loading: false
+      loading: false,
+      onlyFailing: false
     }
   },
   computed: {
+    filteredChecks () {
+      return this.checks.filter((check) => {
+        if (this.onlyFailing) {
+          return check.status.status > 0
+        }
+
+        return true
+      })
+    },
     loggedIn () {
       return this.$store.getters['auth/loggedIn']
+    },
+    hasFailingCheck () {
+      return this.checks.length && this.checks.some(check => check.status && check.status.status > 0)
     }
   },
   async created () {
@@ -124,7 +146,8 @@ export default {
         const checks = await this.$axios.get('/v1/check', {
           params: {
             populate: false,
-            select: 'name,progress,enabled,display'
+            select: 'name,progress,enabled,display',
+            sort: 'order ASC'
           }
         }).then((res) => res.data)
 
@@ -145,34 +168,36 @@ export default {
           check.statusHistory = status.reverse()
         }
 
+        this.checks = checks
+
         // assign when we have all the data
-        this.checks = sortBy(checks, [
-          (check) => {
-            let sortable = 0
+        // this.checks = sortBy(checks, [
+        //   (check) => {
+        //     let sortable = 0
 
-            if (!check.enabled) {
-              sortable = 3
-            }
+        //     if (!check.enabled) {
+        //       sortable = 3
+        //     }
 
-            if (check.status) {
-              if (typeof check.status.status === 'number') {
-                switch (check.status.status) {
-                  case 0:
-                    sortable = 2
-                    break
-                  case 1:
-                    sortable = 1
-                    break
-                  case 2:
-                    sortable = 0
-                    break
-                }
-              }
-            }
+        //     if (check.status) {
+        //       if (typeof check.status.status === 'number') {
+        //         switch (check.status.status) {
+        //           case 0:
+        //             sortable = 2
+        //             break
+        //           case 1:
+        //             sortable = 1
+        //             break
+        //           case 2:
+        //             sortable = 0
+        //             break
+        //         }
+        //       }
+        //     }
 
-            return sortable
-          }
-        ])
+        //     return sortable
+        //   }
+        // ])
       } catch (error) {
         console.error(error)
 

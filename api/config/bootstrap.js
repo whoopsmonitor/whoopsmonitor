@@ -56,6 +56,9 @@ module.exports.bootstrap = async function (done) {
     await sails.helpers.updateCronJobs()
   })
 
+  // reorder "0" checks
+  await sails.helpers.reorderZeroChecks()
+
   // install health index data
   await sails.helpers.installHealthIndex()
 

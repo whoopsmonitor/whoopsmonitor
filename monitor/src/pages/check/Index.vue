@@ -37,6 +37,28 @@
             </q-item-section>
             <q-item-section top side>
               <div class="text-grey-8 q-gutter-xs">
+                <q-btn-group flat>
+                  <q-btn
+                    :disable="loading.order || check.order === 0"
+                    @click="move(check, -1)"
+                    color="secondary"
+                    dense
+                    round
+                    icon="arrow_upward"
+                  >
+                    <q-tooltip>move up</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    :disable="loading.order || checks.length - 1 === check.order"
+                    @click="move(check, 1)"
+                    color="secondary"
+                    dense
+                    round
+                    icon="arrow_downward"
+                  >
+                    <q-tooltip>move down</q-tooltip>
+                  </q-btn>
+                </q-btn-group>
                 <q-btn
                   @click="duplicate(check)"
                   color="secondary"
@@ -109,7 +131,8 @@ export default {
       enabled: {},
       loading: {
         fetch: false,
-        destroy: false
+        destroy: false,
+        order: false
       },
       dialog: {
         destroy: false
@@ -141,8 +164,9 @@ export default {
       try {
         this.checks = await this.$axios.get('/v1/check', {
           params: {
-            select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display',
-            populate: 'image'
+            select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display,order',
+            populate: 'image',
+            sort: 'order ASC'
           }
         }).then(response => response.data)
 
@@ -176,6 +200,9 @@ export default {
 
       try {
         await this.$axios.delete(`/v1/check/${this.destroyId}`)
+
+        await this.forceOrdering()
+
         await this.fetchData({
           verbose: false
         })
@@ -226,6 +253,7 @@ export default {
       record.name = `${record.name} - copy`
       record.image = check.image.id
       record.display = check.display || null
+      record.order = this.checks.length // order at the end
 
       try {
         await this.$axios.post('/v1/check', record)
@@ -234,6 +262,7 @@ export default {
           message: 'Check successfully duplicated.'
         })
 
+        await this.forceOrdering()
         await this.fetchData({
           verbose: false
         })
@@ -243,6 +272,64 @@ export default {
         this.$whoopsNotify.error({
           message: 'It is not possible to duplicate this check. Please try it again.'
         })
+      }
+    },
+
+    async move (check, howMuch) {
+      const newOrder = check.order + howMuch
+      const changeOrderInElementOnOrder = check.order + howMuch
+      const changeOrderInElementOnOrderValue = check.order
+
+      const changes = []
+      for (const item of this.checks) {
+        if (item.order === changeOrderInElementOnOrder) {
+          changes.push({
+            id: check.id,
+            order: newOrder
+          })
+
+          changes.push({
+            id: item.id,
+            order: changeOrderInElementOnOrderValue
+          })
+        }
+      }
+
+      try {
+        this.loading.order = true
+        for (const change of changes) {
+          await this.$axios.patch(`/v1/check/${change.id}`, {
+            order: change.order
+          })
+        }
+
+        await this.fetchData({
+          verbose: false
+        })
+      } catch (error) {
+        console.error(error)
+
+        this.$whoopsNotify.error({
+          message: 'It is not possible to change the ordering. Please try it again.'
+        })
+      } finally {
+        this.loading.order = false
+      }
+    },
+
+    async forceOrdering () {
+      try {
+        this.loading.order = true
+        await this.$axios.post('/v1/check/reorder-all')
+        await this.fetchData({
+          verbose: false
+        })
+      } catch (error) {
+        this.$whoopsNotify.error({
+          message: 'It is not possible to force a new ordering. Please try it again.'
+        })
+      } finally {
+        this.loading.order = false
       }
     }
   }
