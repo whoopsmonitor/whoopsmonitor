@@ -44,6 +44,10 @@ module.exports = {
 
     file: {
       type: 'json'
+    },
+
+    display: {
+      type: 'json'
     }
   },
   customToJSON: function () {

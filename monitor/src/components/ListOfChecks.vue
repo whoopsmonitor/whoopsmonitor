@@ -17,7 +17,7 @@
           <q-list bordered separator>
             <q-item v-ripple :to="{ name: 'check.dashboard', params: { id: check.id } }">
                 <q-item-section>
-                  <q-item-label caption>
+                  <q-item-label caption v-if="check.status">
                     <span>
                       {{ check.status.createdAt | timeAgo }}
                       <q-tooltip>
@@ -25,8 +25,8 @@
                       </q-tooltip>
                     </span>
                   </q-item-label>
-                  <q-item-label :lines="1">{{ check.name }}</q-item-label>
-                  <q-item-label caption :lines="2">
+                  <q-item-label :lines="2">{{ check.name }}</q-item-label>
+                  <q-item-label caption :lines="2" v-if="check.display === null">
                     <div v-if="check.status">
                       <div :class="colorizeTextClass(check.status)" v-html="truncate(check.status.output.replace(/\n/g, '<br />'), 100) || 'no output yet'" />
                     </div>
@@ -39,7 +39,7 @@
                       </div>
                     </div>
                   </q-item-label>
-                  <q-item-label>
+                  <q-item-label v-if="check.statusHistory.length">
                     <q-avatar
                       v-for="status in check.statusHistory"
                       :key="status.id"
@@ -48,14 +48,26 @@
                       class="q-mr-sm"
                     />
                   </q-item-label>
+                  <q-item-label caption v-else>
+                    no output yet
+                  </q-item-label>
                 </q-item-section>
-                <q-item-section v-if="check.enabled" avatar>
-                  <q-avatar v-if="!check.progress" :color="colorizeCircleClass(check.status)" size="30px" />
-                  <q-skeleton v-if="check.progress" type="QAvatar" size="30px" />
-                </q-item-section>
-                <q-item-section v-else avatar>
-                  <q-badge color="grey">disabled</q-badge>
-                </q-item-section>
+                <template v-if="check.display === null">
+                  <q-item-section v-if="check.enabled" avatar>
+                    <q-avatar v-if="check.status && !check.progress" :color="colorizeCircleClass(check.status)" size="30px" />
+                    <q-skeleton v-if="check.progress" type="QAvatar" size="30px" />
+                  </q-item-section>
+                  <q-item-section v-else avatar>
+                    <q-badge color="grey">disabled</q-badge>
+                  </q-item-section>
+                </template>
+                <template v-if="check.status && check.display && check.display.metric">
+                  <div>
+                    <q-chip size="xl" dense :color="metricBgColor(check)" text-color="white">
+                      {{ parseInt(check.status.output) || '?' }} <span v-if="check.display.type.value === 'numberWithPercent'">%</span>
+                    </q-chip>
+                  </div>
+                </template>
             </q-item>
           </q-list>
         </div>
@@ -112,7 +124,7 @@ export default {
         const checks = await this.$axios.get('/v1/check', {
           params: {
             populate: false,
-            select: 'name,progress,enabled'
+            select: 'name,progress,enabled,display'
           }
         }).then((res) => res.data)
 
@@ -205,6 +217,41 @@ export default {
 
     truncate (str, length) {
       return truncate(str, length)
+    },
+
+    metricBgColor (check) {
+      let color = 'grey'
+      const status = check.status
+
+      if (!status.output) {
+        return color
+      }
+
+      if (typeof check.display.warning === 'undefined') {
+        return color
+      }
+
+      if (typeof check.display.critical === 'undefined') {
+        return color
+      }
+
+      const output = status.output * 1 // make sure it is a number
+      const warning = check.display.warning * 1
+      const critical = check.display.critical * 1
+
+      if (isNaN(output)) {
+        return color
+      }
+
+      if (output >= warning) {
+        color = 'green'
+      } else if (output >= critical && output < warning) {
+        color = 'orange'
+      } else if (output < critical) {
+        color = 'red'
+      }
+
+      return color
     }
   }
 }
