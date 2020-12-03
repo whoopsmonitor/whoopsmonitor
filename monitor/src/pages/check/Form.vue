@@ -17,6 +17,7 @@
         align="left"
       >
         <q-tab name="general" label="General" />
+        <q-tab name="display" label="Display" />
         <q-tab name="env" label="ENV Variables" :disable="Object.values(form.image).length === 0" />
         <q-tab name="file" label="File" :disable="Object.values(form.image).length === 0" />
         <q-tab name="alert" label="Alerts" :disable="Object.values(form.image).length === 0" />
@@ -89,6 +90,97 @@
             <q-tooltip>Reset variables to default ones provided by the image.</q-tooltip>
           </q-btn>
 
+        </q-tab-panel>
+
+      <q-tab-panel name="general" class="q-gutter-md">
+          <q-input
+            filled
+            v-model="form.name"
+            label="Check Name *"
+            hint="Enter the check name."
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please enter the name of your check.']"
+          />
+
+          <q-select
+            v-if="hasImages"
+            v-model="form.image"
+            :options="imageOptions"
+            label="Image *"
+            hint="Select the image."
+            lazy-rules
+            :rules="[ val => val && Object.keys(val).length > 0 || 'Please select image that would trigger your check.']"
+            use-input
+            input-debounce="0"
+            @filter="filterImages"
+          />
+          <div v-else>
+            <div class="caption">Images</div>
+            There are no images to select from or they are invalid.
+          </div>
+
+          <q-input
+            filled
+            v-model="form.cron"
+            label="Cron *"
+            hint="Cron notation to trigger the check. Default is every minute."
+            lazy-rules
+            :rules="[ val => val && val.length > 0 && validateCron(val) || 'You should enter valid cron notation for your check to trigger correctly.']"
+          />
+          <div v-if="form.cron" class="text-caption">
+            You entered <i>{{ form.cron | translateCron }}</i>.
+          </div>
+        </q-tab-panel>
+
+        <q-tab-panel name="display" class="q-gutter-md">
+          <q-toggle
+            v-model="form.display.metric"
+            checked-icon="check"
+            color="accent"
+            unchecked-icon="clear"
+            label="Show as a Metric"
+          />
+
+          <div v-if="form.display.metric">
+            <div>
+              <q-select
+                v-model="form.display.type"
+                :options="metric.options"
+                label="Type"
+                hint="Select metric type."
+                lazy-rules
+                :rules="[ val => form.display.metric && val && Object.keys(val).length > 0 || 'Please select metric type.']"
+              />
+            </div>
+
+            <div class="row q-col-gutter-sm q-mt-md">
+              <div class="col-12">
+                <h4 class="text-h6 q-mt-md q-mb-none">Thresholds</h4>
+              </div>
+              <div class="col-4">
+                <q-input
+                  filled
+                  type="number"
+                  v-model="form.display.warning"
+                  label="Warning"
+                  hint="Warning level."
+                  lazy-rules
+                  :rules="[ val => val && val > 0 || 'You should enter warning threshold for the metric.']"
+                />
+              </div>
+              <div class="col-4">
+                <q-input
+                  filled
+                  type="number"
+                  v-model="form.display.critical"
+                  label="Critical"
+                  hint="critical level."
+                  lazy-rules
+                  :rules="[ val => val && val > 0 || 'You should enter critical threshold for the metric.']"
+                />
+              </div>
+            </div>
+          </div>
         </q-tab-panel>
 
         <q-tab-panel name="file" class="q-gutter-md">
@@ -175,13 +267,35 @@ export default {
           name: '',
           content: ''
         },
-        alerts: []
+        alerts: [],
+        display: {
+          metric: false,
+          type: 'number',
+          warning: 80,
+          critical: 40
+        }
       },
       tab: 'general',
       images: [],
       filterImagesString: '',
       alerts: [],
-      alertElements: []
+      alertElements: [],
+      metric: {
+        options: [
+          {
+            label: 'number',
+            value: 'number'
+          },
+          {
+            label: 'number with percent',
+            value: 'numberWithPercent'
+          }
+        ],
+        originalForm: {
+          metric: false,
+          type: 'number'
+        }
+      }
     }
   },
   computed: {
@@ -211,6 +325,16 @@ export default {
       return this.images.length > 0
     }
   },
+
+  watch: {
+    'form.display.metric' (val) {
+      if (val === false) {
+        // reset metric data to default values
+        this.form.display = this.metric.originalForm
+      }
+    }
+  },
+
   async created () {
     if (this.edit) {
       await this.fetchData()
@@ -241,6 +365,10 @@ export default {
 
           if (item.alerts.length) {
             this.form.alerts = item.alerts.map(alert => alert.id)
+          }
+
+          if (item.display) {
+            this.form.display = item.display
           }
         }
       } catch (error) {
@@ -291,6 +419,11 @@ export default {
       try {
         if (form.environmentVariables) {
           form.environmentVariables = ini.parse(form.environmentVariables)
+        }
+
+        // reset metric if necessary
+        if (form.display.metric === false) {
+          form.display = null
         }
 
         // make sure image is just an ID
