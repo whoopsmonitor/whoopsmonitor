@@ -141,7 +141,7 @@ export default {
       try {
         this.checks = await this.$axios.get('/v1/check', {
           params: {
-            select: 'enabled,name,progress,environmentVariables,createdAt,image,cron',
+            select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display',
             populate: 'image'
           }
         }).then(response => response.data)
@@ -225,6 +225,7 @@ export default {
       record.enabled = false
       record.name = `${record.name} - copy`
       record.image = check.image.id
+      record.display = check.display || null
 
       try {
         await this.$axios.post('/v1/check', record)
