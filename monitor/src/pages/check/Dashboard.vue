@@ -45,35 +45,39 @@
       <div class="row q-col-gutter-md q-mb-md">
         <div class="col-12">
           <div class="row q-col-gutter-md">
-            <template v-if="detail.display === null">
-                <div class="col-10">
-                <q-card flat bordered>
-                  <q-card-section>
-                    <div class="text-h6">Summary</div>
-                  </q-card-section>
+            <div class="col-10">
+              <q-card flat bordered>
+                <q-card-section>
+                  <div v-if="detail.display === null" class="text-h6">Summary</div>
+                  <div v-else class="text-h6">History</div>
+                </q-card-section>
 
-                  <q-separator inset />
+                <q-separator inset />
 
-                  <skeleton-list v-if="loading.aggregates" />
+                <skeleton-list v-if="loading.aggregates" />
 
+                <template v-if="detail.display === null">
                   <q-card-section v-if="!loading.aggregates && chart.series">
-                    <apexchart type="bar" :options="chart" :series="chart.series" />
+                    <apexchart type="bar" :height="500" :options="chart" :series="chart.series" />
                   </q-card-section>
-                </q-card>
-              </div>
-              <div class="col-2 q-gutter-y-md">
-                <correctness-index :check="$route.params.id" :hours="24" last-text="last 24 hours" />
-                <correctness-index :check="$route.params.id" :hours="7 * 24" last-text="last 7 days" />
-              </div>
-            </template>
-            <template v-else>
-              <div class="col-6">
-                <correctness-index :check="$route.params.id" :hours="24" last-text="last 24 hours" />
-              </div>
-              <div class="col-6">
-                <correctness-index :check="$route.params.id" :hours="7 * 24" last-text="last 7 days" />
-              </div>
-            </template>
+                </template>
+                <template v-else>
+                  <q-card-section v-if="!loading.aggregates && chartMetric.series">
+                    <apexchart type="line" :height="500" :options="chart" :series="chartMetric.series" />
+                  </q-card-section>
+                </template>
+              </q-card>
+            </div>
+            <div class="col-2 q-gutter-y-md">
+              <correctness-index :check="$route.params.id" :hours="24" last-text="last 24 hours" />
+              <correctness-index :check="$route.params.id" :hours="7 * 24" last-text="last 7 days" />
+            </div>
+            <div class="col-6">
+              <correctness-index :check="$route.params.id" :hours="24" last-text="last 24 hours" />
+            </div>
+            <div class="col-6">
+              <correctness-index :check="$route.params.id" :hours="7 * 24" last-text="last 7 days" />
+            </div>
           </div>
         </div>
         <div class="col-12">
@@ -195,11 +199,43 @@ export default {
         series: this.statsSeries,
         chart: {
           type: 'bar',
-          height: 350,
           stacked: true,
           stackType: '100%'
         },
         colors: ['#008000', '#ffa500', '#ff0000'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            legend: {
+              position: 'bottom',
+              offsetX: -10,
+              offsetY: 0
+            }
+          }
+        }],
+        xaxis: {
+          categories: this.statsXAxisCategories
+        },
+        fill: {
+          opacity: 1
+        },
+        legend: {
+          position: 'right',
+          offsetX: 0,
+          offsetY: 50
+        }
+      }
+    },
+
+    chartMetric () {
+      return {
+        series: this.statsSeriesMetric,
+        chart: {
+          type: 'line',
+          stacked: true,
+          stackType: '100%'
+        },
+        colors: ['#008000'],
         responsive: [{
           breakpoint: 480,
           options: {
@@ -253,6 +289,21 @@ export default {
       return this.items.map((item) => {
         return item.date
       }) || []
+    },
+
+    statsSeriesMetric () {
+      const results = []
+
+      for (const item of this.items) {
+        results.push(item.output)
+      }
+
+      return [
+        {
+          name: 'value',
+          data: results
+        }
+      ]
     }
   },
 
@@ -263,7 +314,13 @@ export default {
   methods: {
     async fetchData () {
       await this.fetchDetails()
-      await this.fetchAggregates()
+
+      if (this.detail.display === null) {
+        await this.fetchAggregates()
+      } else {
+        await this.fetchMetricAggregates()
+      }
+
       await this.fetchLatestLogs()
     },
     async fetchDetails () {
@@ -291,6 +348,29 @@ export default {
 
       try {
         const items = await this.$axios.get(`/v1/checkstatus/aggregate-by-day/${this.$route.params.id}`, {
+          params: {
+            from: startOfDay.valueOf(),
+            to: endOfDay.valueOf()
+          }
+        }).then((response) => response.data)
+
+        this.items = sortBy(items, 'date')
+      } catch (error) {
+        console.error(error)
+      } finally {
+        this.loading.aggregates = false
+      }
+    },
+
+    async fetchMetricAggregates () {
+      const date = DateTime.local()
+      const startOfDay = date.minus({ months: 1 }).startOf('day')
+      const endOfDay = date.endOf('day')
+
+      this.loading.aggregates = true
+
+      try {
+        const items = await this.$axios.get(`/v1/checkstatus/aggregate-metric-by-day/${this.$route.params.id}`, {
           params: {
             from: startOfDay.valueOf(),
             to: endOfDay.valueOf()

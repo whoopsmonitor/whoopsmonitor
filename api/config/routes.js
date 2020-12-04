@@ -41,6 +41,7 @@ module.exports.routes = {
 
   'GET /v1/checkstatus/aggregate/:checkId?': 'v1/checkstatus/aggregate',
   'GET /v1/checkstatus/aggregate-by-day/:checkId?': 'v1/checkstatus/aggregate-by-day',
+  'GET /v1/checkstatus/aggregate-metric-by-day/:checkId?': 'v1/checkstatus/aggregate-metric-by-day',
   'GET /v1/checkstatus/isfailing': 'v1/checkstatus/isfailing',
 
   // do login
