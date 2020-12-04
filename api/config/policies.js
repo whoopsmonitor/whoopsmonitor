@@ -44,6 +44,7 @@ module.exports.policies = {
   'v1/checkstatus/isfailing': 'token',
   'v1/checkstatus/aggregate': 'token',
   'v1/checkstatus/aggregate-by-day': 'token',
+  'v1/checkstatus/aggregate-metric-by-day': 'token',
 
   'v1/dockerimage/envvars': 'token',
 

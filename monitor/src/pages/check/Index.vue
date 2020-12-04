@@ -41,7 +41,7 @@
                   <q-btn
                     :disable="loading.order || check.order === 0"
                     @click="move(check, -1)"
-                    color="secondary"
+                    color="accent"
                     dense
                     round
                     icon="arrow_upward"
@@ -51,7 +51,7 @@
                   <q-btn
                     :disable="loading.order || checks.length - 1 === check.order"
                     @click="move(check, 1)"
-                    color="secondary"
+                    color="accent"
                     dense
                     round
                     icon="arrow_downward"
