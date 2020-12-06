@@ -101,6 +101,13 @@ questions.push({
   default: 0
 })
 
+questions.push({
+  type: 'input',
+  name: 'apiUrl',
+  message: 'Application URL where the monitor is accessible from the browser (with the port 8080 at the end).',
+  default: 'http://localhost:8080'
+})
+
 // base auth
 questions.push({
   type: 'confirm',
@@ -149,6 +156,7 @@ inquirer.prompt(questions).then((answers) => {
       APP_REDIS_PASSWORD,
       APP_DATA_ENCRYPTION_KEY,
       APP_TOKEN,
+      APP_API_URL: answers.apiUrl,
       MONGODB_ROOT_PASSWORD,
       MONGODB_DATABASE,
       MONGODB_USERNAME,
