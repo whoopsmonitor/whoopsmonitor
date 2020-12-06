@@ -57,6 +57,14 @@ const routes = [
   },
 
   {
+    path: '/backuprestore',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', name: 'backuprestore.index', component: () => import('pages/backuprestore/Index.vue'), meta: { auth: true } }
+    ]
+  },
+
+  {
     path: '/server-error',
     component: () => import('pages/Error500.vue'),
     name: 'error.500',
