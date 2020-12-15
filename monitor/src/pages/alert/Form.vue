@@ -177,9 +177,12 @@ export default {
         }
       } catch (error) {
         console.error(error)
-        this.$whoopsNotify.negative({
-          message: 'It is not possible to load alert details. Please refresh this page.'
-        })
+
+        if (error.response) {
+          this.$whoopsNotify.negative({
+            message: 'It is not possible to load alert details. Please refresh this page.'
+          })
+        }
       }
     },
 
