@@ -14,7 +14,8 @@ module.exports = {
     }
   },
 
-  fn: async function (inputs, exits) {
+  fn: async function (_, exits) {
+    let hasError = false
     let db = false
     let redis = false
 
@@ -27,6 +28,7 @@ module.exports = {
       }
     }
 
+    // if not connection to DB available, there is no need to search for other errors
     if (!db) {
       return exits.wrongStatus()
     }
@@ -51,13 +53,12 @@ module.exports = {
       queue.check = await sails.hooks.bull.executeCheck.count()
       queue.alerting = await sails.hooks.bull.alertingQueue.count()
       redis = true
-
-
     } catch (err) {
       if (err) {
         // do nothing
       }
       redis = false
+      hasError = true
     }
 
     let status = {
@@ -65,6 +66,10 @@ module.exports = {
       db,
       redis,
       queue
+    }
+
+    if (hasError) {
+      return exits.wrongStatus(status)
     }
 
     return exits.success(JSend.success(status))
