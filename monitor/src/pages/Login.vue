@@ -18,7 +18,6 @@
         <div class="row window-height justify-center">
           <div class="col-6 self-center">
             <q-input
-              :disable="devModeNoCookie"
               type="password"
               label="Admin Password"
               outlined
@@ -32,7 +31,7 @@
                 <q-icon name="lock" />
               </template>
             </q-input>
-            <div v-if="!devModeNoCookie" class="text-right q-pt-sm">
+            <div class="text-right q-pt-sm">
               <router-link :to="{ name: 'dashboard' }">Are you a guest?</router-link>
             </div>
           </div>
@@ -52,18 +51,6 @@ export default {
         password: ''
       },
       loading: false
-    }
-  },
-  computed: {
-    devModeNoCookie () {
-      return process.env.NODE_ENV === 'development' && !this.$q.cookies.get('APP_TOKEN')
-    }
-  },
-  created () {
-    if (this.devModeNoCookie) {
-      this.$whoopsNotify.negative({
-        message: 'You are in development mode. You have to create "APP_TOKEN" cookie.'
-      })
     }
   },
   methods: {

@@ -1,14 +1,15 @@
 import axios from 'axios'
-import { Cookies } from 'quasar'
 const MAX_REQUESTS_COUNT = 10
 const INTERVAL_MS = 20
 let PENDING_REQUESTS = 0
+const API_URL = process.env.APP_API_URL
+const API_TOKEN = process.env.API_TOKEN
 
-const client = (async function () {
-  let url = `${window.location.protocol}//${window.location.hostname}:1337` // used mostly for localhost
+const client = async function (API_URL, API_TOKEN) {
+  let url = ''
   let token = ''
 
-  if (process.env.NODE_ENV !== 'development') {
+  if (!process.env.DEV) {
     // load config from the "remote" file
     try {
       const config = await axios.get('/config.json').then(result => result.data)
@@ -24,8 +25,8 @@ const client = (async function () {
       console.error(error)
     }
   } else {
-    // try to set it via cookie
-    token = Cookies.get('APP_TOKEN')
+    token = API_TOKEN
+    url = API_URL
   }
 
   const client = axios.create({
@@ -58,17 +59,10 @@ const client = (async function () {
   })
 
   return Promise.resolve(client)
-})()
+}
 
-export default async ({ Vue, store }) => {
-  // make sure we are logged out in case we don't have the token specified - in case of local development
-  if (process.env.NODE_ENV === 'development' && !Cookies.get('APP_TOKEN')) {
-    if (store.getters['auth/loggedIn']) {
-      store.dispatch('auth/logout')
-    }
-  }
-
-  Vue.prototype.$axios = await client
+export default async ({ Vue }) => {
+  Vue.prototype.$axios = await client(API_URL, API_TOKEN)
 }
 
 export { client }

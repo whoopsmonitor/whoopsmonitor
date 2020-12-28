@@ -8,6 +8,10 @@
       </q-card-section>
 
       <q-card-section>
+        <q-btn label="new backup" size="sm" @click="createBackup" icon="cloud_upload" :disable="loading.create" />
+      </q-card-section>
+
+      <q-card-section>
         <q-list bordered separator>
           <q-item v-for="(backup, key) in backups" :key="key">
             <q-item-section>
@@ -44,7 +48,8 @@ export default {
   data () {
     return {
       loading: {
-        list: false
+        list: false,
+        create: false
       },
       backups: []
     }
@@ -71,8 +76,37 @@ export default {
       }
     },
 
-    download (backupName) {
-      alert(backupName)
+    async createBackup () {
+      this.loading.create = true
+
+      try {
+        await this.$axios.post('/v1/backup').then(response => response.data)
+
+        await this.fetchData()
+
+        this.$whoopsNotify.positive({
+          message: 'Backup successfully created.'
+        })
+      } catch (error) {
+        console.error(error)
+
+        this.$whoopsNotify.negative({
+          message: 'It is not possible to create a new backup. Please try it again.'
+        })
+      } finally {
+        this.loading.create = false
+      }
+    },
+
+    async download (backupName) {
+      try {
+        window.open(`${this.$store.state.config.APP_API_URL}/v1/backup/${backupName}/download?token=${this.$store.state.config.API_TOKEN}`, '_blank')
+      } catch (error) {
+        console.error(error)
+        this.$whoopsNotify.negative({
+          message: 'It is not possible to download a backup. Please try it again.'
+        })
+      }
     }
   }
 }

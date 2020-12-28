@@ -32,6 +32,11 @@ module.exports = {
     const zipFileName = `${inputs.id}.zip`
     const downloadedBackupFile = path.join(downloadFolder, zipFileName)
 
+    // check if the downloaded file already exists
+    if (fs.existsSync(downloadedBackupFile)) {
+      return exits.success(downloadedBackupFile)
+    }
+
     if (!fs.existsSync(downloadFolder)) {
       try {
         fs.mkdirSync(downloadFolder)
@@ -39,8 +44,6 @@ module.exports = {
         sails.log.error(error)
         throw 'downloadFolderCreateFailed'
       }
-    } else {
-      return exits.success(downloadedBackupFile)
     }
 
     if (!fs.existsSync(dirWithBackup)) {
