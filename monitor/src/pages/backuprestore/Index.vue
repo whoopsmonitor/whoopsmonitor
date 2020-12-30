@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <q-card v-if="backups.length" flat bordered>
+    <q-card flat bordered>
       <q-separator inset />
 
       <q-card-section>
@@ -11,7 +11,7 @@
         <q-btn label="new backup" size="sm" @click="createBackup" icon="cloud_upload" :disable="loading.create" />
       </q-card-section>
 
-      <q-card-section>
+      <q-card-section v-if="backups.length">
         <q-list bordered separator>
           <q-item v-for="(backup, key) in backups" :key="key">
             <q-item-section>
@@ -28,12 +28,13 @@
           </q-item>
         </q-list>
       </q-card-section>
-    </q-card>
 
-    <p v-if="!loading.list && !backups.length">
-      There are no backups yet.
-    </p>
-    <skeleton-list v-if="loading.list" />
+      <q-card-section are no backups yet.-section v-if="!loading.list && !backups.length">
+        There are no backups yet.
+      </q-card-section>
+
+      <skeleton-list v-if="loading.list" />
+    </q-card>
   </q-page>
 </template>
 
