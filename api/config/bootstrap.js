@@ -1,5 +1,6 @@
 const fs = require('fs')
 const cron = require('node-cron')
+const path = require('path')
 
 /**
  * Bootstrap
@@ -32,15 +33,24 @@ module.exports.bootstrap = async function (done) {
   if (!await sails.helpers.isInstalled()) {
     await sails.helpers.generateSecurityKey()
 
-    // create a temporary folder if not exists
+    // install health index data
+    await sails.helpers.installHealthIndex()
 
-    if (!fs.existsSync(sails.config.paths.public)) {
-      fs.mkdirSync(sails.config.paths.public, {
-        recursive: true
-      })
-    }
-
+    // mark application installed
     await sails.helpers.markInstalled()
+  }
+
+  // create a temporary folder if not exists
+  if (!fs.existsSync(sails.config.paths.public)) {
+    fs.mkdirSync(sails.config.paths.public, {
+      recursive: true
+    })
+  }
+
+  // backup dir is ready
+  const bckDir = path.join(sails.config.paths.tmp, 'backup')
+  if (!fs.existsSync(bckDir)) {
+    fs.mkdirSync(bckDir)
   }
 
   // scan for all cronjobs in every 30 seconds
@@ -58,9 +68,6 @@ module.exports.bootstrap = async function (done) {
 
   // reorder "0" checks
   await sails.helpers.reorderZeroChecks()
-
-  // install health index data
-  await sails.helpers.installHealthIndex()
 
   // Don't forget to trigger `done()` when this bootstrap function's logic is finished.
   // (otherwise your server will never lift, since it's waiting on the bootstrap)
