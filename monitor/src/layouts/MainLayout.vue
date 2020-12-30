@@ -145,6 +145,34 @@
           </q-item-section>
         </q-item>
       </q-list>
+
+      <q-list>
+        <q-item-label
+          header
+          class="text-grey-8"
+        >
+          System
+        </q-item-label>
+      </q-list>
+
+      <q-list>
+        <q-item
+          clickable
+          tag="a"
+          :to="{ name: 'backuprestore.index' }"
+        >
+          <q-item-section
+            avatar
+          >
+            <q-icon name="import_export" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>Backup & Restore</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+
       <div class="fixed-bottom q-mb-md text-center">
         <a href="https://whoopsmonitor.app/" target="_blank" rel="noreferrer noopener">
           <q-img

@@ -5,6 +5,10 @@
 </template>
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  created () {
+    this.$store.commit('config/setApiUrl', process.env.APP_API_URL)
+    this.$store.commit('config/setApiToken', process.env.API_TOKEN)
+  }
 }
 </script>

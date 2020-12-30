@@ -56,5 +56,11 @@ module.exports.routes = {
   'GET /v1/dockerimage/list': 'v1/dockerimage/list',
 
   // clear records in all queues
-  'DELETE /v1/queue': 'v1/queue/clean'
+  'DELETE /v1/queue': 'v1/queue/clean',
+
+  'GET /v1/backup': 'v1/backup/find',
+  'POST /v1/backup': 'v1/backup/create',
+  'GET /v1/backup/:id/download': 'v1/backup/download',
+  'POST /v1/backup/:id/restore': 'v1/backup/restore',
+  'DELETE /v1/backup/:id': 'v1/backup/destroy'
 }
