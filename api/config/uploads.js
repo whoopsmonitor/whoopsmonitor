@@ -1,3 +1,3 @@
 module.exports.uploads = {
-  adapter: 'skipper-disk'
+  adapter: require('skipper-disk')
 }

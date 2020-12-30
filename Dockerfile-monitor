@@ -14,11 +14,10 @@ RUN yarn global add @quasar/cli@1.1.0
 # install dependencies
 RUN yarn install
 
-# build app
-RUN quasar build
+COPY monitor/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
-# start app to serve static files in /dist directory
-CMD [ "yarn", "production" ]
+ENTRYPOINT ["./entrypoint.sh"]
 
 # expose port for Node server
 EXPOSE 80
