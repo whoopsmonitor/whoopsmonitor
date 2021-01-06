@@ -23,7 +23,8 @@
     "winston": "^3.3.3",
     "node-cache": "^5.1.2",
     "archiver": "^5.0.2",
-    "sails-hook-uploads": "^0.4.3"
+    "sails-hook-uploads": "^0.4.3",
+    "unzipper": "^0.10.11"
   },
   "devDependencies": {
     "@sailshq/eslint": "^4.19.3",

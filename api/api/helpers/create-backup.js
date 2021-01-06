@@ -1,5 +1,4 @@
 const { DateTime } = require('luxon')
-const map = require('lodash').map
 const fs = require('fs')
 const path = require('path')
 const tmpPath = sails.config.paths.tmp
@@ -61,28 +60,21 @@ module.exports = {
       throw 'createBackupFolderFailed'
     }
 
-    const collections = ['alert', 'alertstatus', 'configuration', 'dockerimage', 'healthindex', 'check', 'checkstatus']
+    const collections = sails.config.backup.collections
 
     for (const collection of collections) {
       const model = sails.models[collection]
-      let results = []
+      const results = []
 
       try {
-        results = await model.find({})
-
-        // convert id to "_id"
-        results = map(results, (result) => {
-          result._id = result.id
-          delete result.id
-          return result
-        })
+        results.concat(await model.find({}))
       } catch (error) {
         sails.log.error(error)
         throw 'collectionFindFailed'
       }
 
       try {
-        fs.writeFileSync(`${backupLocation}/${collection}.js`, JSON.stringify(results))
+        fs.writeFileSync(`${backupLocation}/${collection}.json`, JSON.stringify(results))
       } catch (error) {
         sails.log.error(error)
         throw 'backupFileWriteFailed'

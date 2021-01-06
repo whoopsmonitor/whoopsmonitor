@@ -20,7 +20,7 @@ module.exports = {
   fn: async function (_, exits) {
     try {
       const folders = fs.readdirSync(backupFolder)
-      return exits.success(folders)
+      return exits.success(JSend.success(folders))
     } catch (error) {
       sails.log.error(error)
       return exits.badRequest()

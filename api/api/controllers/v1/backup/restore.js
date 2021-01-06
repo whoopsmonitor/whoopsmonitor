@@ -2,7 +2,7 @@ const JSend = require('jsend')
 
 module.exports = {
 
-  friendlyName: 'Restorre a backup',
+  friendlyName: 'Restore a backup',
 
   inputs: {
     id: {
@@ -14,12 +14,39 @@ module.exports = {
   exits: {
     badRequest: {
       responseType: 'badRequest'
+    },
+    fileUploadError: {
+      responseType: 'badRequest'
+    },
+    restoreFailed: {
+      responseType: 'badRequest'
     }
   },
 
   fn: async function (inputs, exits) {
-    let result = await sails.helpers.restoreBackup(inputs.id)
+    this.req.file('backup').upload(async (err, files) => {
+      if (err) {
+        return exits.fileUploadError()
+      }
 
-    return exits.success(JSend.success(result))
+      if (!files.length) {
+        return exits.fileUploadError()
+      }
+
+      const file = files[0]
+
+      // just make sure we talk about ZIP
+      if (file.type !== 'application/zip') {
+        return exits.fileUploadError()
+      }
+
+      const result = await sails.helpers.restoreBackup(file)
+
+      if (result !== true) {
+        return exits.restoreFailed()
+      }
+
+      return exits.success(JSend.success(true))
+    })
   }
 }
