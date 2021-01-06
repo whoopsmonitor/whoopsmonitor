@@ -35,6 +35,15 @@
                     icon="cloud_download"
                   />
                 </q-item-section>
+                <q-item-section top side>
+                  <q-btn
+                    @click="remove(backup)"
+                    dense
+                    round
+                    icon="delete"
+                    color="red"
+                  />
+                </q-item-section>
               </q-item>
             </q-list>
           </q-card-section>
@@ -43,7 +52,7 @@
             There are no backups yet.
           </q-card-section>
 
-          <skeleton-list v-if="loading.list" />
+          <skeleton-list v-if="loading.list || loading.remove" />
         </q-card>
       </q-tab-panel>
 
@@ -89,7 +98,8 @@ export default {
       loading: {
         list: false,
         create: false,
-        restore: false
+        restore: false,
+        remove: false
       },
       form: {
         backup: null
@@ -104,6 +114,8 @@ export default {
 
   methods: {
     async fetchData () {
+      this.backups = []
+
       this.loading.list = true
 
       try {
@@ -181,6 +193,28 @@ export default {
         })
       } finally {
         this.loading.restore = false
+      }
+    },
+
+    async remove (backup) {
+      try {
+        this.loading.remove = true
+        this.backups = []
+
+        await this.$axios.delete(`/v1/backup/${backup}`)
+        await this.fetchData()
+
+        this.$whoopsNotify.positive({
+          message: 'Backup removed.'
+        })
+      } catch (error) {
+        console.error(error)
+
+        this.$whoopsNotify.negative({
+          message: 'It is not possible to remove a backup. Please try it again.'
+        })
+      } finally {
+        this.loading.remove = false
       }
     }
   }
