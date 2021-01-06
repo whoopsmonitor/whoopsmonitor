@@ -13,8 +13,6 @@
 let log = {}
 
 if (process.env.NODE_ENV !== 'development') {
-  const { version } = require('../package');
-
   const { createLogger, format, transports } = require('winston');
   const { combine, timestamp, colorize, printf, align } = format;
   const { SPLAT } = require('triple-beam');
