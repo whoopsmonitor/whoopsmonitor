@@ -69,8 +69,8 @@ module.exports = {
       throw err
     })
 
-    archive.finalize()
-
-    return exits.success(downloadedBackupFile)
+    archive.finalize().then(() => {
+      return exits.success(downloadedBackupFile)
+    })
   }
 }

@@ -64,10 +64,10 @@ module.exports = {
 
     for (const collection of collections) {
       const model = sails.models[collection]
-      const results = []
+      let results = []
 
       try {
-        results.concat(await model.find({}))
+        results = results.concat(await model.find({}))
       } catch (error) {
         sails.log.error(error)
         throw 'collectionFindFailed'
