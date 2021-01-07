@@ -155,7 +155,7 @@
         </q-item-label>
       </q-list>
 
-      <q-list v-if="loggedIn">
+      <q-list>
         <q-item
           clickable
           tag="a"
