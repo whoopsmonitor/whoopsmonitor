@@ -104,8 +104,8 @@ questions.push({
 questions.push({
   type: 'input',
   name: 'apiUrl',
-  message: 'Application URL where the monitor is accessible from the browser (with the port 8080 at the end).',
-  default: 'http://localhost:8080'
+  message: 'API URL where the monitor is accessible from the browser (with the port 1337 at the end).',
+  default: 'http://localhost:1337'
 })
 
 // base auth
