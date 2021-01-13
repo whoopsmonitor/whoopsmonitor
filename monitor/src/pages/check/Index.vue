@@ -35,7 +35,7 @@
                 <q-icon name="warning" color="red" /> Image is not valid.
               </q-item-label>
             </q-item-section>
-            <q-item-section top side>
+            <q-item-section top side :class="{ 'disabled': loading.run }">
               <div class="text-grey-8 q-gutter-xs">
                 <q-btn-group flat>
                   <q-btn
@@ -59,6 +59,15 @@
                     <q-tooltip>move down</q-tooltip>
                   </q-btn>
                 </q-btn-group>
+                <q-btn
+                  @click="runNow(check)"
+                  color="secondary"
+                  dense
+                  round
+                  icon="local_fire_department"
+                >
+                  <q-tooltip>run immediately</q-tooltip>
+                </q-btn>
                 <q-btn
                   @click="duplicate(check)"
                   color="secondary"
@@ -239,7 +248,7 @@ export default {
       } catch (error) {
         console.error(error)
 
-        this.$whoopsNotify.error({
+        this.$whoopsNotify.negative({
           message: `Check "${check.name} status has not been changed. Please try it again or refresh the page."`
         })
       }
@@ -269,7 +278,7 @@ export default {
       } catch (error) {
         console.error(error)
 
-        this.$whoopsNotify.error({
+        this.$whoopsNotify.negative({
           message: 'It is not possible to duplicate this check. Please try it again.'
         })
       }
@@ -309,7 +318,7 @@ export default {
       } catch (error) {
         console.error(error)
 
-        this.$whoopsNotify.error({
+        this.$whoopsNotify.negative({
           message: 'It is not possible to change the ordering. Please try it again.'
         })
       } finally {
@@ -325,11 +334,25 @@ export default {
           verbose: false
         })
       } catch (error) {
-        this.$whoopsNotify.error({
+        this.$whoopsNotify.negative({
           message: 'It is not possible to force a new ordering. Please try it again.'
         })
       } finally {
         this.loading.order = false
+      }
+    },
+
+    async runNow (check) {
+      try {
+        await this.$axios.get(`/v1/check/${check.id}/run`)
+
+        this.$whoopsNotify.positive({
+          message: 'Check added to queue.'
+        })
+      } catch (error) {
+        this.$whoopsNotify.negative({
+          message: 'It is not possible to run the check. Please try it again.'
+        })
       }
     }
   }

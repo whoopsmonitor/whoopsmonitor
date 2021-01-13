@@ -201,7 +201,7 @@ export default {
       } catch (error) {
         console.error(error)
 
-        this.$whoopsNotify.error({
+        this.$whoopsNotify.negative({
           message: `Alert "${alert.name} status has not been changed. Please try it again or refresh the page."`
         })
       }
@@ -228,7 +228,7 @@ export default {
       } catch (error) {
         console.error(error)
 
-        this.$whoopsNotify.error({
+        this.$whoopsNotify.negative({
           message: 'It is not possible to duplicate this alert. Please try it again.'
         })
       }

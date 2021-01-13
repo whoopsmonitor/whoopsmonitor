@@ -98,6 +98,7 @@ executeCheckQueue.process(async (job, done) => {
   const checkId = job.data.checkId
   const cron = job.data.cron
   const environmentVariables = job.data.environmentVariables
+  const immediate = job.data.immediate // run now
 
   if (!checkId) {
     return done(Error('Check ID not specified.'))
@@ -144,11 +145,14 @@ executeCheckQueue.process(async (job, done) => {
     return done(err)
   }
 
-  if (!check.enabled) {
-    console.log(`[${packageName}] [${logSymbols.info}] Check ${checkId} not enabled.`)
-    return done(null, {
-      check
-    })
+  // run the check even it is not enabled
+  if (!immediate) {
+    if (!check.enabled) {
+      console.log(`[${packageName}] [${logSymbols.info}] Check ${checkId} not enabled.`)
+      return done(null, {
+        check
+      })
+    }
   }
 
   if (check.progress) {

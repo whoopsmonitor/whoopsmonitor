@@ -197,7 +197,7 @@ export default {
       } catch (error) {
         console.error(error)
 
-        this.$whoopsNotify.error({
+        this.$whoopsNotify.negative({
           message: 'It is not possible to refresh metadata of this image.'
         })
       }
