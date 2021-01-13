@@ -36,6 +36,13 @@
             :rules="[ val => val && val.length > 0 || 'Please enter the name of your check.']"
           />
 
+          <q-input
+            filled
+            v-model="form.description"
+            label="Description"
+            hint="Enter the check description."
+          />
+
           <q-select
             v-if="hasImages"
             v-model="form.image"
@@ -260,6 +267,7 @@ export default {
       form: {
         enabled: false,
         name: '',
+        description: '',
         image: '',
         cron: '* * * * *',
         environmentVariables: '',
@@ -352,6 +360,7 @@ export default {
         if (item) {
           this.form.enabled = item.enabled
           this.form.name = item.name
+          this.form.description = item.description
           this.form.image = {
             label: item.image.image,
             value: item.image.id

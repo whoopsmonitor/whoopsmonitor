@@ -34,7 +34,12 @@
                       </q-tooltip>
                     </span>
                   </q-item-label>
-                  <q-item-label :lines="2">{{ check.name }}</q-item-label>
+                  <q-item-label :lines="2">
+                    {{ check.name }}
+                    <q-icon name="info" v-if="check.description" color="grey" style="cursor: help" @click.prevent.self>
+                      <q-tooltip>{{ check.description }}</q-tooltip>
+                    </q-icon>
+                  </q-item-label>
                   <q-item-label caption :lines="2" v-if="!check.display || check.display === null">
                     <div v-if="check.status">
                       <div :class="colorizeTextClass(check.status)" v-html="truncate(check.status.output.replace(/\n/g, '<br />'), 100) || 'no output yet'" />
@@ -146,7 +151,7 @@ export default {
         const checks = await this.$axios.get('/v1/check', {
           params: {
             populate: false,
-            select: 'name,progress,enabled,display',
+            select: 'name,description,progress,enabled,display',
             sort: 'order ASC'
           }
         }).then((res) => res.data)

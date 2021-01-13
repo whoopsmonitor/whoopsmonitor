@@ -19,6 +19,10 @@ module.exports = {
       type: 'string'
     },
 
+    description: {
+      type: 'string'
+    },
+
     image: {
       model: 'DockerImage',
       required: true
