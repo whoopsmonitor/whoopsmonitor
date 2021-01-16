@@ -19,7 +19,12 @@ module.exports = {
 
   fn: async function (_, exits) {
     try {
-      const folders = fs.readdirSync(backupFolder)
+      const folders = fs.readdirSync(backupFolder, {
+        withFileTypes: true
+      })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name)
+
       return exits.success(JSend.success(folders))
     } catch (error) {
       sails.log.error(error)
