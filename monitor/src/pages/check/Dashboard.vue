@@ -63,7 +63,7 @@
                 </template>
                 <template v-else>
                   <q-card-section v-if="!loading.aggregates && chartMetric.series">
-                    <apexchart type="line" :height="500" :options="chart" :series="chartMetric.series" />
+                    <apexchart type="line" :height="500" :options="chartMetric" :series="chartMetric.series" />
                   </q-card-section>
                 </template>
               </q-card>
@@ -231,9 +231,7 @@ export default {
       return {
         series: this.statsSeriesMetric,
         chart: {
-          type: 'line',
-          stacked: true,
-          stackType: '100%'
+          type: 'line'
         },
         colors: ['#008000'],
         responsive: [{
@@ -285,11 +283,6 @@ export default {
         }
       ]
     },
-    statsXAxisCategories () {
-      return this.items.map((item) => {
-        return item.date
-      }) || []
-    },
 
     statsSeriesMetric () {
       const results = []
@@ -304,6 +297,12 @@ export default {
           data: results
         }
       ]
+    },
+
+    statsXAxisCategories () {
+      return this.items.map((item) => {
+        return item.date
+      }) || []
     }
   },
 
