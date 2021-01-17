@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "console-stamp": "^3.0.0-rc4.2",
     "execa": "^4.0.3",
     "execution-time": "^1.4.1",
