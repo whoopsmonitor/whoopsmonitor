@@ -187,14 +187,6 @@ inquirer.prompt(questions).then((answers) => {
 
   ; (async () => {
     try {
-      // network must be created otherwise it is not possible to connect with installer to the other services
-      console.log(`${logSymbols.info} Creating private network.`)
-      await execa.command([
-        `docker network create -d bridge ${APP_NAME}_app_tier`
-      ].join('\\'), {
-        shell: true
-      })
-
       console.log(`${logSymbols.info} Starting all containers on background.`)
       await execa.command([
         `cd ${outputDir} &&`,
