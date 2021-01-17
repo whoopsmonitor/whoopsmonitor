@@ -144,4 +144,5 @@ volumes:
 
 networks:
   app-tier:
-    driver: bridge
+    external:
+      name: <%= APP_NAME %>_app-tier
