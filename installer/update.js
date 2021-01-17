@@ -4,6 +4,7 @@ const logSymbols = require('log-symbols')
 const fs = require('fs')
 const path = require('path')
 const execa = require('execa')
+const waitForUrl = require('./utils/wait-for-url')
 
 const outputDir = '../output'
 const composeFile = 'docker-compose.yml'
@@ -72,6 +73,9 @@ questions.push({
 
         console.log(`${logSymbols.info} (done) Starting all containers.`)
 
+        console.log(`${logSymbols.info} (start) Waiting for Monitor to start.`)
+        await waitForUrl('http://localhost:8080', 'monitor')
+        console.log(`${logSymbols.info} (done) Waiting for Monitor to start.`)
       } catch (error) {
         console.error(error)
         process.exit(1)
