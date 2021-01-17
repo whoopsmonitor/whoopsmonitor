@@ -74,7 +74,8 @@ questions.push({
         console.log(`${logSymbols.info} (done) Starting all containers.`)
 
         console.log(`${logSymbols.info} (start) Waiting for Monitor to start.`)
-        await waitForUrl('http://monitor:8080', 'monitor')
+        // port "80" is the inner port - we're on the same network
+        await waitForUrl('http://monitor:80', 'monitor')
         console.log(`${logSymbols.info} (done) Waiting for Monitor to start.`)
       } catch (error) {
         console.error(error)

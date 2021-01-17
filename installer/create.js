@@ -187,6 +187,14 @@ inquirer.prompt(questions).then((answers) => {
 
   ; (async () => {
     try {
+      // network must be created otherwise it is not possible to connect with installer to the other services
+      console.log(`${logSymbols.info} Creating private network.`)
+      await execa.command([
+        `docker network create -d bridge ${APP_NAME}_app_tier`
+      ].join('\\'), {
+        shell: true
+      })
+
       console.log(`${logSymbols.info} Starting all containers on background.`)
       await execa.command([
         `cd ${outputDir} &&`,
@@ -196,7 +204,8 @@ inquirer.prompt(questions).then((answers) => {
       })
 
       console.log(`${logSymbols.info} (start) Waiting for Monitor to start.`)
-      await waitForUrl('http://monitor:8080', 'monitor')
+      // port "80" is the inner port - we're on the same network
+      await waitForUrl('http://monitor:80', 'monitor')
       console.log(`${logSymbols.info} (done) Waiting for Monitor to start.`)
     } catch (error) {
       console.error(error)
