@@ -7,5 +7,5 @@ That is the most straightforward update. Switch to the directory with the `docke
 ```bash
 docker pull ghcr.io/whoopsmonitor/whoopsmonitor/installer:1.0
 
-docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/whoopsmonitor/whoopsmonitor/installer:1.0 update
+docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock --network whoopsmonitor_app-tier ghcr.io/whoopsmonitor/whoopsmonitor/installer:1.0 update
 ```
