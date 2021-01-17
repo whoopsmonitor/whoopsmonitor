@@ -6,6 +6,7 @@ const generatePassword = require('generate-password')
 const fs = require('fs')
 const path = require('path')
 const execa = require('execa')
+const waitForUrl = require('./utils/wait-for-url')
 
 const APP_NAME = 'whoopsmonitor'
 const outputDir = '../output'
@@ -193,6 +194,10 @@ inquirer.prompt(questions).then((answers) => {
       ].join('\\'), {
         shell: true
       })
+
+      console.log(`${logSymbols.info} (start) Waiting for Monitor to start.`)
+      await waitForUrl('http://localhost:8080', 'monitor')
+      console.log(`${logSymbols.info} (done) Waiting for Monitor to start.`)
     } catch (error) {
       console.error(error)
       process.exit(2)
