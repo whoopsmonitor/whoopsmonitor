@@ -31,6 +31,8 @@ You need
 The easiest way is to run this project with the `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords, etc.). Run it with this command:
 
 ```bash
+docker network create -d bridge whoopsmonitor_app-tier
+
 docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/whoopsmonitor/whoopsmonitor/installer:1.0 create
 ```
 
