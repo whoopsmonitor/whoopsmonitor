@@ -6,6 +6,7 @@ const generatePassword = require('generate-password')
 const fs = require('fs')
 const path = require('path')
 const execa = require('execa')
+const request = require('request')
 const waitForUrl = require('./utils/wait-for-url')
 
 const APP_NAME = 'whoopsmonitor'
@@ -199,6 +200,16 @@ inquirer.prompt(questions).then((answers) => {
       // port "80" is the inner port - we're on the same network
       await waitForUrl('http://monitor:80', 'monitor')
       console.log(`${logSymbols.info} (done) Waiting for Monitor to start.`)
+
+      // restart API container - it is probably dead during Mongo connection
+      console.log(`${logSymbols.info} (start) Restarting API container.`)
+      await execa.command([
+        `cd ${outputDir} &&`,
+        `docker-compose -p whoopsmonitor restart api`
+      ].join('\\'), {
+        shell: true
+      })
+      console.log(`${logSymbols.info} (done) Restarting API container.`)
     } catch (error) {
       console.error(error)
       process.exit(2)
