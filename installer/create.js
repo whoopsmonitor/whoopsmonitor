@@ -6,7 +6,6 @@ const generatePassword = require('generate-password')
 const fs = require('fs')
 const path = require('path')
 const execa = require('execa')
-const request = require('request')
 const waitForUrl = require('./utils/wait-for-url')
 
 const APP_NAME = 'whoopsmonitor'
