@@ -38,14 +38,6 @@ docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.so
 
 It will ask for some simple questions and generate a `docker-compose.yml` file right in the current directory. You also get a file for local development (feel free to ignore that file).
 
-Now you can run the project in the background.
-
-```bash
-docker-compose -p whoopsmonitor up -d
-```
-
-`-p` means project name so you can have unified volume names, etc.
-
 Now you can access the monitor right from URL <http://localhost:8080>.
 
 ### Install with Caprover
