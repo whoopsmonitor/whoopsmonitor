@@ -48,8 +48,6 @@ module.exports.datastores = {
     *                                                                          *
     ***************************************************************************/
     adapter: 'sails-mongo',
-    url: process.env.MONGO_CONNECTION,
-    reconnectTries: Number.MAX_VALUE,
-    reconnectInterval: 1000
+    url: process.env.MONGO_CONNECTION
   }
 }
