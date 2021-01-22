@@ -24,7 +24,8 @@
     "node-cache": "^5.1.2",
     "archiver": "^5.0.2",
     "sails-hook-uploads": "^0.4.3",
-    "unzipper": "^0.10.11"
+    "unzipper": "^0.10.11",
+    "acorn": ">=5.7.4"
   },
   "devDependencies": {
     "@sailshq/eslint": "^4.19.3",
