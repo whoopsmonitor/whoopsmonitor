@@ -109,15 +109,15 @@ queue.process(async (job, done) => {
       }
 
       let commands = []
-      let imageRegistry = alert.image.image.split('/')[0]
 
-      // let's download the image
-      if (alert.image.local === false) {
-        if (alert.image.username && alert.image.password) {
-          commands.push(`echo "${alert.image.password}" | docker login ${imageRegistry} --username ${alert.image.username} --password-stdin >/dev/null &&`)
-        }
-        commands.push(`docker pull ${alert.image.image} >/dev/null &&`)
-      }
+      // let imageRegistry = alert.image.image.split('/')[0]
+      // INFO: do not pull docker images, let's image-metadata to handle it
+      // if (alert.image.local === false) {
+      //   if (alert.image.username && alert.image.password) {
+      //     commands.push(`echo "${alert.image.password}" | docker login ${imageRegistry} --username ${alert.image.username} --password-stdin >/dev/null &&`)
+      //   }
+      //   commands.push(`docker pull ${alert.image.image} >/dev/null &&`)
+      // }
 
       const envVars = []
 

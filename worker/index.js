@@ -179,7 +179,7 @@ executeCheckQueue.process(async (job, done) => {
     await markProgress(checkId, true)
 
     let commands = []
-    let imageRegistry = check.image.image.split('/')[0]
+    // let imageRegistry = check.image.image.split('/')[0]
 
     // files to copy
     const filesToCopy = []
@@ -212,13 +212,14 @@ executeCheckQueue.process(async (job, done) => {
       })
     }
 
-    if (check.image.local === false) {
-      // login with docker if required
-      if (check.image.username && check.image.password) {
-        commands.push(`echo "${check.image.password}" | docker login ${imageRegistry} --username ${check.image.username} --password-stdin >/dev/null &&`)
-      }
-      commands.push(`docker pull ${check.image.image} >/dev/null &&`)
-    }
+    // INFO: do not pull docker images, let's image-metadata to handle it
+    // if (check.image.local === false) {
+    //   // login with docker if required
+    //   if (check.image.username && check.image.password) {
+    //     commands.push(`echo "${check.image.password}" | docker login ${imageRegistry} --username ${check.image.username} --password-stdin >/dev/null &&`)
+    //   }
+    //   commands.push(`docker pull ${check.image.image} >/dev/null &&`)
+    // }
 
     const envVars = []
     const volumeVars = []
