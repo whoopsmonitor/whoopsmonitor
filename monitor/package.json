@@ -28,7 +28,8 @@
     "serve-static": "^1.14.1",
     "truncate": "^2.1.0",
     "vue-apexcharts": "^1.6.0",
-    "vuex-persist": "^3.1.0"
+    "vuex-persist": "^3.1.0",
+    "trend": "^0.3.0"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",

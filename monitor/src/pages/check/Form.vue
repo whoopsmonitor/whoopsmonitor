@@ -149,6 +149,14 @@
           />
 
           <div v-if="form.display.metric">
+            <q-toggle
+              v-model="form.display.trend"
+              checked-icon="check"
+              color="accent"
+              unchecked-icon="clear"
+              label="Show a trend icon"
+            />
+
             <div>
               <q-select
                 v-model="form.display.type"
@@ -280,7 +288,8 @@ export default {
           metric: false,
           type: 'number',
           warning: 80,
-          critical: 40
+          critical: 40,
+          trend: false
         }
       },
       tab: 'general',
@@ -377,6 +386,11 @@ export default {
           }
 
           if (item.display) {
+            // set the default value in case "trend" has not been setup yet (due to compatibility)
+            if (typeof item.display.trend === 'undefined') {
+              item.display.trend = this.form.display.trend
+            }
+
             this.form.display = item.display
           }
         }

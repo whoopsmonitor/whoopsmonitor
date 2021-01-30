@@ -78,6 +78,14 @@
                 <template v-if="check.status && check.display && check.display.metric">
                   <div>
                     <q-chip size="xl" dense :color="metricBgColor(check)" text-color="white">
+                      <template v-if="check.status.trend && check.display.trend">
+                        <template v-if="check.status.trend < 0">
+                          <q-icon name="arrow_downward" size="xs" />
+                        </template>
+                        <template v-if="check.status.trend > 0">
+                          <q-icon name="arrow_upward" size="xs" />
+                        </template>
+                      </template>
                       {{ parseInt(check.status.output) || '?' }} <span v-if="check.display.type.value === 'numberWithPercent'">%</span>
                     </q-chip>
                   </div>
@@ -92,7 +100,8 @@
 
 <script>
 import truncate from 'truncate'
-// import { sortBy } from 'lodash'
+import { map } from 'lodash'
+import trend from 'trend'
 import timeAgo from '../filters/timeAgo'
 import datetime from '../filters/datetime'
 import NoItemListHere from '../components/NoItemListHere'
@@ -171,6 +180,13 @@ export default {
 
           check.status = status[0]
           check.statusHistory = status.reverse()
+
+          if (check.display && check.display.trend) {
+            const outputs = map(check.statusHistory, history => history.output * 1)
+            check.status.trend = trend(outputs, {
+              avgPoints: 5
+            }) || false
+          }
         }
 
         this.checks = checks
