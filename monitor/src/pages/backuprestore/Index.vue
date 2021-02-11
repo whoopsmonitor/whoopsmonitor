@@ -172,6 +172,7 @@ export default {
         this.loading.restore = true
 
         await this.$axios.post(`/v1/backup/${this.form.backup.name}/restore`, formData, {
+          timeout: 60 * 5 * 1000,
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -183,7 +184,7 @@ export default {
 
         setTimeout(() => {
           window.location.href = '#'
-          window.location.reload(true)
+          window.location.reload()
         }, 3000)
       } catch (error) {
         console.error(error)
