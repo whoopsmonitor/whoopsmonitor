@@ -180,7 +180,7 @@
                   label="Warning"
                   hint="Warning level."
                   lazy-rules
-                  :rules="[ val => val && val > 0 || 'You should enter warning threshold for the metric.']"
+                  :rules="[ val => val && typeof val !== 'number' || 'You should enter warning threshold for the metric.']"
                 />
               </div>
               <div class="col-4">
@@ -191,7 +191,7 @@
                   label="Critical"
                   hint="critical level."
                   lazy-rules
-                  :rules="[ val => val && val > 0 || 'You should enter critical threshold for the metric.']"
+                  :rules="[ val => val && typeof val !== 'number' || 'You should enter critical threshold for the metric.']"
                 />
               </div>
             </div>
