@@ -289,6 +289,14 @@ export default {
         return color
       }
 
+      if (!critical) {
+        return color
+      }
+
+      if (!warning) {
+        return color
+      }
+
       if (output >= warning) {
         color = 'green'
       } else if (output >= critical && output < warning) {
