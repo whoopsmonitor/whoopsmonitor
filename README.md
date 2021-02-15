@@ -1,5 +1,5 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/whoopsmonitor/whoopsmonitor)
-![https://twitter.com/whoopsmonitor](https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40whoopsmonitor)
+<a href="https://twitter.com/whoopsmonitor">![Twitter](https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40whoopsmonitor)</a>
 
 <img src="/docs/img/logo_1024_1024.png" alt="logo" width="150" height="150" align="right"
  />
