@@ -59,7 +59,7 @@ module.exports = {
     }
   },
   customToJSON: function () {
-    // encrypt env vars
+    // decrypt env vars
     if (this.environmentVariables) {
       this.environmentVariables = sails.helpers.decryptAttribute(this.environmentVariables)
     }

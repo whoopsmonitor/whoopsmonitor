@@ -65,6 +65,16 @@ const routes = [
   },
 
   {
+    path: '/variable',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', name: 'variable.index', component: () => import('pages/variable/Index.vue'), meta: { auth: true } },
+      { path: 'create', name: 'variable.create', component: () => import('pages/variable/Form.vue'), meta: { auth: true } },
+      { path: ':id', name: 'variable.detail', component: () => import('pages/variable/Form.vue'), meta: { auth: true, edit: true } }
+    ]
+  },
+
+  {
     path: '/server-error',
     component: () => import('pages/Error500.vue'),
     name: 'error.500',

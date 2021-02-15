@@ -71,7 +71,7 @@
           header
           class="text-grey-8"
         >
-          Configuration
+          Items
         </q-item-label>
       </q-list>
 
@@ -126,6 +126,15 @@
       </q-list>
 
       <q-list>
+        <q-item-label
+          header
+          class="text-grey-8"
+        >
+          Configuration
+        </q-item-label>
+      </q-list>
+
+      <q-list>
         <q-item
           clickable
           tag="a"
@@ -141,6 +150,25 @@
             <q-item-label>Docker Images</q-item-label>
             <q-item-label caption>
               all Docker images
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item
+          clickable
+          tag="a"
+          :to="{ name: 'variable.index' }"
+        >
+          <q-item-section
+            avatar
+          >
+            <q-icon name="lock" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>Shared Variables</q-item-label>
+            <q-item-label caption>
+              environmental variables
             </q-item-label>
           </q-item-section>
         </q-item>
