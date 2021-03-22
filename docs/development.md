@@ -25,7 +25,7 @@ It will generate a `docker-compose.yml` and `docker-compose-dev.yml` files right
 Now you can start all required containers (without a monitor - described below).
 
 ```sh
-docker-compose down && docker-compose -f docker-compose-dev.yml up
+docker-compose -p whoopsmonitor down && docker-compose -f docker-compose-dev.yml -p whoopsmonitor up
 ```
 
 That is what you get:
