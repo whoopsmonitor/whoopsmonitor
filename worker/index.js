@@ -268,11 +268,11 @@ executeCheckQueue.process(async (job, done) => {
   } catch (error) {
     perfResult = perf.stop()
 
-    // remove job from the queue
-    await removeJobFromQueue(job)
-
     // also make sure the status code is 2 in case of the higher number
     try {
+      // remove job from the queue
+      await removeJobFromQueue(job)
+
       await addToLog(check.id, (error.exitCode > 2 ? error.exitCode : error.exitCode), error.stdout || error.stderr, perfResult.time)
       await markProgress(check.id, false)
 
