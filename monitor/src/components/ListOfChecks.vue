@@ -181,7 +181,7 @@ export default {
           check.status = status[0]
           check.statusHistory = status.reverse()
 
-          if (check.display && check.display.trend) {
+          if (check.display && check.display.trend && check.status) {
             const outputs = map(check.statusHistory, history => history.output * 1)
             check.status.trend = trend(outputs, {
               avgPoints: 5
