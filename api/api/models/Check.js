@@ -19,8 +19,8 @@ module.exports = {
       type: 'string'
     },
 
-    description: {
-      type: 'string'
+    tags: {
+      type: 'ref'
     },
 
     image: {

@@ -44,6 +44,20 @@
           />
 
           <q-select
+            label="Tags"
+            hint="Enter tags separated by comma."
+            filled
+            v-model="form.tags"
+            use-input
+            use-chips
+            multiple
+            input-debounce="0"
+            @new-value="createValue"
+            :options="filterOptions"
+            @filter="filterFn"
+          />
+
+          <q-select
             v-if="hasImages"
             v-model="form.image"
             :options="imageOptions"
@@ -283,6 +297,7 @@ export default {
           name: '',
           content: ''
         },
+        tags: [],
         alerts: [],
         display: {
           metric: false,
@@ -312,7 +327,9 @@ export default {
           metric: false,
           type: 'number'
         }
-      }
+      },
+      filterOptions: [],
+      stringOptions: []
     }
   },
   computed: {
@@ -362,6 +379,29 @@ export default {
   },
 
   methods: {
+    createValue (val, done) {
+      if (val.length > 0) {
+        if (!this.stringOptions.includes(val)) {
+          this.stringOptions.push(val)
+        }
+
+        done(val, 'toggle')
+      }
+    },
+
+    filterFn (val, update) {
+      update(() => {
+        if (val === '') {
+          this.filterOptions = this.stringOptions
+        } else {
+          const needle = val.toLowerCase()
+          this.filterOptions = this.stringOptions.filter(
+            v => v.toLowerCase().indexOf(needle) > -1
+          )
+        }
+      })
+    },
+
     async fetchData () {
       try {
         const item = await this.$axios.get(`/v1/check/${this.$route.params.id}`).then((response) => response.data)
@@ -380,6 +420,9 @@ export default {
           }
           this.form.cron = item.cron
           this.form.environmentVariables = ini.stringify(item.environmentVariables)
+          this.form.tags = item.tags
+
+          this.stringOptions = this.form.tag || []
 
           if (item.alerts.length) {
             this.form.alerts = item.alerts.map(alert => alert.id)
