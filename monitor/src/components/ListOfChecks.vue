@@ -23,8 +23,17 @@
 
       <div class="row q-col-gutter-sm" v-if="checks.length">
         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-12" v-for="check in filteredChecks" :key="check.id">
-          <q-list bordered separator>
-            <q-item v-ripple :to="{ name: 'check.dashboard', params: { id: check.id } }">
+          <q-list
+            bordered
+            separator
+            :style="{
+              'border-color': check.status && check.status.status === 1 ? 'orange' : check.status && check.status.status === 2 ? 'red' : ''
+            }"
+          >
+            <q-item
+              v-ripple
+              :to="{ name: 'check.dashboard', params: { id: check.id } }"
+            >
                 <q-item-section>
                   <q-item-label caption v-if="check.status">
                     <span>
@@ -129,7 +138,9 @@ export default {
     filteredChecks () {
       return this.checks.filter((check) => {
         if (this.onlyFailing) {
-          return check.status.status > 0
+          if (check.status) {
+            return check.status.status > 0
+          }
         }
 
         return true
