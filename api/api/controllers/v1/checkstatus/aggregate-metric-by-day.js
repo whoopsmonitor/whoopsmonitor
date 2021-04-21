@@ -1,4 +1,8 @@
 var { ObjectId } = require('bson')
+const NodeCache = require('node-cache')
+const myCache = new NodeCache({
+  stdTTL: 60 * 60 // stored for 60 minutes
+})
 
 module.exports = {
 
@@ -22,6 +26,13 @@ module.exports = {
   },
 
   fn: async function ({ checkId, from, to }, exits) {
+    const cacheKey = `aggregate-metric-by-day.${checkId}-${from}-${to}`
+    const cachedResults = myCache.get(cacheKey)
+
+    if (cachedResults) {
+      return exits.success(cachedResults)
+    }
+
     let query = [
       {
         '$match': {
@@ -85,6 +96,8 @@ module.exports = {
           sails.log.error(err)
           return exits.success([])
         }
+
+        myCache.set(cacheKey, results)
 
         return exits.success(results)
       })

@@ -8,7 +8,7 @@
  * https://sailsjs.com/docs/concepts/policies
  */
 
- const blueprintTokenPolicy = {
+const blueprintTokenPolicy = {
   find: 'token',
   findOne: 'token',
   create: 'token',
@@ -42,6 +42,7 @@ module.exports.policies = {
   'v1/check/reorder-all': 'token',
   'v1/check/run': 'token',
 
+  'v1/checkstatus/find': 'token',
   'v1/checkstatus/isfailing': 'token',
   'v1/checkstatus/aggregate': 'token',
   'v1/checkstatus/aggregate-by-day': 'token',
