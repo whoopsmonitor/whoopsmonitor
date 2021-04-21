@@ -80,60 +80,45 @@
             </div>
           </div>
         </div>
+
         <div class="col-12">
-          <q-card flat bordered dense>
-            <q-card-section>
-              <div class="text-h6">
-                Latest Results <span class="text-caption">(50 records)</span>
-              </div>
-              <div>
-                <q-toggle
-                  v-model="logsStatusOnlyFailed"
-                  @input="fetchLatestLogs"
-                  checked-icon="check"
-                  color="green"
-                  unchecked-icon="clear"
-                  label="errors only"
-                  v-if="logs.length"
-                >
-                  <q-tooltip v-if="logsStatusOnlyFailed">all logs</q-tooltip>
-                  <q-tooltip v-else>only failed records</q-tooltip>
-                </q-toggle>
-              </div>
-            </q-card-section>
-
-            <q-separator inset />
-
-            <q-card-section>
-              <skeleton-list v-if="loading.latest" />
-              <q-list v-if="!loading.latest && logs.length" bordered separator>
-                <q-item v-for="log in logs" :key="log.id">
-                  <q-item-section avatar>
-                    <q-avatar :color="colorizeCircleClass(log)" size="30px" />
-                  </q-item-section>
-                  <q-item-section>
-                    <div v-if="log.output" :class="colorizeTextClass(log)" v-html="log.output.replace(/\n/g, '<br />')" />
-                    <div v-else>
-                      no output
-                    </div>
-                    <q-item-label caption>
-                      {{ log.createdAt | dateformat }}
-                    </q-item-label>
-                    <q-item-label v-if="loggedIn">
-                      <q-btn
-                        size="xs"
-                        color="red"
-                        @click="destroyDialog(log.id)"
-                      >delete</q-btn>
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-              <q-item-section v-if="!loading.latest && !logs.length">
-                No logs here.
-              </q-item-section>
-            </q-card-section>
-          </q-card>
+          <q-table
+            title="Latest Results (50 records)"
+            :data="tableData"
+            :columns="table.columns"
+            row-key="id"
+            :rows-per-page-options="[100]"
+          >
+            <template v-slot:top>
+              <q-toggle
+                v-model="logsStatusOnlyFailed"
+                @input="fetchLatestLogs"
+                checked-icon="check"
+                color="green"
+                unchecked-icon="clear"
+                label="errors only"
+              >
+                <q-tooltip v-if="logsStatusOnlyFailed">all logs</q-tooltip>
+                <q-tooltip v-else>only failed records</q-tooltip>
+              </q-toggle>
+            </template>
+            <template v-slot:body="props">
+              <q-tr :props="props">
+                <q-td key="options" :props="props" auto-width>
+                  <q-avatar :color="colorizeCircleClass(props.row)" size="sm" />
+                  <!-- <q-btn
+                    size="xs"
+                    color="red"
+                    @click="destroyDialog(props.row.id)"
+                  >delete</q-btn> -->
+                </q-td>
+                <q-td key="output" :props="props">
+                  <div v-html="props.row.output.replace(/\n/g, '<br />')" />
+                  <div>{{ props.row.createdAt | dateformat }}</div>
+                </q-td>
+              </q-tr>
+            </template>
+          </q-table>
         </div>
       </div>
       <confirm-dialog
@@ -185,6 +170,23 @@ export default {
         aggregates: false,
         latest: false,
         destroy: false
+      },
+      table: {
+        columns: [
+          {
+            name: 'options',
+            style: 'vertical-align: top'
+          },
+          {
+            name: 'output',
+            required: true,
+            label: 'Output',
+            align: 'left',
+            field: row => row.output,
+            format: val => `${val}`,
+            sortable: false
+          }
+        ]
       }
     }
   },
@@ -192,6 +194,17 @@ export default {
   computed: {
     loggedIn () {
       return this.$store.getters['auth/loggedIn']
+    },
+
+    tableData () {
+      return this.logs.map(item => {
+        return {
+          id: item.id,
+          status: item.status,
+          output: item.output,
+          createdAt: item.createdAt
+        }
+      })
     },
 
     chart () {
@@ -226,7 +239,6 @@ export default {
         }
       }
     },
-
     chartMetric () {
       return {
         series: this.statsSeriesMetric,
