@@ -329,7 +329,7 @@ export default {
         }
       },
       filterOptions: [],
-      stringOptions: []
+      tags: []
     }
   },
   computed: {
@@ -376,13 +376,14 @@ export default {
 
     await this.fetchImages()
     await this.fetchAlerts()
+    await this.fetchTags()
   },
 
   methods: {
     createValue (val, done) {
       if (val.length > 0) {
-        if (!this.stringOptions.includes(val)) {
-          this.stringOptions.push(val)
+        if (!this.tags.includes(val)) {
+          this.tags.push(val)
         }
 
         done(val, 'toggle')
@@ -392,10 +393,10 @@ export default {
     filterFn (val, update) {
       update(() => {
         if (val === '') {
-          this.filterOptions = this.stringOptions
+          this.filterOptions = this.tags
         } else {
           const needle = val.toLowerCase()
-          this.filterOptions = this.stringOptions.filter(
+          this.filterOptions = this.tags.filter(
             v => v.toLowerCase().indexOf(needle) > -1
           )
         }
@@ -422,8 +423,6 @@ export default {
           this.form.environmentVariables = ini.stringify(item.environmentVariables)
           this.form.tags = item.tags
 
-          this.stringOptions = this.form.tag || []
-
           if (item.alerts.length) {
             this.form.alerts = item.alerts.map(alert => alert.id)
           }
@@ -445,6 +444,14 @@ export default {
             message: 'It is not possible to load check details. Please refresh this page.'
           })
         }
+      }
+    },
+
+    async fetchTags () {
+      try {
+        this.tags = await this.$axios.get('/v1/check/tags').then(response => response.data)
+      } catch (error) {
+        console.error(error)
       }
     },
 

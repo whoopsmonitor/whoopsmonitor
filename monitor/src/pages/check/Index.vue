@@ -28,6 +28,14 @@
               <q-item-label caption>
                 <q-icon name="event_note" /> {{ check.createdAt | datetime }}
               </q-item-label>
+              <q-item-label v-if="check.tags && check.tags.length">
+                <q-chip
+                  v-for="tag in check.tags" :key="tag"
+                  size="sm"
+                >
+                  {{ tag }}
+                </q-chip>
+              </q-item-label>
               <q-item-label v-if="!check.image" caption>
                 <q-icon name="warning" color="red" /> Image does not exists.
               </q-item-label>
@@ -173,7 +181,7 @@ export default {
       try {
         this.checks = await this.$axios.get('/v1/check', {
           params: {
-            select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display,order',
+            select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display,order,tags',
             populate: 'image',
             sort: 'order ASC'
           }
