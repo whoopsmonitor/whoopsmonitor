@@ -22,6 +22,17 @@
       />
 
       <div class="row q-col-gutter-sm" v-if="checks.length">
+        <div class="col-12">
+          <q-chip
+            v-for="tag in tags" :key="tag.id"
+            clickable
+            :selected.sync="selectedTags[tag.id]"
+            icon="radio_button_unchecked"
+            selected-icon="radio_button_checked"
+          >
+            {{ tag.tag }}
+          </q-chip>
+        </div>
         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-12" v-for="check in filteredChecks" :key="check.id">
           <q-list
             bordered
@@ -131,7 +142,8 @@ export default {
       checks: [],
       interval: undefined,
       loading: false,
-      onlyFailing: false
+      onlyFailing: false,
+      selectedTags: {}
     }
   },
   computed: {
@@ -143,6 +155,24 @@ export default {
           }
         }
 
+        if (this.selectedTags && Object.keys(this.selectedTags).length) {
+          const activeTags = []
+          for (const tagKey in this.selectedTags) {
+            const tagIsActive = this.selectedTags[tagKey]
+            if (tagIsActive) {
+              activeTags.push(tagKey)
+            }
+          }
+
+          if (activeTags && activeTags.length) {
+            if (check.tags && check.tags.length) {
+              return check.tags.filter(value => activeTags.includes(value)).length > 0
+            } else {
+              return false
+            }
+          }
+        }
+
         return true
       })
     },
@@ -151,6 +181,23 @@ export default {
     },
     hasFailingCheck () {
       return this.checks.length && this.checks.some(check => check.status && check.status.status > 0)
+    },
+    tags () {
+      let tags = []
+
+      for (const check of this.checks) {
+        if (check.tags) {
+          tags = [...new Set([...tags, ...check.tags])]
+        }
+      }
+
+      return tags.map(tag => {
+        return {
+          id: tag,
+          tag,
+          selected: false
+        }
+      })
     }
   },
   async created () {
@@ -171,7 +218,7 @@ export default {
         const checks = await this.$axios.get('/v1/check', {
           params: {
             populate: false,
-            select: 'name,description,progress,enabled,display',
+            select: 'name,description,progress,enabled,display,tags',
             sort: 'order ASC'
           }
         }).then((res) => res.data)
