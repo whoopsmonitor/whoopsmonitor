@@ -1,7 +1,34 @@
 <template>
   <q-card flat bordered>
     <q-card-section>
-      <h3 class="text-h6 q-mt-none q-mb-sm">Latest Results</h3>
+      <div class="row q-col-gutter-md q-mb-md">
+        <div class="col">
+          <div>
+            <q-chip
+              v-for="tag in tags" :key="tag.id"
+              clickable
+              :selected.sync="selectedTags[tag.id]"
+              icon="radio_button_unchecked"
+              :disable="onlyFailing"
+            >
+              {{ tag.tag }}
+            </q-chip>
+          </div>
+          <div>
+            <q-toggle
+              v-if="hasFailingCheck"
+              v-model="onlyFailing"
+              checked-icon="check"
+              color="green"
+              unchecked-icon="clear"
+              label="only failing"
+            />
+          </div>
+        </div>
+        <div class="col text-right">
+          <h3 class="text-h6 q-mt-none q-mb-sm">Latest Results</h3>
+        </div>
+      </div>
       <skeleton-list v-if="loading && !checks.length" />
 
       <no-item-list-here
@@ -12,26 +39,7 @@
         to-title="new check"
       />
 
-      <q-toggle
-        v-if="hasFailingCheck"
-        v-model="onlyFailing"
-        checked-icon="check"
-        color="green"
-        unchecked-icon="clear"
-        label="only failing"
-      />
-
       <div class="row q-col-gutter-sm" v-if="checks.length">
-        <div class="col-12">
-          <q-chip
-            v-for="tag in tags" :key="tag.id"
-            clickable
-            :selected.sync="selectedTags[tag.id]"
-            icon="radio_button_unchecked"
-          >
-            {{ tag.tag }}
-          </q-chip>
-        </div>
         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-12" v-for="check in filteredChecks" :key="check.id">
           <q-list
             bordered
@@ -197,6 +205,12 @@ export default {
           selected: false
         }
       })
+    }
+  },
+  watch: {
+    onlyFailing () {
+      // reset tags
+      this.selectedTags = {}
     }
   },
   async created () {
