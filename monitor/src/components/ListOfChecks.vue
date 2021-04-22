@@ -28,7 +28,6 @@
             clickable
             :selected.sync="selectedTags[tag.id]"
             icon="radio_button_unchecked"
-            selected-icon="radio_button_checked"
           >
             {{ tag.tag }}
           </q-chip>
