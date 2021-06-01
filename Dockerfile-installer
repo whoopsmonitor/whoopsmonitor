@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmo
 RUN apk add --no-cache openssl=1.1.1k-r0 \
     docker-cli=20.10.3-r1 \
     docker-compose=1.27.4-r0 \
-    curl=7.76.1-r0 && \
+    curl=7.77.0-r0 && \
     rm -rf /var/cache/apk/*
 
 WORKDIR /app
