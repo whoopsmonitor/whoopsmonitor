@@ -203,7 +203,7 @@ export default {
         const item = await this.$axios.get(`/v1/alert/${this.$route.params.id}`).then((response) => response.data)
 
         if (item) {
-          this.form.enabled = item.enabled || true
+          this.form.enabled = (typeof item.enabled === 'boolean' ? item.enabled : false)
           this.form.name = item.name
           this.form.description = item.description
           if (item.image) {
@@ -212,13 +212,9 @@ export default {
               value: item.image.id
             }
           }
-          this.form.environmentVariables = ini.stringify(item.environmentVariables)
           this.form.repeat = item.repeat
-          this.form.level = item.level
-
-          if (!this.form.level || this.form.level.length) {
-            this.form.level = levels
-          }
+          console.log(item.level)
+          this.form.level = (typeof item.level === 'undefined' ? levels : item.level)
         }
       } catch (error) {
         console.error(error)
