@@ -28,7 +28,7 @@
               <q-item-label caption>
                 <q-icon name="event_note" /> {{ alert.createdAt | datetime }}
               </q-item-label>
-              <q-item-label caption>
+              <q-item-label caption v-if="alert.level.length">
                 <q-chip v-if="alert.level.indexOf(0) > -1" color="green" text-color="white" size="sm">success</q-chip>
                 <q-chip v-if="alert.level.indexOf(1) > -1" color="orange" text-color="white" size="sm">warning</q-chip>
                 <q-chip v-if="alert.level.indexOf(2) > -1" color="red" text-color="white" size="sm">critical</q-chip>
