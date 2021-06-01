@@ -10,12 +10,28 @@
       <q-card-section>
         <q-list bordered separator>
           <q-item v-for="alert in alerts" :key="alert.id">
+            <q-item-section side top>
+              <q-toggle
+                @input="switchStatus(alert)"
+                v-model="enabled[alert.id]"
+                checked-icon="check"
+                color="green"
+                unchecked-icon="clear"
+              >
+                <q-tooltip>click to {{ enabled[alert.id] ? 'disable' : 'enable' }}</q-tooltip>
+              </q-toggle>
+            </q-item-section>
             <q-item-section>
               <q-item-label line="1">
                 <router-link :to="{ name: 'alert.detail', params: { id: alert.id }}">{{ alert.name }}</router-link>
               </q-item-label>
               <q-item-label caption>
                 <q-icon name="event_note" /> {{ alert.createdAt | datetime }}
+              </q-item-label>
+              <q-item-label caption>
+                <q-chip v-if="alert.level.indexOf(0) > -1" color="green" text-color="white" size="sm">success</q-chip>
+                <q-chip v-if="alert.level.indexOf(1) > -1" color="orange" text-color="white" size="sm">warning</q-chip>
+                <q-chip v-if="alert.level.indexOf(2) > -1" color="red" text-color="white" size="sm">critical</q-chip>
               </q-item-label>
               <q-item-label v-if="!alert.image" caption>
                 <q-icon name="warning" color="red" /> Image does not exists.
@@ -130,7 +146,7 @@ export default {
       try {
         this.alerts = await this.$axios.get('/v1/alert', {
           params: {
-            select: 'name,description,image,environmentVariables,createdAt',
+            select: 'enabled,name,description,image,environmentVariables,createdAt,level',
             populate: 'image'
           }
         }).then(response => response.data)
@@ -214,6 +230,8 @@ export default {
       record.enabled = false
       record.name = `${record.name} - copy`
       record.image = alert.image.id
+      record.level = alert.level
+      record.repeat = alert.repeat
 
       try {
         await this.$axios.post('/v1/alert', record)

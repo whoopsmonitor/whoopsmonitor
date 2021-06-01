@@ -5,6 +5,11 @@
 
 module.exports = {
   attributes: {
+    enabled: {
+      type: 'boolean',
+      defaultsTo: false
+    },
+
     name: {
       type: 'string',
       required: true
@@ -27,6 +32,12 @@ module.exports = {
     repeat: {
       type: 'number',
       defaultsTo: 5 // minutes
+    },
+
+    level: {
+      type: 'json',
+      columnType: 'array',
+      defaultsTo: [1, 2]
     }
   },
   customToJSON: function () {

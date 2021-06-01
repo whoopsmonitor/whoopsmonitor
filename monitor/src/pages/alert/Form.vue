@@ -4,6 +4,14 @@
     <h1 v-else class="text-h4 q-mt-sm">New Alert</h1>
 
     <q-form @submit="onSubmit">
+      <q-toggle
+        v-model="form.enabled"
+        checked-icon="check"
+        color="green"
+        unchecked-icon="clear"
+        label="Published"
+      />
+
       <q-tabs
         v-model="tab"
         align="left"
@@ -45,7 +53,35 @@
           <div>
             <h6 class="text-caption q-ma-none q-mb-sm">Repeat (minutes)</h6>
             <q-slider v-model="form.repeat" :min="1" :max="60" snap label />
-            <div class="text-caption">Select an interval the check will trigger this alert.</div>
+            <div class="text-caption">Alert won't trigger for selected period (in case status has not changed).</div>
+          </div>
+
+          <div>
+            <div class="text-h6">Levels</div>
+            <div class="text-caption">Allows notification for selected levels.</div>
+
+            <q-toggle
+              label="success"
+              v-model="form.level"
+              :val="0"
+              color="green"
+            />
+
+            <q-toggle
+              label="warning"
+              v-model="form.level"
+              :val="1"
+              color="orange"
+            />
+            <q-toggle
+              label="critical"
+              v-model="form.level"
+              :val="2"
+              color="red"
+            />
+            <div class="text-red" v-if="!form.level.length">
+              Please select some level. Otherwise it will be saved with all options checked.
+            </div>
           </div>
         </q-tab-panel>
 
@@ -94,11 +130,13 @@ export default {
   data () {
     return {
       form: {
+        enabled: true,
         name: '',
         description: '',
         image: '',
         environmentVariables: '',
-        repeat: 5
+        repeat: 5,
+        level: [0, 1, 2]
       },
       tab: 'general',
       images: [],
@@ -164,6 +202,7 @@ export default {
         const item = await this.$axios.get(`/v1/alert/${this.$route.params.id}`).then((response) => response.data)
 
         if (item) {
+          this.form.enabled = item.enabled
           this.form.name = item.name
           this.form.description = item.description
           if (item.image) {
@@ -174,6 +213,7 @@ export default {
           }
           this.form.environmentVariables = ini.stringify(item.environmentVariables)
           this.form.repeat = item.repeat
+          this.form.level = item.level
         }
       } catch (error) {
         console.error(error)
@@ -197,6 +237,10 @@ export default {
 
         // make sure image is just an ID
         form.image = form.image.value
+
+        if (!form.level.length) {
+          form.level = [0, 1, 2]
+        }
 
         await this.$axios[method]('/v1/alert' + (this.edit ? `/${this.$route.params.id}` : ''), form)
 

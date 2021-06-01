@@ -25,6 +25,10 @@ It will generate a `docker-compose.yml` and `docker-compose-dev.yml` files right
 Now you can start all required containers (without a monitor - described below).
 
 ```sh
+# create an internal network if missing
+docker network create -d bridge whoopsmonitor_app-tier
+
+# start development (without UI)
 docker-compose -p whoopsmonitor down && docker-compose -f docker-compose-dev.yml -p whoopsmonitor up
 ```
 

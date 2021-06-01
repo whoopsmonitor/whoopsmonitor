@@ -60,14 +60,31 @@ queue.process(async (job, done) => {
     try {
       const alert = await axiosInstance.get(`/v1/alert/${alertId}`, {
         params: {
-          select: 'name,image,environmentVariables,repeat,createdAt'
+          select: 'enabled,name,image,environmentVariables,repeat,createdAt,level'
         }
       }).then(response => response.data)
+
+      if (alert.enabled === null) {
+        // if no info about being enabled is available, presume it is on
+        alert.enabled = true
+      }
+
+      // alert is not enabled at all
+      if (!alert.enabled) {
+        continue
+      }
+
+      // exclusion by level if configured
+      if (!alert.level.length) {
+        if (alert.level.indexOf(checkExitCode) === -1) {
+          continue
+        }
+      }
 
       // get alert status as well
       const latestStatuses = await axiosInstance.get(`/v1/alertstatus`, {
         params: {
-          select: 'createdAt',
+          select: 'createdAt,status',
           limit: 2, // only 2 latests
           where: {
             alert: alertId
@@ -78,8 +95,8 @@ queue.process(async (job, done) => {
       }).then(response => response.data) // just the first item in array
 
       if (latestStatuses.length) {
-        const lastStatus = latestStatus[0]
-        const previousStatus = latestStatus[1]
+        const lastStatus = latestStatuses[0]
+        const previousStatus = latestStatuses[1]
 
         // compare exit codes - in case they differ, send message even the repeat interval is not yet completed
         let checkAlsoForInterval = false
@@ -157,7 +174,6 @@ queue.process(async (job, done) => {
       } catch (error) {
         console.error(`[${packageJson.name}]`, error)
       }
-
     }
   }
 
