@@ -14,7 +14,7 @@ WORKDIR /app
 COPY installer/ .
 RUN npm install --quiet
 
-VOLUME .:/output/
+VOLUME ${PWD}:/output/
 
 COPY installer/entrypoint.sh /opt/whoopsmonitor/entrypoint.sh
 RUN chmod +x /opt/whoopsmonitor/entrypoint.sh
