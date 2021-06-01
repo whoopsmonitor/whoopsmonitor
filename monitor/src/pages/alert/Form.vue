@@ -79,7 +79,7 @@
               :val="2"
               color="red"
             />
-            <div class="text-red" v-if="!form.level.length">
+            <div class="text-red" v-if="form.level && !form.level.length">
               Please select some level. Otherwise it will be saved with all options checked.
             </div>
           </div>
@@ -124,6 +124,7 @@
 
 <script>
 import ini from 'ini'
+const levels = [0, 1, 2]
 
 export default {
   name: 'PageCheckCreate',
@@ -136,7 +137,7 @@ export default {
         image: '',
         environmentVariables: '',
         repeat: 5,
-        level: [0, 1, 2]
+        level: levels
       },
       tab: 'general',
       images: [],
@@ -202,7 +203,7 @@ export default {
         const item = await this.$axios.get(`/v1/alert/${this.$route.params.id}`).then((response) => response.data)
 
         if (item) {
-          this.form.enabled = item.enabled
+          this.form.enabled = item.enabled || true
           this.form.name = item.name
           this.form.description = item.description
           if (item.image) {
@@ -214,6 +215,10 @@ export default {
           this.form.environmentVariables = ini.stringify(item.environmentVariables)
           this.form.repeat = item.repeat
           this.form.level = item.level
+
+          if (!this.form.level || this.form.level.length) {
+            this.form.level = levels
+          }
         }
       } catch (error) {
         console.error(error)
