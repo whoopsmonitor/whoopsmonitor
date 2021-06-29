@@ -43,8 +43,18 @@ const addToLog = async (checkId, status, output, duration) => {
 }
 
 const removeJobFromQueue = async (job) => {
-  console.log(`[${packageName}] [${logSymbols.info}] [${job.opts.jobId}] Removing job from queue`)
-  await executeCheckQueue.removeRepeatable(job.opts.repeat, job.opts.jobId)
+  try {
+    console.log(`[${packageName}] [${logSymbols.info}] Removing job from queue`)
+    if (job.opts && job.opts.jobId) {
+      console.log(`[${packageName}] [${logSymbols.info}] Removing job from queue, job ID [${job.opts.jobId}]`)
+      await executeCheckQueue.removeRepeatable(job.opts.repeat, job.opts.jobId)
+    }
+  } catch (error) {
+    console.log(`[${packageName}] [${logSymbols.error}] Removing job from queue - unknown error.`)
+    if (error) {
+      console.error('ERROR:', error)
+    }
+  }
 }
 
 const getLastStatus = async (checkId) => {
