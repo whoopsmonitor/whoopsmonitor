@@ -3,22 +3,12 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn
-          v-if="loggedIn"
           flat
           dense
           round
           icon="menu"
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
-        />
-        <q-btn
-          v-if="!loggedIn"
-          flat
-          dense
-          round
-          icon="home"
-          aria-label="Home"
-          @click="$router.push({ name: 'dashboard' })"
         />
 
         <q-toolbar-title>Whoops Monitor</q-toolbar-title>
@@ -42,7 +32,6 @@
     </q-header>
 
     <q-drawer
-      v-if="loggedIn"
       v-model="leftDrawerOpen"
       show-if-above
       bordered
@@ -66,112 +55,114 @@
         </q-item>
       </q-list>
 
-      <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
-          Configuration
-        </q-item-label>
-      </q-list>
-
-      <q-list>
-        <q-item
-          clickable
-          tag="a"
-          :to="{ name: 'check.index' }"
-        >
-          <q-item-section
-            avatar
+      <template v-if="loggedIn">
+        <q-list>
+          <q-item-label
+            header
+            class="text-grey-8"
           >
-            <q-icon name="fact_check" />
-          </q-item-section>
+            Configuration
+          </q-item-label>
+        </q-list>
 
-          <q-item-section>
-            <q-item-label ref="guide-checks">
-              Checks
-            </q-item-label>
-            <q-item-label caption>
-              list all checks
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-
-      <q-list>
-        <q-item
-          clickable
-          tag="a"
-          :to="{ name: 'alert.index' }"
-        >
-          <q-item-section
-            avatar
+        <q-list>
+          <q-item
+            clickable
+            tag="a"
+            :to="{ name: 'check.index' }"
           >
-            <q-icon name="notifications" />
-          </q-item-section>
+            <q-item-section
+              avatar
+            >
+              <q-icon name="fact_check" />
+            </q-item-section>
 
-          <q-item-section>
-            <q-item-label>
-              Alerts
-              <!-- <q-badge color="blue">
-                beta
-              </q-badge> -->
+            <q-item-section>
+              <q-item-label ref="guide-checks">
+                Checks
+              </q-item-label>
+              <q-item-label caption>
+                list all checks
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
 
-            </q-item-label>
-            <q-item-label caption>
-              list all alerts
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-
-      <q-list>
-        <q-item
-          clickable
-          tag="a"
-          :to="{ name: 'image.index' }"
-        >
-          <q-item-section
-            avatar
+        <q-list>
+          <q-item
+            clickable
+            tag="a"
+            :to="{ name: 'alert.index' }"
           >
-            <q-icon name="wallpaper" />
-          </q-item-section>
+            <q-item-section
+              avatar
+            >
+              <q-icon name="notifications" />
+            </q-item-section>
 
-          <q-item-section>
-            <q-item-label>Docker Images</q-item-label>
-            <q-item-label caption>
-              all Docker images
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
+            <q-item-section>
+              <q-item-label>
+                Alerts
+                <!-- <q-badge color="blue">
+                  beta
+                </q-badge> -->
 
-      <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
-          System
-        </q-item-label>
-      </q-list>
+              </q-item-label>
+              <q-item-label caption>
+                list all alerts
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
 
-      <q-list>
-        <q-item
-          clickable
-          tag="a"
-          :to="{ name: 'backuprestore.index' }"
-        >
-          <q-item-section
-            avatar
+        <q-list>
+          <q-item
+            clickable
+            tag="a"
+            :to="{ name: 'image.index' }"
           >
-            <q-icon name="import_export" />
-          </q-item-section>
+            <q-item-section
+              avatar
+            >
+              <q-icon name="wallpaper" />
+            </q-item-section>
 
-          <q-item-section>
-            <q-item-label>Backup & Restore</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
+            <q-item-section>
+              <q-item-label>Docker Images</q-item-label>
+              <q-item-label caption>
+                all Docker images
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+
+        <q-list>
+          <q-item-label
+            header
+            class="text-grey-8"
+          >
+            System
+          </q-item-label>
+        </q-list>
+
+        <q-list>
+          <q-item
+            clickable
+            tag="a"
+            :to="{ name: 'backuprestore.index' }"
+          >
+            <q-item-section
+              avatar
+            >
+              <q-icon name="import_export" />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label>Backup & Restore</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </template>
 
       <div class="fixed-bottom q-mb-md text-center">
         <a href="https://whoopsmonitor.app/" target="_blank" rel="noreferrer noopener">

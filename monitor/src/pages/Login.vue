@@ -19,7 +19,7 @@
           <div class="col-6 self-center">
             <q-input
               type="password"
-              label="Admin Password"
+              label="Enter Admin Password"
               outlined
               autofocus
               v-model="form.password"
@@ -32,7 +32,7 @@
               </template>
             </q-input>
             <div class="text-right q-pt-sm">
-              <router-link :to="{ name: 'dashboard' }">Are you a guest?</router-link>
+              <router-link :to="{ name: 'dashboard' }">or continue as a guest</router-link>
             </div>
           </div>
         </div>

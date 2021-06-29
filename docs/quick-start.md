@@ -5,7 +5,7 @@ Or any other URL where you install Whoops Monitor.
 
 ## Login
 
-Now you can log in. Use the admin password you can read from the Docker Compose file, the `APP_PASSWORD` variable. You might also click on the "Are you a guest?" link, allowing anonymous users to view dashboard data.
+Now you can log in. Use the admin password you can read from the Docker Compose file, the `APP_PASSWORD` variable. You might also click on the "or continue as a guest" link, allowing anonymous users to view dashboard data.
 
 <img src="/docs/img/quick-start/app-password-variable.png" alt="image" height="300" />
 
