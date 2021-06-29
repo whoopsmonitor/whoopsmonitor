@@ -211,6 +211,13 @@ export default {
     onlyFailing () {
       // reset tags
       this.selectedTags = {}
+    },
+
+    selectedTags: {
+      deep: true,
+      handler (items) {
+        this.$store.commit('config/setSelectedTags', JSON.parse(JSON.stringify(items)))
+      }
     }
   },
   async created () {
@@ -219,6 +226,8 @@ export default {
     this.interval = setInterval(async () => {
       await this.fetchData()
     }, 10000)
+
+    this.selectedTags = JSON.parse(JSON.stringify(this.$store.state.config.selectedTags))
   },
   destroyed () {
     clearInterval(this.interval)

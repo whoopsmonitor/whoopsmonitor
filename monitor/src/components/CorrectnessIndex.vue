@@ -159,7 +159,10 @@ export default {
       return this.$store.getters['auth/loggedIn']
     },
     thresholdsRaw () {
-      return this.$store.state.healthindex.thresholds.filter(item => item.check === this.check && item.hours === this.hours)
+      if (Object.keys(this.$store.state.healthindex.thresholds).length) {
+        return this.$store.state.healthindex.thresholds.filter(item => item.check === this.check && item.hours === this.hours)
+      }
+      return {}
     },
     thresholds () {
       const thresholds = {}

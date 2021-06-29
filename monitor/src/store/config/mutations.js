@@ -5,3 +5,7 @@ export function setApiToken (state, API_TOKEN) {
 export function setApiUrl (state, APP_API_URL) {
   state.APP_API_URL = APP_API_URL
 }
+
+export function setSelectedTags (state, tags) {
+  state.selectedTags = tags
+}
