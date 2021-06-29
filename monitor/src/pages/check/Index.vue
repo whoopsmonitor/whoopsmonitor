@@ -2,14 +2,29 @@
   <q-page padding>
     <q-card v-if="checks.length" flat bordered>
       <q-card-section>
-        <div class="text-h6">Checks</div>
+        <div class="row">
+          <div class="col">
+            <div class="text-h6">Checks</div>
+          </div>
+          <div class="col">
+            <q-input v-model="filter.checks" filled type="search" placeholder="filter..." dense>
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
+        </div>
       </q-card-section>
 
       <q-separator inset />
 
       <q-card-section>
-        <q-list bordered separator>
-          <q-item v-for="check in checks" :key="check.id">
+
+      </q-card-section>
+
+      <q-card-section>
+        <q-list bordered separator v-if="filteredChecks.length">
+          <q-item v-for="check in filteredChecks" :key="check.id">
             <q-item-section side top>
               <q-toggle
                 @input="switchStatus(check)"
@@ -98,6 +113,9 @@
             </q-item-section>
           </q-item>
         </q-list>
+        <p v-else>
+          There are no checks to select from.
+        </p>
       </q-card-section>
     </q-card>
 
@@ -155,7 +173,17 @@ export default {
         destroy: false
       },
       destroyId: '',
-      interval: undefined
+      interval: undefined,
+      filter: {
+        checks: ''
+      }
+    }
+  },
+  computed: {
+    filteredChecks () {
+      return this.checks.filter(check => {
+        return check.name.toLowerCase().indexOf(this.filter.checks) > -1
+      })
     }
   },
   async created () {
