@@ -2,14 +2,25 @@
   <q-page padding>
     <q-card v-if="images.length" flat bordered>
       <q-card-section>
-        <div class="text-h6">Docker Images</div>
+        <div class="row">
+          <div class="col">
+            <div class="text-h6">Docker Images</div>
+          </div>
+          <div class="col">
+            <q-input v-model="filter.images" filled type="search" placeholder="filter..." dense>
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
+        </div>
       </q-card-section>
 
       <q-separator inset />
 
       <q-card-section>
-        <q-list bordered separator>
-          <q-item v-for="image in images" :key="image.id">
+        <q-list bordered separator v-if="filteredImages.length">
+          <q-item v-for="image in filteredImages" :key="image.id">
             <q-item-section side top>
               <q-icon :name="iconForImageType(image)" />
             </q-item-section>
@@ -54,6 +65,9 @@
             </q-item-section>
           </q-item>
         </q-list>
+        <p v-else>
+          There are no images to select from.
+        </p>
       </q-card-section>
     </q-card>
 
@@ -109,7 +123,17 @@ export default {
         destroy: false
       },
       destroyId: '',
-      interval: undefined
+      interval: undefined,
+      filter: {
+        images: ''
+      }
+    }
+  },
+  computed: {
+    filteredImages () {
+      return this.images.filter(item => {
+        return item.image.toLowerCase().indexOf(this.filter.images) > -1
+      })
     }
   },
   async created () {

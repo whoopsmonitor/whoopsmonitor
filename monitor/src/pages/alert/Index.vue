@@ -2,14 +2,25 @@
   <q-page padding>
     <q-card v-if="alerts.length" flat bordered>
       <q-card-section>
-        <div class="text-h6">Alerts</div>
+        <div class="row">
+          <div class="col">
+            <div class="text-h6">Alerts</div>
+          </div>
+          <div class="col">
+            <q-input v-model="filter.alert" filled type="search" placeholder="filter..." dense>
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
+        </div>
       </q-card-section>
 
       <q-separator inset />
 
       <q-card-section>
-        <q-list bordered separator>
-          <q-item v-for="alert in alerts" :key="alert.id">
+        <q-list bordered separator v-if="filteredAlerts.length">
+          <q-item v-for="alert in filteredAlerts" :key="alert.id">
             <q-item-section side top>
               <q-toggle
                 @input="switchStatus(alert)"
@@ -64,6 +75,9 @@
             </q-item-section>
           </q-item>
         </q-list>
+        <p v-else>
+          There are no alerts to select from.
+        </p>
       </q-card-section>
     </q-card>
 
@@ -120,7 +134,17 @@ export default {
         destroy: false
       },
       destroyId: '',
-      interval: undefined
+      interval: undefined,
+      filter: {
+        alert: ''
+      }
+    }
+  },
+  computed: {
+    filteredAlerts () {
+      return this.alerts.filter(item => {
+        return item.name.toLowerCase().indexOf(this.filter.alert) > -1
+      })
     }
   },
   async created () {
