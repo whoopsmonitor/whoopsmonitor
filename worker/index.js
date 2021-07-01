@@ -242,11 +242,11 @@ executeCheckQueue.process(async (job, done) => {
     }
 
     for (let envKey in check.environmentVariables) {
-      envVars.push(`--env ${envKey}=${check.environmentVariables[envKey]}`)
+      envVars.push(`--env '${envKey}=${check.environmentVariables[envKey]}'`)
     }
 
     // attach check id as well, prefix with "WM_"
-    envVars.push(`--env WM_CHECK_ID=${check.id}`)
+    envVars.push(`--env 'WM_CHECK_ID=${check.id}'`)
 
     commands.push(`docker run --rm ${envVars.join(' ')} ${volumeVars.join(' ')} ${check.image.image}`)
 
