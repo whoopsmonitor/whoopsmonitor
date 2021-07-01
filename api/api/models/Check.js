@@ -67,6 +67,18 @@ module.exports = {
     return this
   },
 
+  beforeCreate: async function (records, done) {
+    try {
+      records.order = await Check.count({})
+    } catch (error) {
+      if (error) {
+        sails.log.error(error)
+      }
+    }
+
+    return done()
+  },
+
   beforeDestroy: async function (criteria, proceed) {
     if (typeof criteria.where.id !== 'undefined') {
       const check = criteria.where.id
