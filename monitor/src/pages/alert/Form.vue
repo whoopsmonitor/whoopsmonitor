@@ -213,7 +213,7 @@ export default {
             }
           }
           this.form.repeat = item.repeat
-          console.log(item.level)
+          this.form.environmentVariables = ini.stringify(item.environmentVariables)
           this.form.level = (typeof item.level === 'undefined' ? levels : item.level)
         }
       } catch (error) {
