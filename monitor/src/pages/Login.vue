@@ -16,7 +16,7 @@
         </div>
       </div>
     </div>
-    <div class="row lt-xs">
+    <div class="row xs">
       <div class="col-12 bg q-pa-lg">
         <login-logo :height="128" />
       </div>
