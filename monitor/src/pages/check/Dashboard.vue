@@ -45,7 +45,7 @@
       <div class="row q-col-gutter-md q-mb-md">
         <div class="col-12">
           <div class="row q-col-gutter-md">
-            <div class="col-10">
+            <div class="col-12">
               <q-card flat bordered>
                 <q-card-section>
                   <div v-if="detail.display === null" class="text-h6">Summary</div>
@@ -68,15 +68,15 @@
                 </template>
               </q-card>
             </div>
-            <div class="col-2 q-gutter-y-md">
-              <correctness-index :check="$route.params.id" :hours="24" last-text="last 24 hours" />
-              <correctness-index :check="$route.params.id" :hours="7 * 24" last-text="last 7 days" />
-            </div>
-            <div class="col-6">
-              <correctness-index :check="$route.params.id" :hours="24" last-text="last 24 hours" />
-            </div>
-            <div class="col-6">
-              <correctness-index :check="$route.params.id" :hours="7 * 24" last-text="last 7 days" />
+            <div class="col-12">
+              <div class="row q-col-gutter-sm">
+                <div class="col-xs-12 col-sm-6">
+                  <correctness-index :check="$route.params.id" :hours="24" last-text="last 24 hours" />
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                  <correctness-index :check="$route.params.id" :hours="7 * 24" last-text="last 7 days" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
