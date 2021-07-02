@@ -302,7 +302,7 @@ export default {
   data () {
     return {
       form: {
-        enabled: false,
+        enabled: true,
         name: '',
         description: '',
         image: '',
