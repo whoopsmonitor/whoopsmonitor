@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <h1 v-if="edit" class="text-h4 q-mt-sm">Update Alert Details</h1>
+    <h1 v-if="edit" class="text-h4 q-mt-sm">Update Alert Details: {{ form.name }}</h1>
     <h1 v-else class="text-h4 q-mt-sm">New Alert</h1>
 
     <q-form @submit="onSubmit">
