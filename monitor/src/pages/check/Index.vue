@@ -19,10 +19,6 @@
       <q-separator inset />
 
       <q-card-section>
-
-      </q-card-section>
-
-      <q-card-section>
         <q-list bordered separator v-if="filteredChecks.length">
           <q-item v-for="check in filteredChecks" :key="check.id">
             <q-item-section side top>
@@ -35,6 +31,9 @@
               >
                 <q-tooltip>click to {{ enabled[check.id] ? 'disable' : 'enable' }}</q-tooltip>
               </q-toggle>
+            </q-item-section>
+            <q-item-section side top v-if="check.image.metadata['com.whoopsmonitor.icon']">
+              <q-icon :name="`img:${check.image.metadata['com.whoopsmonitor.icon']}`" />
             </q-item-section>
             <q-item-section>
               <q-item-label line="1" caption>
@@ -207,13 +206,18 @@ export default {
       }
 
       try {
-        this.checks = await this.$axios.get('/v1/check', {
+        const checks = await this.$axios.get('/v1/check', {
           params: {
             select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display,order,tags',
             populate: 'image',
             sort: 'order ASC'
           }
         }).then(response => response.data)
+
+        this.checks = checks.map(check => {
+          check.image.metadata = JSON.parse(check.image.metadata)
+          return check
+        })
 
         for (const check of this.checks) {
           this.$set(this.enabled, check.id, check.enabled)

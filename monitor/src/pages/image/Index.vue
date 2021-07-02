@@ -24,6 +24,9 @@
             <q-item-section side top>
               <q-icon :name="iconForImageType(image)" />
             </q-item-section>
+            <q-item-section side top v-if="image.metadata['com.whoopsmonitor.icon']">
+              <q-icon :name="`img:${image.metadata['com.whoopsmonitor.icon']}`" />
+            </q-item-section>
             <q-item-section>
               <q-item-label line="1">
                 <router-link :to="{ name: 'image.detail', params: { id: image.id }}">
@@ -157,11 +160,16 @@ export default {
       }
 
       try {
-        this.images = await this.$axios.get('/v1/dockerimage', {
+        const images = await this.$axios.get('/v1/dockerimage', {
           params: {
-            select: 'image,createdAt,username,password,type,healthyStatus,healthyStatusOutput'
+            select: 'image,createdAt,username,password,type,healthyStatus,healthyStatusOutput,metadata'
           }
         }).then(response => response.data)
+
+        this.images = images.map(image => {
+          image.metadata = JSON.parse(image.metadata)
+          return image
+        })
       } catch (error) {
         console.error(error)
         this.$whoopsNotify.negative({

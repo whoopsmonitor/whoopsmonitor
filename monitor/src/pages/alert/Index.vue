@@ -32,6 +32,9 @@
                 <q-tooltip>click to {{ enabled[alert.id] ? 'disable' : 'enable' }}</q-tooltip>
               </q-toggle>
             </q-item-section>
+            <q-item-section side top v-if="alert.image.metadata['com.whoopsmonitor.icon']">
+              <q-icon :name="`img:${alert.image.metadata['com.whoopsmonitor.icon']}`" />
+            </q-item-section>
             <q-item-section>
               <q-item-label line="1">
                 <router-link :to="{ name: 'alert.detail', params: { id: alert.id }}">{{ alert.name }}</router-link>
@@ -168,12 +171,17 @@ export default {
       }
 
       try {
-        this.alerts = await this.$axios.get('/v1/alert', {
+        const alerts = await this.$axios.get('/v1/alert', {
           params: {
             select: 'enabled,name,description,image,environmentVariables,createdAt,level',
             populate: 'image'
           }
         }).then(response => response.data)
+
+        this.alerts = alerts.map(alert => {
+          alert.image.metadata = JSON.parse(alert.image.metadata)
+          return alert
+        })
 
         for (const alert of this.alerts) {
           this.$set(this.enabled, alert.id, alert.enabled)

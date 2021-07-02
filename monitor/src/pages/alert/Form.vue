@@ -44,7 +44,22 @@
             use-input
             input-debounce="0"
             @filter="filterImages"
-          />
+          >
+          <template v-slot:option="scope">
+            <q-item
+              v-bind="scope.itemProps"
+              v-on="scope.itemEvents"
+            >
+              <q-item-section avatar v-if="scope.opt.icon">
+                <q-icon :name="scope.opt.icon" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+                <q-item-label caption v-if="scope.opt.description">{{ scope.opt.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+          </q-select>
           <div v-else>
             <div class="caption">Images</div>
             There are no images to select from or they are invalid.
@@ -151,10 +166,18 @@ export default {
     },
     imageOptions () {
       let items = this.images.map((image) => {
-        return {
+        const metadata = JSON.parse(image.metadata)
+
+        const opts = {
           label: image.image,
           value: image.id
         }
+
+        if (metadata['com.whoopsmonitor.icon']) {
+          opts.icon = `img:${metadata['com.whoopsmonitor.icon']}`
+        }
+
+        return opts
       })
 
       if (this.filterImagesString.length) {
@@ -182,7 +205,7 @@ export default {
       try {
         this.images = await this.$axios.get('/v1/dockerimage', {
           params: {
-            select: 'image',
+            select: 'image,metadata',
             where: {
               type: 'alert'
             },

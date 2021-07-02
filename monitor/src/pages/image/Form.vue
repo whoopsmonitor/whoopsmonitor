@@ -82,6 +82,9 @@
                 v-bind="scope.itemProps"
                 v-on="scope.itemEvents"
               >
+                <q-item-section avatar v-if="scope.opt.icon">
+                  <q-icon :name="scope.opt.icon" />
+                </q-item-section>
                 <q-item-section>
                   <q-item-label v-html="scope.opt.label" />
                   <q-item-label caption v-if="scope.opt.description">{{ scope.opt.description }}</q-item-label>
@@ -281,6 +284,13 @@ export default {
     async fetchImages () {
       try {
         this.images = await this.$axios.get('v1/dockerimage/list').then(res => res.data)
+        this.images.map(image => {
+          if (image.icon) {
+            image.icon = `img:${image.icon}`
+          }
+
+          return image
+        })
       } catch (error) {
         console.error(error)
       }
