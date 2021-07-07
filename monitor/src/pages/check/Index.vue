@@ -1,26 +1,24 @@
 <template>
   <q-page padding>
-    <q-card v-if="checks.length" flat bordered>
+    <q-card flat bordered>
       <q-card-section>
         <div class="row">
           <div class="col">
             <div class="text-h6">Checks</div>
           </div>
           <div class="col">
-            <q-input v-model="filter.checks" filled type="search" placeholder="filter..." dense>
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
+            <filter-results
+              v-model="filter.results"
+            />
           </div>
         </div>
       </q-card-section>
 
       <q-separator inset />
 
-      <q-card-section>
-        <q-list bordered separator v-if="filteredChecks.length">
-          <q-item v-for="check in filteredChecks" :key="check.id">
+      <q-card-section v-if="filteredItems.length">
+        <q-list bordered separator>
+          <q-item v-for="check in filteredItems" :key="check.id">
             <q-item-section side top>
               <q-toggle
                 @input="switchStatus(check)"
@@ -71,7 +69,7 @@
                     <q-tooltip>move up</q-tooltip>
                   </q-btn>
                   <q-btn
-                    :disable="loading.order || checks.length - 1 === check.order"
+                    :disable="loading.order || items.length - 1 === check.order"
                     @click="move(check, 1)"
                     color="accent"
                     dense
@@ -112,21 +110,19 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <p v-else>
+      </q-card-section>
+
+      <q-card-section v-if="!loading.fetch && !filteredItems.length">
+        <p>
           There are no checks to select from.
         </p>
+        <div>
+          <q-btn flat color="primary" type="a" :to="{ name: 'check.create' }">new check</q-btn>
+        </div>
       </q-card-section>
     </q-card>
 
     <skeleton-list v-if="loading.fetch" />
-
-    <no-item-list-here
-      v-if="!loading.fetch && !checks.length"
-      title="No checks here"
-      description="Currently there are no checks here yet. Please add a new one."
-      :to="{ name: 'check.create' }"
-      to-title="new check"
-    />
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="add" color="primary" type="a" :to="{ name: 'check.create' }" title="New Check" />
@@ -144,15 +140,16 @@
 </template>
 
 <script>
-import NoItemListHere from '../../components/NoItemListHere'
+import FilterResults from '../../components/FilterResults.vue'
 import SkeletonList from '../../components/SkeletonList'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import DateTime from '../../filters/datetime'
+import filteredItems from '../../helpers/filteredItems'
 
 export default {
   name: 'PageCheckIndex',
   components: {
-    NoItemListHere,
+    FilterResults,
     SkeletonList,
     ConfirmDialog
   },
@@ -161,7 +158,7 @@ export default {
   },
   data () {
     return {
-      checks: [],
+      items: [],
       enabled: {},
       loading: {
         fetch: false,
@@ -174,16 +171,13 @@ export default {
       destroyId: '',
       interval: undefined,
       filter: {
-        checks: ''
-      }
+        results: ''
+      },
+      filterByKey: 'name'
     }
   },
   computed: {
-    filteredChecks () {
-      return this.checks.filter(check => {
-        return check.name.toLowerCase().indexOf(this.filter.checks) > -1
-      })
-    }
+    ...filteredItems
   },
   async created () {
     await this.fetchData({
@@ -214,12 +208,12 @@ export default {
           }
         }).then(response => response.data)
 
-        this.checks = checks.map(check => {
+        this.items = checks.map(check => {
           check.image.metadata = JSON.parse(check.image.metadata)
           return check
         })
 
-        for (const check of this.checks) {
+        for (const check of this.items) {
           this.$set(this.enabled, check.id, check.enabled)
         }
       } catch (error) {
@@ -302,7 +296,7 @@ export default {
       record.name = `${record.name} - copy`
       record.image = check.image.id
       record.display = check.display || null
-      record.order = this.checks.length // order at the end
+      record.order = this.items.length // order at the end
 
       try {
         await this.$axios.post('/v1/check', record)
@@ -330,7 +324,7 @@ export default {
       const changeOrderInElementOnOrderValue = check.order
 
       const changes = []
-      for (const item of this.checks) {
+      for (const item of this.items) {
         if (item.order === changeOrderInElementOnOrder) {
           changes.push({
             id: check.id,

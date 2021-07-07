@@ -1,26 +1,24 @@
 <template>
   <q-page padding>
-    <q-card v-if="images.length" flat bordered>
+    <q-card>
       <q-card-section>
         <div class="row">
           <div class="col">
             <div class="text-h6">Docker Images</div>
           </div>
           <div class="col">
-            <q-input v-model="filter.images" filled type="search" placeholder="filter..." dense>
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
+            <filter-results
+              v-model="filter.results"
+            />
           </div>
         </div>
       </q-card-section>
 
       <q-separator inset />
 
-      <q-card-section>
-        <q-list bordered separator v-if="filteredImages.length">
-          <q-item v-for="image in filteredImages" :key="image.id">
+      <q-card-section v-if="filteredItems.length">
+        <q-list bordered separator>
+          <q-item v-for="image in filteredItems" :key="image.id">
             <q-item-section side top>
               <q-icon :name="iconForImageType(image)" />
             </q-item-section>
@@ -68,21 +66,19 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <p v-else>
+      </q-card-section>
+
+      <q-card-section v-if="!loading.fetch && !filteredItems.length">
+        <p v-if="!filteredItems.length">
           There are no images to select from.
         </p>
+        <div>
+          <q-btn flat color="primary" type="a" :to="{ name: 'image.create' }">new image</q-btn>
+        </div>
       </q-card-section>
     </q-card>
 
     <skeleton-list v-if="loading.fetch" />
-
-    <no-item-list-here
-      v-if="!loading.fetch && !images.length"
-      title="No Docker images here"
-      description="Currently there are no images registered yet. Please add a new one."
-      :to="{ name: 'image.create' }"
-      to-title="new image"
-    />
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="add" color="primary" type="a" :to="{ name: 'image.create' }" title="New Docker Image" />
@@ -100,15 +96,16 @@
 </template>
 
 <script>
-import NoItemListHere from '../../components/NoItemListHere'
+import FilterResults from '../../components/FilterResults.vue'
 import SkeletonList from '../../components/SkeletonList'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import DateTime from '../../filters/datetime'
+import filteredItems from '../../helpers/filteredItems'
 
 export default {
   name: 'PageImageIndex',
   components: {
-    NoItemListHere,
+    FilterResults,
     SkeletonList,
     ConfirmDialog
   },
@@ -117,7 +114,7 @@ export default {
   },
   data () {
     return {
-      images: [],
+      items: [],
       loading: {
         fetch: false,
         destroy: false
@@ -128,16 +125,13 @@ export default {
       destroyId: '',
       interval: undefined,
       filter: {
-        images: ''
-      }
+        results: ''
+      },
+      filterByKey: 'image'
     }
   },
   computed: {
-    filteredImages () {
-      return this.images.filter(item => {
-        return item.image.toLowerCase().indexOf(this.filter.images) > -1
-      })
-    }
+    ...filteredItems
   },
   async created () {
     await this.fetchData({
@@ -166,8 +160,10 @@ export default {
           }
         }).then(response => response.data)
 
-        this.images = images.map(image => {
-          image.metadata = JSON.parse(image.metadata)
+        this.items = images.map(image => {
+          if (image.metadata) {
+            image.metadata = JSON.parse(image.metadata)
+          }
           return image
         })
       } catch (error) {

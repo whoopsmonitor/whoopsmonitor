@@ -137,6 +137,27 @@
         </q-list>
 
         <q-list>
+          <q-item
+            clickable
+            tag="a"
+            :to="{ name: 'sharedenvvars.index' }"
+          >
+            <q-item-section
+              avatar
+            >
+              <q-icon name="vpn_key" />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label>Environment variables</q-item-label>
+              <q-item-label caption>
+                shared variables
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+
+        <q-list>
           <q-item-label
             header
             class="text-grey-8"

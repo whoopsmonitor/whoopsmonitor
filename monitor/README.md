@@ -10,8 +10,8 @@ yarn
 
 \### Local configuration
 
-Create a `.quasar.env.json` file in the root of the [/monitor](/monitor) directory. This file contains environmental variables for local development. You can check the example file - [.quasar.env.json.example](/monitor/.quasar.env.json.example)
-All environmental variables should be taken from docker-compose.yml file as well. New environmental variables means you have to update [installer](/installer) package as well.
+Create a `.quasar.env.json` file in the root of the [/monitor](/monitor) directory. This file contains environment variables for local development. You can check the example file - [.quasar.env.json.example](/monitor/.quasar.env.json.example)
+All environment variables should be taken from docker-compose.yml file as well. New environment variables means you have to update [installer](/installer) package as well.
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 

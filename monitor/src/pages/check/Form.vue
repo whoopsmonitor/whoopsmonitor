@@ -27,6 +27,23 @@
 
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="general" class="q-gutter-md">
+          <q-select
+            v-if="hasImages"
+            v-model="form.image"
+            :options="imageOptions"
+            label="Image *"
+            hint="Select the image."
+            lazy-rules
+            :rules="[ val => val && Object.keys(val).length > 0 || 'Please select image that would trigger your check.']"
+            use-input
+            input-debounce="0"
+            @filter="filterImages"
+          />
+          <div v-else>
+            <div class="caption">Images</div>
+            There are no images to select from or they are invalid.
+          </div>
+
           <q-input
             filled
             v-model="form.name"
@@ -107,7 +124,7 @@
             <template v-slot:avatar>
               <q-icon name="info" color="white" />
             </template>
-            <div>Put your environmental variables in the field bellow like you would do in Docker <i>.env</i> file, like:</div>
+            <div>Put your environment variables in the field bellow like you would do in Docker <i>.env</i> file, like:</div>
             <div>
               MY_VARIABLE=MY_VALUE
             </div>
@@ -126,6 +143,9 @@
             <q-tooltip>Reset variables to default ones provided by the image.</q-tooltip>
           </q-btn>
 
+          <shared-variables
+            v-model="form.sharedEnvironmentVariables"
+          />
         </q-tab-panel>
 
       <q-tab-panel name="general" class="q-gutter-md">
@@ -137,23 +157,6 @@
             lazy-rules
             :rules="[ val => val && val.length > 0 || 'Please enter the name of your check.']"
           />
-
-          <q-select
-            v-if="hasImages"
-            v-model="form.image"
-            :options="imageOptions"
-            label="Image *"
-            hint="Select the image."
-            lazy-rules
-            :rules="[ val => val && Object.keys(val).length > 0 || 'Please select image that would trigger your check.']"
-            use-input
-            input-debounce="0"
-            @filter="filterImages"
-          />
-          <div v-else>
-            <div class="caption">Images</div>
-            There are no images to select from or they are invalid.
-          </div>
 
           <q-input
             filled
@@ -293,9 +296,13 @@
 import { isValidCron } from 'cron-validator'
 import ini from 'ini'
 import translateCron from '../../filters/translateCron'
+import SharedVariables from '../../components/SharedVariables.vue'
 
 export default {
   name: 'PageCheckCreate',
+  components: {
+    SharedVariables
+  },
   filters: {
     translateCron
   },
@@ -320,7 +327,8 @@ export default {
           warning: 80,
           critical: 40,
           trend: false
-        }
+        },
+        sharedEnvironmentVariables: []
       },
       tab: 'general',
       images: [],
@@ -344,7 +352,8 @@ export default {
         }
       },
       filterOptions: [],
-      tags: []
+      tags: [],
+      selectedSharedVariables: []
     }
   },
   computed: {
@@ -434,6 +443,7 @@ export default {
           this.form.enabled = item.enabled
           this.form.name = item.name
           this.form.description = item.description
+          this.form.sharedEnvironmentVariables = item.sharedEnvironmentVariables.map(i => i.id)
           this.form.image = {
             label: item.image.image,
             value: item.image.id
@@ -592,7 +602,7 @@ export default {
         this.form.environmentVariables = ini.stringify(labels)
       } else {
         this.$whoopsNotify.negative({
-          message: 'There are no environmental variables in this image that we could use.'
+          message: 'There are no environment variables in this image that we could use.'
         })
       }
     }

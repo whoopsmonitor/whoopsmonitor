@@ -105,7 +105,7 @@
             <template v-slot:avatar>
               <q-icon name="info" color="white" />
             </template>
-            <div>Put your environmental variables in the field bellow like you would do in Docker <i>.env</i> file, like:</div>
+            <div>Put your environment variables in the field bellow like you would do in Docker <i>.env</i> file, like:</div>
             <div>
               MY_VARIABLE=MY_VALUE
             </div>
@@ -125,6 +125,10 @@
             reset variables
             <q-tooltip>Reset variables to default ones provided by the image.</q-tooltip>
           </q-btn>
+
+          <shared-variables
+            v-model="form.sharedEnvironmentVariables"
+          />
         </q-tab-panel>
 
       </q-tab-panels>
@@ -139,10 +143,14 @@
 
 <script>
 import ini from 'ini'
+import SharedVariables from '../../components/SharedVariables.vue'
 const levels = [0, 1, 2]
 
 export default {
   name: 'PageCheckCreate',
+  components: {
+    SharedVariables
+  },
   data () {
     return {
       form: {
@@ -152,7 +160,8 @@ export default {
         image: '',
         environmentVariables: '',
         repeat: 5,
-        level: levels
+        level: levels,
+        sharedEnvironmentVariables: []
       },
       tab: 'general',
       images: [],
@@ -237,6 +246,7 @@ export default {
           }
           this.form.repeat = item.repeat
           this.form.environmentVariables = ini.stringify(item.environmentVariables)
+          this.form.sharedEnvironmentVariables = item.sharedEnvironmentVariables.map(i => i.id)
           this.form.level = (typeof item.level === 'undefined' ? levels : item.level)
         }
       } catch (error) {
@@ -301,17 +311,17 @@ export default {
           this.form.environmentVariables = ini.stringify(envProps)
 
           this.$whoopsNotify.positive({
-            message: 'Environmental veriables loaded to the textarea field.'
+            message: 'Environment veriables loaded to the textarea field.'
           })
         } else {
           this.$whoopsNotify.positive({
-            message: 'There are no environmental variables.'
+            message: 'There are no environment variables.'
           })
         }
       } catch (error) {
         console.error(error)
         this.$whoopsNotify.negative({
-          message: 'It is not possible to load environmental veriables.'
+          message: 'It is not possible to load environment veriables.'
         })
       }
     }

@@ -1,5 +1,3 @@
-var { DateTime } = require('luxon')
-
 module.exports = {
 
   friendlyName: 'Add a check to the queue immediately.',
@@ -40,7 +38,6 @@ module.exports = {
         environmentVariables: JSON.stringify(check.environmentVariables),
         immediate: true
       })
-
     } catch (error) {
       if (error) {
         sails.log.error(error)

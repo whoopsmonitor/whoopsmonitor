@@ -31,7 +31,7 @@ The result depends on the check. For example, our [URL Alive](https://github.com
 
 ### Tab: Env Variables
 
-Now you can configure environmental variables that the alert container use. In our Teams alert, we configure a single variable.
+Now you can configure environment variables that the alert container use. In our Teams alert, we configure a single variable.
 
 <img src="/docs/img/quick-start/new-alert-env-teams.png" alt="image" width="492" />
 

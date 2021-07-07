@@ -126,11 +126,12 @@ executeCheckQueue.process(async (job, done) => {
   try {
     check = await axiosInstance.get(`/v1/check/${checkId}`, {
       params: {
-        populate: 'image,alerts',
+        populate: 'image,alerts,sharedEnvironmentVariables',
         select: 'name,enabled,image,environmentVariables,cron,file'
       }
     }).then(response => response.data)
   } catch (error) {
+    console.error(error)
     const err = new Error()
     err.message = `Check ${checkId} not found.`
     err.name = 404
@@ -188,10 +189,10 @@ executeCheckQueue.process(async (job, done) => {
     // mark check as a progress
     await markProgress(checkId, true)
 
-    let commands = []
-    // let imageRegistry = check.image.image.split('/')[0]
+    // list of commands to join later and execute within the shell
+    const commands = []
 
-    // files to copy
+    // files to attach to running container
     const filesToCopy = []
 
     if (check.file && check.file.name && check.file.content) {
@@ -222,15 +223,6 @@ executeCheckQueue.process(async (job, done) => {
       })
     }
 
-    // INFO: do not pull docker images, let's image-metadata to handle it
-    // if (check.image.local === false) {
-    //   // login with docker if required
-    //   if (check.image.username && check.image.password) {
-    //     commands.push(`echo "${check.image.password}" | docker login ${imageRegistry} --username ${check.image.username} --password-stdin >/dev/null &&`)
-    //   }
-    //   commands.push(`docker pull ${check.image.image} >/dev/null &&`)
-    // }
-
     const envVars = []
     const volumeVars = []
 
@@ -241,8 +233,18 @@ executeCheckQueue.process(async (job, done) => {
       }
     }
 
+    const addslashes = (convert) => {
+      let str = JSON.stringify(String(convert))
+      str = str.substring(1, str.length - 1)
+      return str
+    }
+
     for (let envKey in check.environmentVariables) {
-      envVars.push(`--env '${envKey}=${check.environmentVariables[envKey]}'`)
+      envVars.push(`--env "${envKey}=${addslashes(check.environmentVariables[envKey])}"`)
+    }
+
+    for (let env of check.sharedEnvironmentVariables) {
+      envVars.push(`--env "${env.key}=${addslashes(env.value)}"`)
     }
 
     // attach check id as well, prefix with "WM_"

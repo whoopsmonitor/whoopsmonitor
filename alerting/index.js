@@ -60,6 +60,7 @@ queue.process(async (job, done) => {
     try {
       const alert = await axiosInstance.get(`/v1/alert/${alertId}`, {
         params: {
+          populate: 'sharedEnvironmentVariables,image',
           select: 'enabled,name,image,environmentVariables,repeat,createdAt,level'
         }
       }).then(response => response.data)
@@ -118,28 +119,28 @@ queue.process(async (job, done) => {
 
             // stop notification, already notified
             console.log(
-              `${logSymbols.info} Alert "${alert.name}" already sent. Waiting for the next interval (${nextRun <= 1 ? 'in a minute' : 'in ' + nextRun + ' minutes'}).
+              `${logSymbols.info} Alert "${alert.name}" already sent. Waiting for the next scheduled interval (${nextRun <= 1 ? 'in a minute' : 'in ' + nextRun + ' minutes'}).
             `)
             continue
           }
         }
       }
 
-      let commands = []
+      const addslashes = (convert) => {
+        let str = JSON.stringify(String(convert))
+        str = str.substring(1, str.length - 1)
+        return str
+      }
 
-      // let imageRegistry = alert.image.image.split('/')[0]
-      // INFO: do not pull docker images, let's image-metadata to handle it
-      // if (alert.image.local === false) {
-      //   if (alert.image.username && alert.image.password) {
-      //     commands.push(`echo "${alert.image.password}" | docker login ${imageRegistry} --username ${alert.image.username} --password-stdin >/dev/null &&`)
-      //   }
-      //   commands.push(`docker pull ${alert.image.image} >/dev/null &&`)
-      // }
-
+      const commands = []
       const envVars = []
 
       for (let envKey in alert.environmentVariables) {
-        envVars.push(`--env ${envKey}="${alert.environmentVariables[envKey]}"`)
+        envVars.push(`--env ${envKey}="${addslashes(alert.environmentVariables[envKey])}"`)
+      }
+
+      for (let env of alert.sharedEnvironmentVariables) {
+        envVars.push(`--env "${env.key}=${addslashes(env.value)}"`)
       }
 
       // special env vars

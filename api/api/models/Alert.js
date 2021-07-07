@@ -29,6 +29,11 @@ module.exports = {
       encrypt: true
     },
 
+    sharedEnvironmentVariables: {
+      collection: 'EnvironmentVariables',
+      via: 'alert'
+    },
+
     repeat: {
       type: 'number',
       defaultsTo: 5 // minutes

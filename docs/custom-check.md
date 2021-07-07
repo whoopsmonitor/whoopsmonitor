@@ -15,7 +15,7 @@ You can also output some other message out, and the response shows up right to t
 #### Note on Docker registry
 Every check *pulls* the Docker image. That means your container has to be uploaded to some registry, either official Docker Hub, GitHub registry, or one of your own.
 
-## Environmental variables
+## Environment variables
 Please prefix all your env vars with `WM_` prefix.
 
 ### Env vars description
@@ -35,7 +35,7 @@ Always prefix your labels with `com.whoopsmonitor` prefix so we know this packag
 You can fill these labels to make the usage more friendly. Monitor will use it.
 
  - `com.whoopsmonitor.documentation` - Link to the documentation.
- - `com.whoopsmonitor.documentation.env.*` - List of environmental variables we can use in the image like connection, credentails and things like that. Example above shows the usage.
+ - `com.whoopsmonitor.documentation.env.*` - List of environment variables we can use in the image like connection, credentails and things like that. Example above shows the usage.
 
 ### Inspiration
 You can always learn from [checks that already exist](https://github.com/whoopsmonitor?q=whoopsmonitor-check-&type=&language=).
