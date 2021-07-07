@@ -77,7 +77,7 @@ Next, click on the `New Check` button, and you're right in the form you're about
 
 ### Tab: Env Variables
 
-This tab is the most important one. Docker containers take environmental variables, so they are easily configurable. Every check and its env vars should be well documented in the README file. So you can read further details in there.
+This tab is the most important one. Docker containers take environment variables, so they are easily configurable. Every check and its env vars should be well documented in the README file. So you can read further details in there.
 
 Remembering all the variables is a bit unfriendly. However, there is a small help. A little button called `Reset Variables` will override the field's content with default values parsed right from the image. This only works if the image supports it (our images do that), and the image is healthy (remember the small green circle?).
 

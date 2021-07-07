@@ -38,6 +38,7 @@ module.exports.policies = {
   HealthIndexController: blueprintTokenPolicy,
   CheckController: blueprintTokenPolicy,
   CheckStatusController: blueprintTokenPolicy,
+  EnvironmentVariablesController: blueprintTokenPolicy,
 
   'v1/check/reorder-all': 'token',
   'v1/check/run': 'token',

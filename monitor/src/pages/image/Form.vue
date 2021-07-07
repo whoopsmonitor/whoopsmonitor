@@ -261,14 +261,17 @@ export default {
         }).then((response) => response.data)
 
         if (item) {
-          this.form.image = item.image
-          if (item.username && item.password) {
-            this.hasCredentials = true
-          }
-          this.form.type = item.type
-          this.form.local = item.local
+          this.form.type = item.type // make sure it is first because it is "watched"
 
-          this.metadata = item.metadata ? JSON.parse(item.metadata) : ''
+          this.$nextTick(() => {
+            this.form.image = item.image
+            if (item.username && item.password) {
+              this.hasCredentials = true
+            }
+            this.form.local = item.local
+
+            this.metadata = item.metadata ? JSON.parse(item.metadata) : ''
+          })
         }
       } catch (error) {
         console.error(error)

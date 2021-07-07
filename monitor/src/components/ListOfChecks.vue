@@ -29,15 +29,14 @@
           <h3 class="text-h6 q-mt-none q-mb-sm">Latest Results</h3>
         </div>
       </div>
+
       <skeleton-list v-if="loading && !checks.length" />
 
-      <no-item-list-here
+      <div
         v-if="!loading && !checks.length"
-        title="No checks here"
-        description="Currently there are no checks configured. Please try to add a new one."
-        :to="{ name: 'check.create' }"
-        to-title="new check"
-      />
+      >
+        Currently there are no checks configured. Please try to add a <router-link :to="{ name: 'check.create' }">new one</router-link>.
+      </div>
 
       <div class="row q-col-gutter-sm" v-if="checks.length">
         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-12" v-for="check in filteredChecks" :key="check.id">
@@ -131,7 +130,6 @@ import { map } from 'lodash'
 import trend from 'trend'
 import timeAgo from '../filters/timeAgo'
 import datetime from '../filters/datetime'
-import NoItemListHere from '../components/NoItemListHere'
 import SkeletonList from '../components/SkeletonList'
 
 export default {
@@ -141,8 +139,7 @@ export default {
     datetime
   },
   components: {
-    SkeletonList,
-    NoItemListHere
+    SkeletonList
   },
   data () {
     return {

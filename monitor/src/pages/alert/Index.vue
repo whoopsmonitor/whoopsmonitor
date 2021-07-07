@@ -1,26 +1,24 @@
 <template>
   <q-page padding>
-    <q-card v-if="alerts.length" flat bordered>
+    <q-card flat bordered>
       <q-card-section>
         <div class="row">
           <div class="col">
             <div class="text-h6">Alerts</div>
           </div>
           <div class="col">
-            <q-input v-model="filter.alert" filled type="search" placeholder="filter..." dense>
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
+            <filter-results
+              v-model="filter.results"
+            />
           </div>
         </div>
       </q-card-section>
 
       <q-separator inset />
 
-      <q-card-section>
-        <q-list bordered separator v-if="filteredAlerts.length">
-          <q-item v-for="alert in filteredAlerts" :key="alert.id">
+      <q-card-section v-if="filteredItems.length">
+        <q-list bordered separator>
+          <q-item v-for="alert in filteredItems" :key="alert.id">
             <q-item-section side top>
               <q-toggle
                 @input="switchStatus(alert)"
@@ -78,21 +76,19 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <p v-else>
+      </q-card-section>
+
+      <q-card-section v-if="!loading.fetch && !filteredItems.length">
+        <p v-if="!filteredItems.length">
           There are no alerts to select from.
         </p>
+        <div>
+          <q-btn flat color="primary" type="a" :to="{ name: 'alert.create' }">new alert</q-btn>
+        </div>
       </q-card-section>
     </q-card>
 
     <skeleton-list v-if="loading.fetch" />
-
-    <no-item-list-here
-      v-if="!loading.fetch && !alerts.length"
-      title="No alerts here"
-      description="Currently there are no alerts here yet. Please add a new one."
-      :to="{ name: 'alert.create' }"
-      to-title="new alert"
-    />
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="add" color="primary" type="a" :to="{ name: 'alert.create' }" title="New Alert" />
@@ -110,15 +106,16 @@
 </template>
 
 <script>
-import NoItemListHere from '../../components/NoItemListHere'
+import FilterResults from '../../components/FilterResults.vue'
 import SkeletonList from '../../components/SkeletonList'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import DateTime from '../../filters/datetime'
+import filteredItems from '../../helpers/filteredItems'
 
 export default {
   name: 'PageCheckIndex',
   components: {
-    NoItemListHere,
+    FilterResults,
     SkeletonList,
     ConfirmDialog
   },
@@ -127,7 +124,7 @@ export default {
   },
   data () {
     return {
-      alerts: [],
+      items: [],
       enabled: {},
       loading: {
         fetch: false,
@@ -139,16 +136,13 @@ export default {
       destroyId: '',
       interval: undefined,
       filter: {
-        alert: ''
-      }
+        results: ''
+      },
+      filterByKey: 'name'
     }
   },
   computed: {
-    filteredAlerts () {
-      return this.alerts.filter(item => {
-        return item.name.toLowerCase().indexOf(this.filter.alert) > -1
-      })
-    }
+    ...filteredItems
   },
   async created () {
     await this.fetchData({
@@ -178,12 +172,12 @@ export default {
           }
         }).then(response => response.data)
 
-        this.alerts = alerts.map(alert => {
+        this.items = alerts.map(alert => {
           alert.image.metadata = JSON.parse(alert.image.metadata)
           return alert
         })
 
-        for (const alert of this.alerts) {
+        for (const alert of this.items) {
           this.$set(this.enabled, alert.id, alert.enabled)
         }
       } catch (error) {

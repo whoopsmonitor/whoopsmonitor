@@ -49,6 +49,16 @@ const routes = [
   },
 
   {
+    path: '/sharedenvvars',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', name: 'sharedenvvars.index', component: () => import('pages/sharedenvvars/Index.vue'), meta: { auth: true } },
+      { path: 'create', name: 'sharedenvvars.create', component: () => import('pages/sharedenvvars/Form.vue'), meta: { auth: true } },
+      { path: ':id', name: 'sharedenvvars.detail', component: () => import('pages/sharedenvvars/Form.vue'), meta: { auth: true, edit: true } }
+    ]
+  },
+
+  {
     path: '/issue',
     component: () => import('layouts/MainLayout.vue'),
     children: [

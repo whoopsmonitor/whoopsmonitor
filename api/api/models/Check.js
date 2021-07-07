@@ -41,6 +41,11 @@ module.exports = {
       encrypt: true
     },
 
+    sharedEnvironmentVariables: {
+      collection: 'EnvironmentVariables',
+      via: 'check'
+    },
+
     progress: {
       type: 'boolean',
       defaultsTo: false
