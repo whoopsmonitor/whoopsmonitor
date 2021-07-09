@@ -16,6 +16,9 @@ module.exports = {
     output: {
       type: 'string'
     },
+    checkOutput: {
+      type: 'string'
+    },
     duration: {
       type: 'number',
       required: true

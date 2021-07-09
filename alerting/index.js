@@ -8,13 +8,14 @@ const perf = require('execution-time')()
 const { DateTime, Interval } = require('luxon')
 const APP_TOKEN = process.env.APP_TOKEN
 
-const addToLog = async (alertId, status, output, duration) => {
+const addToLog = async (alertId, status, output, checkStdout, duration) => {
   try {
     await axiosInstance.post('/v1/alertstatus', {
       alert: alertId,
       status: status || 0,
       output: output,
-      duration
+      duration,
+      checkOutput: checkStdout
     })
   } catch (_) {
     const err = new Error()
@@ -161,7 +162,7 @@ queue.process(async (job, done) => {
       const perfResult = perf.stop()
 
       // make sure that the result is saved
-      await addToLog(alertId, exitCode, stdout, perfResult.time)
+      await addToLog(alertId, exitCode, stdout, checkStdout, perfResult.time)
 
       results.push(stdout)
     } catch (error) {
@@ -171,7 +172,7 @@ queue.process(async (job, done) => {
 
       // make sure that the result is saved
       try {
-        await addToLog(alertId, error.exitCode, error.stderr, perfResult.time)
+        await addToLog(alertId, error.exitCode, error.stderr, checkStdout, perfResult.time)
       } catch (error) {
         console.error(`[${packageJson.name}]`, error)
       }
