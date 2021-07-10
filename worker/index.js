@@ -117,9 +117,6 @@ executeCheckQueue.process(async (job, done) => {
   // get check details
   let check
 
-  // latest status of the check
-  let latestStatus
-
   // perf result
   let perfResult
 
@@ -265,8 +262,7 @@ executeCheckQueue.process(async (job, done) => {
       checkName: check.name,
       alerts: check.alerts.map(alert => alert.id),
       exitCode,
-      stdout,
-      latestStatus: latestStatus ? latestStatus.status || 0 : 0
+      stdout
     })
 
     perfResult = perf.stop()
@@ -294,8 +290,7 @@ executeCheckQueue.process(async (job, done) => {
         checkName: check.name,
         alerts: check.alerts.map(alert => alert.id),
         exitCode: error.exitCode,
-        stdout: error.stdout,
-        latestStatus: latestStatus ? latestStatus.status || 0 : 0
+        stdout: error.stdout
       })
 
       return done(error)

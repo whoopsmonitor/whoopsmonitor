@@ -8,14 +8,15 @@ const perf = require('execution-time')()
 const { DateTime, Interval } = require('luxon')
 const APP_TOKEN = process.env.APP_TOKEN
 
-const addToLog = async (alertId, status, output, checkStdout, duration) => {
+const addToLog = async (alertId, status, output, checkStdout, checkExitCode, duration) => {
   try {
     await axiosInstance.post('/v1/alertstatus', {
       alert: alertId,
       status: status || 0,
       output: output,
       duration,
-      checkOutput: checkStdout
+      checkOutput: checkStdout,
+      checkExitCode
     })
   } catch (_) {
     const err = new Error()
@@ -46,14 +47,7 @@ queue.process(async (job, done) => {
   const alerts = job.data.alerts
   const checkExitCode = job.data.exitCode || 0
   const checkStdout = job.data.stdout
-  const latestStatus = job.data.latestStatus
   const results = []
-
-  // we do not process the alert in case the exit code and latest status are both "ok"
-  if (latestStatus === 0 && checkExitCode === 0) {
-    console.log(`[${packageJson.name}] [${logSymbols.success}] No notificitation needs to be sent.`)
-    return done()
-  }
 
   for (const alertId of alerts) {
     perf.start()
@@ -86,7 +80,7 @@ queue.process(async (job, done) => {
       // get alert status as well
       const latestStatuses = await axiosInstance.get(`/v1/alertstatus`, {
         params: {
-          select: 'createdAt,status',
+          select: 'createdAt,checkExitCode',
           limit: 2, // only 2 latests
           where: {
             alert: alertId
@@ -100,10 +94,16 @@ queue.process(async (job, done) => {
         const lastStatus = latestStatuses[0]
         const previousStatus = latestStatuses[1]
 
+        // we do not process the alert in case the exit code and latest status are both "ok"
+        if (lastStatus.checkExitCode === 0 && checkExitCode === 0) {
+          console.log(`[${packageJson.name}] [${logSymbols.success}] No notificitation needs to be sent.`)
+          return done()
+        }
+
         // compare exit codes - in case they differ, send message even the repeat interval is not yet completed
         let checkAlsoForInterval = false
         if (previousStatus) {
-          if (previousStatus.status === lastStatus.status) {
+          if (checkExitCode === lastStatus.checkExitCode) {
             checkAlsoForInterval = true
           }
         }
@@ -162,7 +162,7 @@ queue.process(async (job, done) => {
       const perfResult = perf.stop()
 
       // make sure that the result is saved
-      await addToLog(alertId, exitCode, stdout, checkStdout, perfResult.time)
+      await addToLog(alertId, exitCode, stdout, checkStdout, checkExitCode, perfResult.time)
 
       results.push(stdout)
     } catch (error) {
@@ -172,7 +172,7 @@ queue.process(async (job, done) => {
 
       // make sure that the result is saved
       try {
-        await addToLog(alertId, error.exitCode, error.stderr, checkStdout, perfResult.time)
+        await addToLog(alertId, error.exitCode, error.stderr, checkStdout, checkExitCode, perfResult.time)
       } catch (error) {
         console.error(`[${packageJson.name}]`, error)
       }
