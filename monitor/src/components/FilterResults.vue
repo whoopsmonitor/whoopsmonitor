@@ -6,7 +6,9 @@
       filled
       type="search"
       placeholder="filter..."
-      dense>
+      dense
+      clearable
+     >
         <template v-slot:append>
           <q-icon name="search" />
         </template>
@@ -15,15 +17,33 @@
 </template>
 
 <script>
+import { SessionStorage } from 'quasar'
+
 export default {
   name: 'FilterResults',
   props: {
     value: {
       type: String
+    },
+    cacheKey: {
+      type: String,
+      required: true
+    }
+  },
+  created () {
+    const sessionValue = SessionStorage.getItem(this.cacheKey)
+
+    if (sessionValue !== null) {
+      this.doUpdate(sessionValue)
     }
   },
   methods: {
     doUpdate (value) {
+      if (value === null) {
+        value = ''
+      }
+
+      SessionStorage.set(this.cacheKey, value)
       this.$emit('input', value)
     }
   }

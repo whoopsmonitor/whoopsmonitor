@@ -9,6 +9,7 @@
           <div class="col">
             <filter-results
               v-model="filter.results"
+              cache-key="alert"
             />
           </div>
         </div>
