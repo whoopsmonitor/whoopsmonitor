@@ -21,6 +21,7 @@ services:
       APP_TOKEN: <%= APP_TOKEN %>
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
       APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
+      APP_QUEUE_NAME_ALERTING: alerting
     depends_on:
       - mongodb
       - redis
