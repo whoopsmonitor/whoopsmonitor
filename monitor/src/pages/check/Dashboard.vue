@@ -8,7 +8,6 @@
             <q-card flat bordered>
               <q-card-section>
                 <div class="text-h6">
-                  {{ detail.name }}
                   <q-icon
                     v-if="loggedIn"
                     name="edit"
@@ -18,16 +17,34 @@
                     <q-tooltip>update details</q-tooltip>
                   </q-icon>
 
-                  <q-chip
-                    :color="detail.enabled ? 'green' : 'gray'"
-                    :text-color="detail.enabled ? 'white' : 'black'">
-                    {{ detail.enabled ? 'enabled' : 'disabled' }}
-                  </q-chip>
+                  <q-toggle
+                    v-if="loggedIn"
+                    @input="switchStatus(detail)"
+                    v-model="detail.enabled"
+                    checked-icon="check"
+                    color="green"
+                    unchecked-icon="clear"
+                  >
+                    <q-tooltip>click to {{ detail.enabled ? 'disable' : 'enable' }}</q-tooltip>
+                  </q-toggle>
+
+                  {{ detail.name }}
 
                   <q-chip v-if="loggedIn">
                     <!-- <q-icon name="schedule" class="q-mr-sm" /> {{ detail.cron | translateCron }} -->
                     <q-icon name="schedule" class="q-mr-sm" /> {{ detail.cron | translateCron }}
                   </q-chip>
+
+                  <q-btn
+                    v-if="loggedIn"
+                    @click="runNow(detail)"
+                    color="secondary"
+                    dense
+                    round
+                    icon="local_fire_department"
+                  >
+                    <q-tooltip>run immediately</q-tooltip>
+                  </q-btn>
                 </div>
               </q-card-section>
 
@@ -142,6 +159,7 @@ import translateCron from '../../filters/translateCron'
 import CorrectnessIndex from '../../components/CorrectnessIndex'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import SkeletonList from '../../components/SkeletonList'
+import { runNow, switchStatus as checkSwitchStatus } from '../../helpers/check'
 
 export default {
   name: 'PageCheckDashboard',
@@ -187,7 +205,8 @@ export default {
             sortable: false
           }
         ]
-      }
+      },
+      checkState: false
     }
   },
 
@@ -323,6 +342,7 @@ export default {
   },
 
   methods: {
+    runNow,
     async fetchData () {
       await this.fetchDetails()
 
@@ -489,6 +509,25 @@ export default {
       } finally {
         this.destroyCancel()
       }
+    },
+
+    async switchStatus (check) {
+      const updated = JSON.parse(JSON.stringify(check))
+      updated.enabled = !updated.enabled // must revert
+
+      await checkSwitchStatus({
+        check: updated,
+        onSuccess: () => {
+          this.$whoopsNotify.positive({
+            message: `Check "${check.name}" successfully ${check.enabled ? 'enabled' : 'disabled'}.`
+          })
+        },
+        onError: () => {
+          this.$whoopsNotify.negative({
+            message: `Check "${check.name} status has not been changed. Please try it again or refresh the page."`
+          })
+        }
+      })
     }
   }
 }

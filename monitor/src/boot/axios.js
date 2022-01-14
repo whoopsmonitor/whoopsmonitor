@@ -61,8 +61,13 @@ const client = async function (API_URL, API_TOKEN) {
   return Promise.resolve(client)
 }
 
+const axiosFnc = async function () {
+  const http = await client(API_URL, API_TOKEN)
+  return http
+}
+
 export default async ({ Vue }) => {
   Vue.prototype.$axios = await client(API_URL, API_TOKEN)
 }
 
-export { client }
+export { axiosFnc }

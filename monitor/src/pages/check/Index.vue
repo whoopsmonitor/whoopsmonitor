@@ -146,6 +146,7 @@ import SkeletonList from '../../components/SkeletonList'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import DateTime from '../../filters/datetime'
 import filteredItems from '../../helpers/filteredItems'
+import { runNow, switchStatus as checkSwitchStatus } from '../../helpers/check'
 
 export default {
   name: 'PageCheckIndex',
@@ -193,6 +194,25 @@ export default {
     clearInterval(this.interval)
   },
   methods: {
+    runNow,
+    async switchStatus (check) {
+      await checkSwitchStatus({
+        check,
+        onBefore: () => {
+          this.$set(this.enabled, check.id, this.enabled[check.id])
+        },
+        onSuccess: () => {
+          this.$whoopsNotify.positive({
+            message: `Check "${check.name}" successfully ${this.enabled[check.id] ? 'enabled' : 'disabled'}.`
+          })
+        },
+        onError: () => {
+          this.$whoopsNotify.negative({
+            message: `Check "${check.name} status has not been changed. Please try it again or refresh the page."`
+          })
+        }
+      })
+    },
     async fetchData (config) {
       config = config || {}
 
@@ -261,31 +281,6 @@ export default {
         })
       } finally {
         this.destroyCancel()
-      }
-    },
-
-    async switchStatus (check) {
-      this.$set(this.enabled, check.id, this.enabled[check.id])
-
-      try {
-        // update state
-        await this.$axios.patch(`/v1/check/${check.id}`, {
-          enabled: this.enabled[check.id]
-        }, {
-          params: {
-            select: 'enabled'
-          }
-        })
-
-        this.$whoopsNotify.positive({
-          message: `Check "${check.name}" successfully ${this.enabled[check.id] ? 'enabled' : 'disabled'}.`
-        })
-      } catch (error) {
-        console.error(error)
-
-        this.$whoopsNotify.negative({
-          message: `Check "${check.name} status has not been changed. Please try it again or refresh the page."`
-        })
       }
     },
 
@@ -374,20 +369,6 @@ export default {
         })
       } finally {
         this.loading.order = false
-      }
-    },
-
-    async runNow (check) {
-      try {
-        await this.$axios.get(`/v1/check/${check.id}/run`)
-
-        this.$whoopsNotify.positive({
-          message: 'Check added to queue.'
-        })
-      } catch (error) {
-        this.$whoopsNotify.negative({
-          message: 'It is not possible to run the check. Please try it again.'
-        })
       }
     }
   }
