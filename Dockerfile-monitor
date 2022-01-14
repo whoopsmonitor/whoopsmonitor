@@ -1,5 +1,5 @@
-FROM node:14.11.0-alpine3.12
-LABEL MAINTAINER="Daniel Rataj <daniel.rataj@centrum.cz>"
+FROM node:17.3.1-alpine3.15
+LABEL maintainer="Daniel Rataj <daniel.rataj@centrum.cz>"
 LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
 
 # set a working directory
@@ -12,7 +12,7 @@ COPY monitor/ .
 RUN yarn global add @quasar/cli@1.1.0
 
 # install dependencies
-RUN yarn install
+RUN yarn install && yarn cache clean
 
 COPY monitor/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
