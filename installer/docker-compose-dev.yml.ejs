@@ -10,7 +10,7 @@ services:
       - ./api:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: npm run dev
+    command: ["/opt/bin/wait-for-it.sh", "mongo:27017", "--", "npm", "run" ,"dev"]
     build:
       context: .
       dockerfile: Dockerfile-api
@@ -41,7 +41,7 @@ services:
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
       - worker_data:/<%= APP_NAME %>-worker
-    command: npm run dev
+    command: ["/opt/bin/wait-for-it.sh", "mongo:27017", "--", "npm", "run" ,"dev"]
     build:
       context: .
       dockerfile: Dockerfile-worker
@@ -69,7 +69,7 @@ services:
       - ./worker:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: npm run dev
+    command: ["/opt/bin/wait-for-it.sh", "mongo:27017", "--", "npm", "run" ,"dev"]
     build:
       context: .
       dockerfile: Dockerfile-alerting
@@ -95,7 +95,7 @@ services:
       - ./image-metadata:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: npm run dev
+    command: ["/opt/bin/wait-for-it.sh", "mongo:27017", "--", "npm", "run" ,"dev"]
     build:
       context: .
       dockerfile: Dockerfile-image-metadata

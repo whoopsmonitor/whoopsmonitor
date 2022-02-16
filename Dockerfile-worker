@@ -4,6 +4,7 @@ LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmo
 
 RUN apk add --no-cache openssl=1.1.1l-r8 \
     docker-cli=20.10.11-r0 \
+    bash=5.1.8-r0 \
   && rm -rf /var/cache/apk/*
 
 WORKDIR /app
@@ -12,5 +13,9 @@ WORKDIR /app
 COPY worker/ .
 RUN npm install --quiet
 
+# wait for container
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /opt/bin/
+RUN chmod +x /opt/bin/wait-for-it.sh
+
 # start worker
-CMD [ "npm", "start" ]
+CMD ["/opt/bin/wait-for-it.sh", "localhost:1337", "--", "npm", "start"]

@@ -58,7 +58,8 @@ Now you can switch to the monitor directory and run the environment.
 
 ```bash
 cd ./monitor
-quasar dev
+yarn install
+yarn dev
 ```
 
 The web browser should automatically open the localhost on port 8080 with a hot reload feature. That's all.
