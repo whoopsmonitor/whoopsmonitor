@@ -12,6 +12,6 @@ echo '{"production":{"API_TOKEN":"'$API_TOKEN'","APP_API_URL":"'$APP_API_URL'"}}
 
 export NODE_OPTIONS=--openssl-legacy-provider
 
-npm run build
+yarn build
 
 exec yarn production

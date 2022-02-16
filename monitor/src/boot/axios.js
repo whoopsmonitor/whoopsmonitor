@@ -9,25 +9,8 @@ const client = async function (API_URL, API_TOKEN) {
   let url = ''
   let token = ''
 
-  if (!process.env.DEV) {
-    // load config from the "remote" file
-    try {
-      const config = await axios.get('/config.json').then(result => result.data)
-
-      if (config.API_TOKEN) {
-        token = config.API_TOKEN
-      }
-
-      if (config.APP_API_URL) {
-        url = config.APP_API_URL
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  } else {
-    token = API_TOKEN
-    url = API_URL
-  }
+  token = API_TOKEN
+  url = API_URL
 
   const client = axios.create({
     baseURL: url,
