@@ -2,13 +2,14 @@
 
 set -uo pipefail
 
-rm -f ./.quasar.env.json
-touch ./.quasar.env.json
+rm -f ./.env
+touch ./.env
 
 API_TOKEN=${API_TOKEN}
 APP_API_URL=${APP_API_URL}
 
-echo '{"production":{"API_TOKEN":"'$API_TOKEN'","APP_API_URL":"'$APP_API_URL'"}}' >> ./.quasar.env.json
+echo "API_TOKEN=$API_TOKEN" >> ./.env
+echo "APP_API_URL=$APP_API_URL" >> ./.env
 
 export NODE_OPTIONS=--openssl-legacy-provider
 
