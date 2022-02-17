@@ -13,6 +13,6 @@ echo "APP_API_URL=$APP_API_URL" >> ./.env
 
 export NODE_OPTIONS=--openssl-legacy-provider
 
-yarn build
+yarn run build
 
-exec yarn production
+exec yarn run production
