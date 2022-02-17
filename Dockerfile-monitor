@@ -1,4 +1,4 @@
-FROM node:17.3.1-alpine3.15
+FROM node:17.5.0-alpine3.15
 LABEL maintainer="Daniel Rataj <daniel.rataj@centrum.cz>"
 LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
 
