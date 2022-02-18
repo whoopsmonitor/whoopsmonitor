@@ -190,7 +190,7 @@ inquirer.prompt(questions).then((answers) => {
       console.log(`${logSymbols.info} Starting all containers on background.`)
       await execa.command([
         `cd ${outputDir} &&`,
-        `docker network create -d bridge ${APP_NAME}_app-tier`,
+        `docker network create -d bridge ${APP_NAME}_app-tier &&`,
         `docker-compose -p ${APP_NAME} up -d`
       ].join('\\'), {
         shell: true

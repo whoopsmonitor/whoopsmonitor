@@ -32,7 +32,7 @@ You need
 The easiest way is to run this project with the `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords, etc.). Run it with these two commands:
 
 ```bash
-docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock --network whoopsmonitor_app-tier ghcr.io/whoopsmonitor/whoopsmonitor/installer:1.0 create
+docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/whoopsmonitor/whoopsmonitor/installer:1.0 create
 ```
 
 It will ask for some simple questions and generate a `docker-compose.yml` file right in the current directory. You also get a file for local development (feel free to ignore that file).
