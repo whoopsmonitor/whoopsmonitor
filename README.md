@@ -8,11 +8,11 @@
 
 I guess you have your own monitoring solution running at your company. Maybe not. However, you can always try Whoops Monitor to achieve some clarity on your systems. It is an excellent tool for helpdesk operators or even for the managers when configured adequately by your IT department.
 
-What Whoops Monitor does is dead simple. It runs any Docker image at regular cron interval and then saves the result. That's it!
+What Whoops Monitor does is dead simple. It runs any Docker image at regular cron interval and saves the result. That's it!
 
-So you can even write your own Docker container with some check for your internal process (like last order on the shop) and then run the check every minute to get the result.
+So you can even write your own Docker container with the check for your internal process (like the latest order on the shop) and then run the check every minute to get the result.
 
-Everything displays on the main dashboard where you can see the results of all of your checks.
+It shows on the main dashboard, where you can see the results of all of your checks.
 
 <div align="middle">
   <img src="/docs/img/login.png" alt="logo" width="256" height="128" />
@@ -29,11 +29,9 @@ You need
 
 ## Installation
 
-The easiest way is to run this project with the `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords, etc.). Run it with this two commands:
+The easiest way is to run this project with the `docker-compose.yml` file. We prepared a simple generator due to security reasons (passwords, etc.). Run it with these two commands:
 
 ```bash
-docker network create -d bridge whoopsmonitor_app-tier
-
 docker run --rm -it -v $(pwd):/output -v /var/run/docker.sock:/var/run/docker.sock --network whoopsmonitor_app-tier ghcr.io/whoopsmonitor/whoopsmonitor/installer:1.0 create
 ```
 
