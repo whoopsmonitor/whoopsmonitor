@@ -58,5 +58,7 @@ module.exports.policies = {
   'v1/backup/create': 'token',
   'v1/backup/download': 'token',
   'v1/backup/destroy': 'token',
-  'v1/backup/restore': 'token'
+  'v1/backup/restore': 'token',
+
+  'v1/demodata/create': 'token'
 };

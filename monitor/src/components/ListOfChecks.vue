@@ -35,7 +35,14 @@
       <div
         v-if="!loading && !checks.length"
       >
-        Currently there are no checks configured. Please try to add a <router-link :to="{ name: 'check.create' }">new one</router-link>.
+        <p>
+          Currently there are no checks configured. Add a <router-link :to="{ name: 'check.create' }">new one</router-link>.
+          <br>
+          We also recommend to read a quick tutorial.
+          <q-btn v-if="guide" @click="goToHelp" flat round dense icon="support" color="primary">
+            <q-tooltip>show guide in new window</q-tooltip>
+          </q-btn>
+        </p>
       </div>
 
       <div class="row q-col-gutter-sm" v-if="checks.length">
@@ -151,6 +158,9 @@ export default {
     }
   },
   computed: {
+    guide () {
+      return this.$store.state.guide.docs
+    },
     filteredChecks () {
       return this.checks.filter((check) => {
         if (this.onlyFailing) {
@@ -218,10 +228,14 @@ export default {
     }
   },
   async created () {
-    await this.fetchData()
+    await this.fetchData({
+      loading: true
+    })
 
     this.interval = setInterval(async () => {
-      await this.fetchData()
+      await this.fetchData({
+        loading: false
+      })
     }, 10000)
 
     this.selectedTags = JSON.parse(JSON.stringify(this.$store.state.config.selectedTags))
@@ -230,8 +244,15 @@ export default {
     clearInterval(this.interval)
   },
   methods: {
-    async fetchData () {
-      this.loading = true
+    async fetchData (options) {
+      let loading = false
+      if (options.loading) {
+        loading = options.loading
+      }
+
+      if (loading) {
+        this.loading = true
+      }
 
       try {
         const checks = await this.$axios.get('/v1/check', {
@@ -303,7 +324,9 @@ export default {
         if (error.response.status !== 404) {
           this.$router.push({ name: 'error.500' })
         }
-      } finally {
+      }
+
+      if (loading) {
         this.loading = false
       }
     },
@@ -383,6 +406,15 @@ export default {
       }
 
       return color
+    },
+
+    goToHelp () {
+      if (this.guide) {
+        window.open(this.guide, '_blank')
+        return true
+      }
+
+      console.error('No URL specified.')
     }
   }
 }

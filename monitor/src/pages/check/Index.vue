@@ -31,7 +31,7 @@
                 <q-tooltip>click to {{ enabled[check.id] ? 'disable' : 'enable' }}</q-tooltip>
               </q-toggle>
             </q-item-section>
-            <q-item-section side top v-if="check.image.metadata['com.whoopsmonitor.icon']">
+            <q-item-section side top v-if="check.image && check.image.metadata['com.whoopsmonitor.icon']">
               <q-icon :name="`img:${check.image.metadata['com.whoopsmonitor.icon']}`" />
             </q-item-section>
             <q-item-section>
@@ -230,7 +230,14 @@ export default {
         }).then(response => response.data)
 
         this.items = checks.map(check => {
-          check.image.metadata = JSON.parse(check.image.metadata)
+          try {
+            check.image.metadata = JSON.parse(check.image.metadata)
+          } catch (error) {
+            if (error) {
+              // do nothing
+            }
+          }
+
           return check
         })
 

@@ -12,7 +12,7 @@
     <q-separator inset />
 
     <q-card-section class="text-center">
-      <div class="row">
+      <div class="row" v-if="results.length">
         <div class="col">
           <div class="row">
             <div class="col-12 text-h6">
@@ -43,6 +43,9 @@
             </div>
           </div>
         </div>
+      </div>
+      <div v-else class="text-h5">
+        no data yet
       </div>
     </q-card-section>
   </q-card>

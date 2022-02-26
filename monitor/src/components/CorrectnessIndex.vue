@@ -21,7 +21,7 @@
       <q-separator inset />
 
       <q-card-section class="text-center">
-        <div class="text-h4" :class="colorize" v-if="!loading">
+        <div class="text-h5" :class="colorize" v-if="!loading">
           {{ index }}<span v-if="aggregatedResults.length">%</span>
         </div>
         <div v-if="loading" class="row justify-center">
@@ -33,7 +33,7 @@
     <q-dialog v-model="dialog" persistent>
       <q-card style="width: 500px; max-width: 50vw;">
         <q-card-section>
-          <q-list dense>
+          <q-list>
             <q-item>
               <q-item-section avatar>
                 <q-icon color="orange" name="warning" />
@@ -123,7 +123,7 @@ export default {
   computed: {
     index () {
       if (!this.aggregatedResults.length) {
-        return 'no data'
+        return 'no data yet'
       }
 
       const okCount = Math.round(this.findStatusById(0).total)

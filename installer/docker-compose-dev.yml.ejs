@@ -66,7 +66,7 @@ services:
     container_name: alerting
     restart: always
     volumes:
-      - ./worker:/app
+      - ./alerting:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
     command: ["/opt/bin/wait-for-it.sh", "mongo:27017", "--", "npm", "run" ,"dev"]
