@@ -65,5 +65,8 @@ module.exports.routes = {
   'POST /v1/backup': 'v1/backup/create',
   'GET /v1/backup/:id/download': 'v1/backup/download',
   'POST /v1/backup/:id/restore': 'v1/backup/restore',
-  'DELETE /v1/backup/:id': 'v1/backup/destroy'
+  'DELETE /v1/backup/:id': 'v1/backup/destroy',
+
+  // install demo data
+  'POST /v1/demodata': 'v1/demodata/create'
 }

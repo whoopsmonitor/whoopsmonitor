@@ -41,7 +41,7 @@
           />
           <div v-else>
             <div class="caption">Images</div>
-            There are no images to select from or they are invalid.
+            There are no docker images to select from or they are invalid. You should <router-link :to="{ name: 'image.create' }">download a new image</router-link> first.
           </div>
 
           <q-input
@@ -73,38 +73,6 @@
             :options="filterOptions"
             @filter="filterFn"
           />
-
-          <q-select
-            v-if="hasImages"
-            v-model="form.image"
-            :options="imageOptions"
-            label="Image *"
-            hint="Select the image."
-            lazy-rules
-            :rules="[ val => val && Object.keys(val).length > 0 || 'Please select image that would trigger your check.']"
-            use-input
-            input-debounce="0"
-            @filter="filterImages"
-          >
-            <template v-slot:option="scope">
-              <q-item
-                v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
-              >
-                <q-item-section avatar v-if="scope.opt.icon">
-                  <q-icon :name="scope.opt.icon" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label v-html="scope.opt.label" />
-                  <q-item-label caption v-if="scope.opt.description">{{ scope.opt.description }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-          <div v-else>
-            <div class="caption">Images</div>
-            There are no images to select from or they are invalid.
-          </div>
 
           <q-input
             filled

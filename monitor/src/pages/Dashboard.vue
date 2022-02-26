@@ -3,6 +3,8 @@
     <div class="row q-col-gutter-sm">
       <div class="col-9 col-md-9 col-sm-12 col-xs-12">
         <list-of-checks />
+        <p></p>
+        <quick-demo v-if="!checks.length" />
       </div>
       <div class="col-3 col-md-3 col-sm-12 col-xs-12">
         <div class="row q-col-gutter-sm">
@@ -22,17 +24,41 @@
 import ListOfChecks from '../components/ListOfChecks'
 import StatusBox from '../components/StatusBox'
 import CorrectnessIndex from '../components/CorrectnessIndex'
+import QuickDemo from '../components/QuickDemo'
 
 export default {
   name: 'DashboardIndex',
   components: {
     ListOfChecks,
     StatusBox,
-    CorrectnessIndex
+    CorrectnessIndex,
+    QuickDemo
   },
   data () {
     return {
-      statusData: []
+      statusData: [],
+      checks: []
+    }
+  },
+
+  computed: {
+    hasChecks () {
+      return this.checks.length > 0
+    }
+  },
+
+  async created () {
+    try {
+      this.checks = await this.$axios.get('/v1/check', {
+        params: {
+          populate: false,
+          select: 'id'
+        }
+      }).then((res) => res.data)
+    } catch (error) {
+      if (error) {
+        console.error(error)
+      }
     }
   }
 }
