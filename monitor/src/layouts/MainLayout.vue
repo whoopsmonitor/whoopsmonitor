@@ -170,6 +170,21 @@
           <q-item
             clickable
             tag="a"
+            :to="{ name: 'tools.index' }"
+          >
+            <q-item-section
+              avatar
+            >
+              <q-icon name="construction" />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label>Tools</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            tag="a"
             :to="{ name: 'backuprestore.index' }"
           >
             <q-item-section

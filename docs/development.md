@@ -58,7 +58,7 @@ Now you can switch to the monitor directory and run the environment.
 
 ```bash
 cd ./monitor
-yarn install
+yarn
 yarn dev
 ```
 

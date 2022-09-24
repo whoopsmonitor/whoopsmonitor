@@ -2,9 +2,13 @@ const JSend = require('jsend')
 
 module.exports = {
 
-  friendlyName: 'Clean all records in all queues.',
+  friendlyName: 'Clean all records in specified queue, return number of records.',
 
   inputs: {
+    name: {
+      type: 'string',
+      required: true
+    }
   },
 
   exits: {
@@ -13,23 +17,17 @@ module.exports = {
     }
   },
 
-  fn: async function (_, exits) {
-    const status = []
+  fn: async function (inputs, exits) {
+    let count = 0
 
     try {
-      const checkCount = await sails.hooks.bull.executeCheck.count()
-      const alertingCount = await sails.hooks.bull.alertingQueue.count()
-
-      await sails.hooks.bull.executeCheck.empty()
-      await sails.hooks.bull.alertingQueue.empty()
-
-      status.push(`Deleted ${checkCount} records from the check queue.`)
-      status.push(`Deleted ${alertingCount} records from the alerting queue.`)
+      count = await sails.hooks.bull[inputs.name].count()
+      await sails.hooks.bull[inputs.name].empty()
     } catch (err) {
       sails.log.error(err)
       return exits.badRequest()
     }
 
-    return exits.success(JSend.success(status))
+    return exits.success(JSend.success(count))
   }
 }

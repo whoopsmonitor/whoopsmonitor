@@ -1,4 +1,4 @@
-const IMAGE = 'ghcr.io/whoopsmonitor/whoopsmonitor-check-url-alive:1.0'
+const IMAGE = 'ghcr.io/whoopsmonitor/whoopsmonitor-check-url-alive:1.1'
 
 module.exports = {
   friendlyName: 'Install demo data.',

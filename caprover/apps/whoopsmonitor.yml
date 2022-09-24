@@ -43,7 +43,6 @@ services:
       APP_REDIS_CONNECTION_PORT: 6379
       APP_TOKEN: $$cap_APP_TOKEN
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
-      APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
     depends_on:
       - $$cap_appname-mongodb
       - $$cap_appname-redis
@@ -77,7 +76,6 @@ services:
       APP_REDIS_PORT: 6379
       APP_API_URL: http://srv-captain--$$cap_appname-api:1337
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
-      APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
       APP_QUEUE_NAME_ALERTING: alerting
       APP_TOKEN: $$cap_APP_TOKEN
     depends_on:
@@ -91,7 +89,7 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/whoopsmonitor/whoopsmonitor/alerting:1.0
+    image: ghcr.io/whoopsmonitor/whoopsmonitor/alerting:1.1
     environment:
       NODE_ENV: production
       APP_REDIS_PASSWORD: $$cap_APP_REDIS_PASSWORD
@@ -111,7 +109,7 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/whoopsmonitor/whoopsmonitor/image-metadata:1.0
+    image: ghcr.io/whoopsmonitor/whoopsmonitor/image-metadata:1.1
     environment:
       NODE_ENV: production
       API_URL: http://srv-captain--$$cap_appname-api:1337
@@ -124,8 +122,8 @@ services:
 caproverOneClickApp:
   variables:
     - label: Version
-      description: Application version, currently 1.0
-      defaultValue: '1.0'
+      description: Application version, currently 1.1
+      defaultValue: '1.1'
       id: $$cap_APP_VERSION
 
     - label: '* External API URL'

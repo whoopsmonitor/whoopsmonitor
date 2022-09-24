@@ -3,6 +3,10 @@
     <h1 v-if="edit" class="text-h4 q-mt-sm">Update Docker Image</h1>
     <h1 v-else class="text-h4 q-mt-sm">New Docker Image</h1>
 
+    <q-chip v-if="metadataDocumentationUrl" clickable @click="openDoc()" icon="link">
+      documentation
+    </q-chip>
+
     <q-form
       @submit="onSubmit"
     >
@@ -15,7 +19,6 @@
         narrow-indicator
       >
         <q-tab name="general" label="General" />
-        <q-tab name="metadata" label="Metadata" />
       </q-tabs>
 
       <q-separator />
@@ -130,30 +133,6 @@
               </div>
             </div>
           </template>
-        </q-tab-panel>
-
-        <q-tab-panel name="metadata">
-          <div v-if="metadata">
-            <h4 class="text-h6 q-ma-none">Documentation</h4>
-            <div v-if="metadataDocumentationUrl">
-              <a :href="metadataDocumentationUrl" target="_blank">
-                {{ metadataDocumentationUrl }}
-              </a>
-            </div>
-            <div v-else>no documentation provided</div>
-
-            <div v-for="(value, name) in form.metadata" :key="name" class="row">
-              <div class="col">
-                {{ name }}
-              </div>
-              <div class="col">
-                {{ value }}
-              </div>
-            </div>
-          </div>
-          <div v-else>
-            Metadata are not available yet. You have to save the image first or the image does not include it.
-          </div>
         </q-tab-panel>
       </q-tab-panels>
 
@@ -358,6 +337,12 @@ export default {
       update(() => {
         this.filterImagesString = val
       })
+    },
+
+    openDoc () {
+      if (this.metadataDocumentationUrl) {
+        window.open(this.metadataDocumentationUrl, '_blank')
+      }
     }
   }
 }

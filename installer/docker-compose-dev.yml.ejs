@@ -25,7 +25,6 @@ services:
       APP_REDIS_CONNECTION_PORT: 6379
       APP_TOKEN: <%= APP_TOKEN %>
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
-      APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
       APP_QUEUE_NAME_ALERTING: alerting
     depends_on:
       - mongodb
@@ -52,7 +51,6 @@ services:
       APP_REDIS_PORT: 6379
       APP_API_URL: http://api:1337
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
-      APP_QUEUE_NAME_CLEANUP_CHECK_STATUS: cleanup-check-status
       APP_QUEUE_NAME_ALERTING: alerting
       APP_TOKEN: <%= APP_TOKEN %>
     depends_on:

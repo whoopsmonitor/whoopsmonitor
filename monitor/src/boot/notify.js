@@ -4,6 +4,7 @@ const $whoopsNotify = {
   negative ({ message, actions }) {
     Notify.create({
       message,
+      html: true,
       color: 'red',
       actions
     })
@@ -11,6 +12,7 @@ const $whoopsNotify = {
   positive ({ message, actions }) {
     Notify.create({
       message,
+      html: true,
       color: 'positive',
       actions
     })
