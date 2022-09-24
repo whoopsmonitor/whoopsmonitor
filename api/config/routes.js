@@ -58,8 +58,11 @@ module.exports.routes = {
   'GET /v1/dockerimage/:id/envvars': 'v1/dockerimage/envvars',
   'GET /v1/dockerimage/list': 'v1/dockerimage/list',
 
+  // count records
+  'GET /v1/queue/:name': 'v1/queue/find',
+
   // clear records in all queues
-  'DELETE /v1/queue': 'v1/queue/clean',
+  'DELETE /v1/queue/:name': 'v1/queue/clean',
 
   'GET /v1/backup': 'v1/backup/find',
   'POST /v1/backup': 'v1/backup/create',
@@ -68,5 +71,5 @@ module.exports.routes = {
   'DELETE /v1/backup/:id': 'v1/backup/destroy',
 
   // install demo data
-  'POST /v1/demodata': 'v1/demodata/create'
+  'POST /v1/demodata': 'v1/demodata/create',
 }

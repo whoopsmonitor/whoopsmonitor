@@ -53,6 +53,7 @@ module.exports.policies = {
   'v1/dockerimage/envvars': 'token',
 
   'v1/queue/clean': 'token',
+  'v1/queue/find': 'token',
 
   'v1/backup/find': 'token',
   'v1/backup/create': 'token',

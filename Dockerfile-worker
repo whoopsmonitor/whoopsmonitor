@@ -2,8 +2,8 @@ FROM node:17.3.1-alpine3.15
 LABEL maintainer="Daniel Rataj <daniel.rataj@centrum.cz>"
 LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
 
-RUN apk add --no-cache openssl=1.1.1l-r8 \
-    docker-cli=20.10.11-r0 \
+RUN apk add --no-cache openssl=1.1.1q-r0 \
+    docker-cli=20.10.16-r0 \
     bash=5.1.16-r0 \
   && rm -rf /var/cache/apk/*
 

@@ -225,7 +225,7 @@ inquirer.prompt(questions).then((answers) => {
         - Monitor Login: ${APP_PASSWORD}
         ${BASIC_AUTH_USERNAME ? '- Basic Auth (username): ' + BASIC_AUTH_USERNAME : ''}
         ${BASIC_AUTH_PASSWORD ? '- Basic Auth (password): ' + BASIC_AUTH_PASSWORD : ''}
-        `.trimRight(`
+        `.trimEnd(`
         `),
         { padding: 1 }
       )

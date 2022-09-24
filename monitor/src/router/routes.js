@@ -73,6 +73,13 @@ const routes = [
       { path: '', name: 'backuprestore.index', component: () => import('pages/backuprestore/Index.vue'), meta: { auth: true } }
     ]
   },
+  {
+    path: '/tools',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', name: 'tools.index', component: () => import('pages/tools/Index.vue'), meta: { auth: true } }
+    ]
+  },
 
   {
     path: '/server-error',
