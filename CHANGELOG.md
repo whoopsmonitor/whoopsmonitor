@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.1.0] - (2022-09-26)
+
+### Changed
+
+-   (monitor) UI layout in the forms in checks and alerts improved.
+
+### Fixed
+
+-   (api) Demo data installer is using image that does not exists.
+
 ## [v1.1.0] - 2022-09-24
 
 ### Added
