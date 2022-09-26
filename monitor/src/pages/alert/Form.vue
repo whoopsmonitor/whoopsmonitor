@@ -24,15 +24,6 @@
 
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="general" class="q-gutter-md">
-          <q-input
-            filled
-            v-model="form.name"
-            label="Alert Name *"
-            hint="Enter the alert name."
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please enter the name of your alert.']"
-          />
-
           <q-select
             v-if="hasImages"
             v-model="form.image"
@@ -62,42 +53,54 @@
           </q-select>
           <div v-else>
             <div class="caption">Images</div>
-            There are no images to select from or they are invalid.
+            <q-icon name="info" /> There are no images to select from or they are invalid.
           </div>
 
-          <div>
-            <h6 class="text-caption q-ma-none q-mb-sm">Repeat (minutes)</h6>
-            <q-slider v-model="form.repeat" :min="1" :max="60" snap label />
-            <div class="text-caption">Alert won't trigger for selected period (in case status has not changed).</div>
-          </div>
-
-          <div>
-            <div class="text-h6">Levels</div>
-            <div class="text-caption">Allows notification for selected levels.</div>
-
-            <q-toggle
-              label="success"
-              v-model="form.level"
-              :val="0"
-              color="green"
+          <template v-if="hasImageSelected">
+            <q-input
+              filled
+              v-model="form.name"
+              label="Alert Name *"
+              hint="Enter the alert name."
+              lazy-rules
+              :disable="!hasImageSelected"
+              :rules="[ val => val && val.length > 0 || 'Please enter the name of your alert.']"
             />
 
-            <q-toggle
-              label="warning"
-              v-model="form.level"
-              :val="1"
-              color="orange"
-            />
-            <q-toggle
-              label="critical"
-              v-model="form.level"
-              :val="2"
-              color="red"
-            />
-            <div class="text-red" v-if="form.level && !form.level.length">
-              Please select some level. Otherwise it will be saved with all options checked.
+            <div>
+              <h6 class="text-caption q-ma-none q-mb-sm">Repeat (minutes)</h6>
+              <q-slider v-model="form.repeat" :min="1" :max="60" snap label />
+              <div class="text-caption">Alert won't trigger for selected period (in case status has not changed).</div>
             </div>
-          </div>
+
+            <div>
+              <div class="text-h6">Levels</div>
+              <div class="text-caption">Allows notification for selected levels.</div>
+
+              <q-toggle
+                label="success"
+                v-model="form.level"
+                :val="0"
+                color="green"
+              />
+
+              <q-toggle
+                label="warning"
+                v-model="form.level"
+                :val="1"
+                color="orange"
+              />
+              <q-toggle
+                label="critical"
+                v-model="form.level"
+                :val="2"
+                color="red"
+              />
+              <div class="text-red" v-if="form.level && !form.level.length">
+                Please select some level. Otherwise it will be saved with all options checked.
+              </div>
+            </div>
+          </template>
         </q-tab-panel>
 
         <q-tab-panel name="env" class="q-gutter-md">
@@ -172,6 +175,9 @@ export default {
   computed: {
     edit () {
       return this.$route.meta.edit || false
+    },
+    hasImageSelected () {
+      return Object.values(this.form.image).length
     },
     imageOptions () {
       let items = this.images.map((image) => {

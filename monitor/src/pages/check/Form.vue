@@ -17,7 +17,7 @@
         align="left"
       >
         <q-tab name="general" label="General" />
-        <q-tab name="display" label="Display" />
+        <q-tab name="display" label="Display" :disable="Object.values(form.image).length === 0"  />
         <q-tab name="env" label="ENV Variables" :disable="Object.values(form.image).length === 0" />
         <q-tab name="file" label="File" :disable="Object.values(form.image).length === 0" />
         <q-tab name="alert" label="Alerts" :disable="Object.values(form.image).length === 0" />
@@ -38,53 +38,71 @@
             use-input
             input-debounce="0"
             @filter="filterImages"
-          />
+          >
+            <template v-slot:option="scope">
+              <q-item
+                v-bind="scope.itemProps"
+                v-on="scope.itemEvents"
+              >
+                <q-item-section avatar v-if="scope.opt.icon">
+                  <q-icon :name="scope.opt.icon" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label v-html="scope.opt.label" />
+                  <q-item-label caption v-if="scope.opt.description">{{ scope.opt.description }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+
           <div v-else>
             <div class="caption">Images</div>
-            There are no docker images to select from or they are invalid. You should <router-link :to="{ name: 'image.create' }">download a new image</router-link> first.
+            <q-icon name="info" /> There are no docker images to select from or they are invalid. You should <router-link :to="{ name: 'image.create' }">download a new image</router-link> first.
           </div>
 
-          <q-input
-            filled
-            v-model="form.name"
-            label="Check Name *"
-            hint="Enter the check name."
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please enter the name of your check.']"
-          />
+          <template v-if="hasImageSelected">
+            <q-input
+              filled
+              v-model="form.name"
+              label="Check Name *"
+              hint="Enter the check name."
+              lazy-rules
+              :rules="[ val => val && val.length > 0 || 'Please enter the name of your check.']"
+            />
 
-          <q-input
-            filled
-            v-model="form.description"
-            label="Description"
-            hint="Enter the check description."
-          />
+            <q-input
+              filled
+              v-model="form.description"
+              label="Description"
+              hint="Enter the check description."
+            />
 
-          <q-select
-            label="Tags"
-            hint="Enter tags separated by comma."
-            filled
-            v-model="form.tags"
-            use-input
-            use-chips
-            multiple
-            input-debounce="0"
-            @new-value="createValue"
-            :options="filterOptions"
-            @filter="filterFn"
-          />
+            <q-select
+              label="Tags"
+              hint="Enter tags separated by comma."
+              filled
+              v-model="form.tags"
+              use-input
+              use-chips
+              multiple
+              input-debounce="0"
+              @new-value="createValue"
+              :options="filterOptions"
+              @filter="filterFn"
+            />
 
-          <q-input
-            filled
-            v-model="form.cron"
-            label="Cron *"
-            hint="Cron notation to trigger the check. Default is every minute."
-            lazy-rules
-            :rules="[ val => val && val.length > 0 && validateCron(val) || 'You should enter valid cron notation for your check to trigger correctly.']"
-          />
-          <div v-if="form.cron" class="text-caption">
-            You entered <i>{{ form.cron | translateCron }}</i>.
-          </div>
+            <q-input
+              filled
+              v-model="form.cron"
+              label="Cron *"
+              hint="Cron notation to trigger the check. Default is every minute."
+              lazy-rules
+              :rules="[ val => val && val.length > 0 && validateCron(val) || 'You should enter valid cron notation for your check to trigger correctly.']"
+            />
+            <div v-if="form.cron" class="text-caption">
+              You entered <i>{{ form.cron | translateCron }}</i>.
+            </div>
+          </template>
         </q-tab-panel>
 
         <q-tab-panel name="env" class="q-gutter-md">
@@ -328,6 +346,9 @@ export default {
     edit () {
       return this.$route.meta.edit || false
     },
+    hasImageSelected () {
+      return Object.values(this.form.image).length
+    },
     imageOptions () {
       let items = this.images.map((image) => {
         const metadata = JSON.parse(image.metadata)
@@ -458,7 +479,7 @@ export default {
 
     async fetchImages () {
       try {
-        this.images = await this.$axios.get('/v1/dockerimage', {
+        const images = await this.$axios.get('/v1/dockerimage', {
           params: {
             select: 'image,metadata',
             where: {
@@ -467,6 +488,8 @@ export default {
             }
           }
         }).then(result => result.data)
+
+        this.images = images
       } catch (error) {
         console.error(error)
       }
