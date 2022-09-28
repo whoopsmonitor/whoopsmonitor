@@ -30,7 +30,7 @@ jobs:
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis
           VERSION=7.0.5-debian-11-r2
-          PULL_IMAGE=redis:$VERSION
+          PULL_IMAGE=bitnami/redis:$VERSION
 
           docker pull "$PULL_IMAGE"
 
