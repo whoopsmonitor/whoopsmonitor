@@ -12,11 +12,25 @@ jobs:
       - name: Log into registry
         run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push Redis
+      - name: Push Bitnami Redis
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis
           VERSION=6.0.8-debian-10-r6
           PULL_IMAGE=bitnami/redis:$VERSION
+
+          docker pull "$PULL_IMAGE"
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
+
+      - name: Push Redis
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/redis
+          VERSION=7.0.5-alpine3.16
+          PULL_IMAGE=redis:$VERSION
 
           docker pull "$PULL_IMAGE"
 
