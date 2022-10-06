@@ -8,26 +8,41 @@ module.exports = {
 
   inputs: {
     value: {
-      type: 'string',
+      type: 'ref', // type "string" does not work correctly
       required: true
     }
   },
 
   exits: {
+    decryptError: {
+      description: 'Empty result when decrypted.'
+    }
   },
 
   sync: true,
 
   fn: function ({ value }, exits) {
     try {
-      const result = JSON.parse(EA(null, {
+      const result = EA(null, {
         keys: sails.config.models.dataEncryptionKeys
-      }).decryptAttribute(undefined, value))
+      }).decryptAttribute(undefined, value)
 
-      // output is JSON
-      return exits.success(result)
-    } catch (_) {
-      return exits.success(false)
+      if (result) {
+        // result is a string, so try to parse it as JSON
+        if (typeof result === 'string') {
+          return exits.success(JSON.parse(result))
+        }
+
+        // already an object
+        if (typeof result === 'object') {
+          return exits.success(result)
+        }
+      }
+
+      return exits.decryptError()
+    } catch (err) {
+      console.error(err)
+      return exits.decryptError()
     }
   }
 }

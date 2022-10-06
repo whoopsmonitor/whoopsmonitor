@@ -1,12 +1,14 @@
-require( 'console-stamp' )( console )
-const execa = require('execa')
-const cron = require('node-cron')
-const axios = require('axios')
-const logSymbols = require('log-symbols')
+import { readFileSync } from 'fs'
+import logSymbols from 'log-symbols'
+import { execa } from 'execa'
+import cron from 'node-cron'
+import axios from 'axios'
+import c from 'console-stamp'
+const packageName = JSON.parse(readFileSync('package.json')).name
 const API_URL = process.env.API_URL
 const APP_TOKEN = process.env.APP_TOKEN
-const packageJson = require('./package.json')
-const packageName = packageJson.name
+
+c(console)
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
@@ -16,7 +18,7 @@ const axiosInstance = axios.create({
   }
 })
 
-updateDockerMetadata = async function() {
+const updateDockerMetadata = async function () {
   console.log(`[${packageName}] [${logSymbols.info}] Getting images from the API.`)
   try {
     const images = await axiosInstance.get('/v1/dockerimage').then(response => response.data)
@@ -40,7 +42,7 @@ updateDockerMetadata = async function() {
       commands.push(`docker inspect ${image.image} | jq -r '.[0].Config.Labels'`)
 
       try {
-        const { stdout } = await execa.command(commands.join('\\'), {
+        const { stdout } = await execa(commands.join('\\'), {
           shell: true
         })
 
@@ -67,7 +69,7 @@ updateDockerMetadata = async function() {
           })
 
           console.log(`[${packageName}] [${logSymbols.success}] Image's metadata (${image.image}) updated.`)
-        } else {
+        } else {
           console.log(`[${packageName}] [${logSymbols.success}] Image's metadata (${image.image}) are the same. No need for update.`)
         }
       } catch (err) {
@@ -91,7 +93,7 @@ updateDockerMetadata = async function() {
   return Promise.resolve()
 }
 
-;(async function main() {
+;(async function main () {
   // run the process every minute
   cron.schedule('* * * * *', async () => {
     console.log(`[${packageName}] [${logSymbols.info}] Reloading docker images metadata - started.`)

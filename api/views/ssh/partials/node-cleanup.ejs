@@ -1,4 +1,0 @@
-docker rm <%= CONTAINER_NAME %> -f &> /dev/null || true
-docker volume prune -f &> /dev/null || true
-rm -Rf <%= DATA_DIR %> &> /dev/null || true
-crontab -r &> /dev/null || true

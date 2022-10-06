@@ -45,7 +45,6 @@ module.exports.policies = {
   'v1/check/tags': 'token',
 
   'v1/checkstatus/find': 'token',
-  'v1/checkstatus/isfailing': 'token',
   'v1/checkstatus/aggregate': 'token',
   'v1/checkstatus/aggregate-by-day': 'token',
   'v1/checkstatus/aggregate-metric-by-day': 'token',
@@ -61,5 +60,6 @@ module.exports.policies = {
   'v1/backup/destroy': 'token',
   'v1/backup/restore': 'token',
 
-  'v1/demodata/create': 'token'
-};
+  'v1/demodata/create': 'token',
+  'v1/realtime/join': 'token'
+}

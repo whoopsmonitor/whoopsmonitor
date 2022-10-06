@@ -1,5 +1,5 @@
-FROM node:17.3.1-alpine3.15
-LABEL maintainer="Daniel Rataj <daniel.rataj@centrum.cz>"
+FROM node:18.10.0-alpine3.15
+LABEL maintainer="Daniel Rataj <info@whoopsmonitor.app>"
 LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
 
 RUN apk add --no-cache openssl=1.1.1q-r0 \
@@ -17,7 +17,7 @@ COPY api/api ./api
 COPY api/config/ ./config
 COPY api/static/ ./static
 COPY api/views/ ./views
-COPY api/test/ ./test
+# COPY api/test/ ./test
 COPY api/app.js ./app.js
 COPY api/.sailsrc ./.sailsrc
 
@@ -26,7 +26,7 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.s
 RUN chmod +x /opt/bin/wait-for-it.sh
 
 # start Sails app
-CMD ["/opt/bin/wait-for-it.sh", "mongo:27017", "--", "npm", "start"]
+CMD ["/opt/bin/wait-for-it.sh", "whoopsmonitor-mongodb:27017", "--", "npm", "start"]
 
 # expose port for Node
 EXPOSE 1337

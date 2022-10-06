@@ -60,17 +60,17 @@ module.exports = {
       //--------------------------------------------------------------------------
 
       /****************************************************************************
-      *                                                                           *
+      *                                                                           *
       * More adapter-specific options                                             *
-      *                                                                           *
+      *                                                                           *
       * > For example, for some hosted PostgreSQL providers (like Heroku), the    *
-      * > extra `ssl: true` option is mandatory and must be provided.             *
-      *                                                                           *
-      * More info:                                                                *
-      * https://sailsjs.com/config/datastores                                     *
-      *                                                                           *
+      * > extra `ssl` object with a `rejectUnauthorized` option must be provided. *
+      *                                                                           *
+      * More info:                                                                *
+      * https://sailsjs.com/config/datastores                                     *
+      *                                                                           *
       ****************************************************************************/
-      // ssl: true,
+      // ssl: { rejectUnauthorized: true },
 
     },
 
@@ -157,6 +157,148 @@ module.exports = {
 
 
 
+  /***************************************************************************
+  *                                                                          *
+  * Configure how your app handles sessions in production.                   *
+  *                                                                          *
+  * (https://sailsjs.com/config/session)                                     *
+  *                                                                          *
+  * > If you have disabled the "session" hook, then you can safely remove    *
+  * > this section from your `config/env/production.js` file.                *
+  *                                                                          *
+  ***************************************************************************/
+  session: {
+
+    /***************************************************************************
+    *                                                                          *
+    * Production session store configuration.                                  *
+    *                                                                          *
+    * Uncomment the following lines to finish setting up a package called      *
+    * "@sailshq/connect-redis" that will use Redis to handle session data.     *
+    * This makes your app more scalable by allowing you to share sessions      *
+    * across a cluster of multiple Sails/Node.js servers and/or processes.     *
+    * (See http://bit.ly/redis-session-config for more info.)                  *
+    *                                                                          *
+    * > While @sailshq/connect-redis is a popular choice for Sails apps, many  *
+    * > other compatible packages (like "connect-mongo") are available on NPM. *
+    * > (For a full list, see https://sailsjs.com/plugins/sessions)            *
+    *                                                                          *
+    ***************************************************************************/
+    // adapter: '@sailshq/connect-redis',
+    // url: 'redis://user:password@localhost:6379/databasenumber',
+    //--------------------------------------------------------------------------
+    // /\   OR, to avoid checking it in to version control, you might opt to
+    // ||   set sensitive credentials like this using an environment variable.
+    //
+    // For example:
+    // ```
+    // sails_session__url=redis://admin:myc00lpAssw2D@bigsquid.redistogo.com:9562/0
+    // ```
+    //
+    //--------------------------------------------------------------------------
+
+    /***************************************************************************
+    *                                                                          *
+    * Production configuration for the session ID cookie name.                 *
+    *                                                                          *
+    * We reccomend prefixing your session cookie with `__Host-`, this limits   *
+    * the scope of your cookie to a single origin to protect against same-site *
+    * attacks.                                                                 *
+    *                                                                          *
+    * Note that with the `__Host-` prefix, session cookies will _not_ be sent  *
+    * unless `sails.config.cookie.secure` is set to `true`.                    *
+    *                                                                          *
+    * Read more:                                                               *
+    * https://sailsjs.com/config/session#?the-session-id-cookie                *
+    *                                                                          *
+    ***************************************************************************/
+    // name: '__Host-sails.sid',
+
+    /***************************************************************************
+    *                                                                          *
+    * Production configuration for the session ID cookie.                      *
+    *                                                                          *
+    * Tell browsers (or other user agents) to ensure that session ID cookies   *
+    * are always transmitted via HTTPS, and that they expire 24 hours after    *
+    * they are set.                                                            *
+    *                                                                          *
+    * Note that with `secure: true` set, session cookies will _not_ be         *
+    * transmitted over unsecured (HTTP) connections. Also, for apps behind     *
+    * proxies (like Heroku), the `trustProxy` setting under `http` must be     *
+    * configured in order for `secure: true` to work.                          *
+    *                                                                          *
+    * > While you might want to increase or decrease the `maxAge` or provide   *
+    * > other options, you should always set `secure: true` in production      *
+    * > if the app is being served over HTTPS.                                 *
+    *                                                                          *
+    * Read more:                                                               *
+    * https://sailsjs.com/config/session#?the-session-id-cookie                *
+    *                                                                          *
+    ***************************************************************************/
+    cookie: {
+      // secure: true,
+      maxAge: 24 * 60 * 60 * 1000,  // 24 hours
+    },
+
+  },
+
+
+
+  /**************************************************************************
+  *                                                                          *
+  * Set up Socket.io for your production environment.                        *
+  *                                                                          *
+  * (https://sailsjs.com/config/sockets)                                     *
+  *                                                                          *
+  * > If you have disabled the "sockets" hook, then you can safely remove    *
+  * > this section from your `config/env/production.js` file.                *
+  *                                                                          *
+  ***************************************************************************/
+  sockets: {
+
+    /***************************************************************************
+    *                                                                          *
+    * Uncomment the `onlyAllowOrigins` whitelist below to configure which      *
+    * "origins" are allowed to open socket connections to your Sails app.      *
+    *                                                                          *
+    * > Replace "https://example.com" etc. with the URL(s) of your app.        *
+    * > Be sure to use the right protocol!  ("http://" vs. "https://")         *
+    *                                                                          *
+    ***************************************************************************/
+    // onlyAllowOrigins: [
+    //   'https://example.com',
+    //   'https://staging.example.com',
+    // ],
+
+
+    /***************************************************************************
+    *                                                                          *
+    * If you are deploying a cluster of multiple servers and/or processes,     *
+    * then uncomment the following lines.  This tells Socket.io about a Redis  *
+    * server it can use to help it deliver broadcasted socket messages.        *
+    *                                                                          *
+    * > Be sure a compatible version of @sailshq/socket.io-redis is installed! *
+    * > (See https://sailsjs.com/config/sockets for the latest version info)   *
+    *                                                                          *
+    * (https://sailsjs.com/docs/concepts/deployment/scaling)                   *
+    *                                                                          *
+    ***************************************************************************/
+    // adapter: '@sailshq/socket.io-redis',
+    // url: 'redis://user:password@bigsquid.redistogo.com:9562/databasenumber',
+    //--------------------------------------------------------------------------
+    // /\   OR, to avoid checking it in to version control, you might opt to
+    // ||   set sensitive credentials like this using an environment variable.
+    //
+    // For example:
+    // ```
+    // sails_sockets__url=redis://admin:myc00lpAssw2D@bigsquid.redistogo.com:9562/0
+    // ```
+    //--------------------------------------------------------------------------
+
+  },
+
+
+
   /**************************************************************************
   *                                                                         *
   * Set the production log level.                                           *
@@ -176,6 +318,9 @@ module.exports = {
     *                                                                          *
     * The number of milliseconds to cache static assets in production.         *
     * (the "max-age" to include in the "Cache-Control" response header)        *
+    *                                                                          *
+    * If you are caching assets with a tool like Cloudflare, you may want to   *
+    * reduce this considerably to allow more flexibility in purging the cache. *
     *                                                                          *
     ***************************************************************************/
     cache: 365.25 * 24 * 60 * 60 * 1000, // One year
@@ -247,8 +392,7 @@ module.exports = {
     baseUrl: 'https://example.com',
     internalEmailAddress: 'support@example.com',
 
-    // mailgunDomain: 'mg.example.com',
-    // mailgunSecret: 'key-prod_fake_bd32301385130a0bafe030c',
+    // sendgridSecret: 'SG.fake.3e0Bn0qSQVnwb1E4qNPz9JZP5vLZYqjh7sn8S93oSHU',
     // stripeSecret: 'sk_prod__fake_Nfgh82401348jaDa3lkZ0d9Hm',
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking them in to version control, you might opt to
@@ -256,8 +400,7 @@ module.exports = {
     //
     // For example:
     // ```
-    // sails_custom__mailgunDomain=mg.example.com
-    // sails_custom__mailgunSecret=key-prod_fake_bd32301385130a0bafe030c
+    // sendgridSecret=SG.fake.3e0Bn0qSQVnwb1E4qNPz9JZP5vLZYqjh7sn8S93oSHU
     // sails_custom__stripeSecret=sk_prod__fake_Nfgh82401348jaDa3lkZ0d9Hm
     // ```
     //--------------------------------------------------------------------------

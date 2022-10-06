@@ -139,12 +139,29 @@ export default {
       verbose: true
     })
 
-    this.interval = setInterval(async () => {
-      await this.fetchData()
-    }, 10000)
+    this.$sailsIo.socket.on('dockerimage', response => {
+      console.log(response)
+      const action = response.verb
+      const id = response.id
+      const data = response.data
+
+      switch (action) {
+        case 'updated':
+          this.items = this.items.map(item => {
+            if (item.id === id) {
+              item.healthyStatus = data.healthyStatus
+              item.healthyStatusOutput = data.healthyStatusOutput
+              item.metadata = data.metadata
+            }
+
+            return item
+          })
+          break
+      }
+    })
   },
   destroyed () {
-    clearInterval(this.interval)
+    this.$sailsIo.socket.off('dockerimage')
   },
   methods: {
     async fetchData (config) {
@@ -155,17 +172,15 @@ export default {
       }
 
       try {
-        const images = await this.$axios.get('/v1/dockerimage', {
-          params: {
-            select: 'image,createdAt,username,password,type,healthyStatus,healthyStatusOutput,metadata'
-          }
-        }).then(response => response.data)
-
-        this.items = images.map(image => {
-          if (image.metadata) {
-            image.metadata = JSON.parse(image.metadata)
-          }
-          return image
+        this.$sailsIo.socket.get('/v1/dockerimage', {
+          select: 'image,createdAt,username,password,type,healthyStatus,healthyStatusOutput,metadata'
+        }, images => {
+          this.items = images.map(image => {
+            if (image.metadata) {
+              image.metadata = JSON.parse(image.metadata)
+            }
+            return image
+          })
         })
       } catch (error) {
         console.error(error)
@@ -193,10 +208,10 @@ export default {
       this.loading.destroy = true
 
       try {
-        await this.$axios.delete(`/v1/dockerimage/${this.destroyId}`)
-        await this.fetchData({
-          verbose: false
+        this.$sailsIo.socket.delete(`/v1/dockerimage/${this.destroyId}`, responseItem => {
+          this.items = this.items.filter(item => item.id !== responseItem.id)
         })
+
         this.$whoopsNotify.positive({
           message: 'Docker image successfully deleted.'
         })
@@ -216,9 +231,17 @@ export default {
       record.healthyStatusOutput = ''
 
       try {
-        await this.$axios.patch(`/v1/dockerimage/${image.id}`, record)
+        this.$sailsIo.socket.patch(`/v1/dockerimage/${image.id}`, record, response => {
+          this.items = this.items.map(item => {
+            if (item.id === response.id) {
+              item = response
+            }
 
-        await this.fetchData()
+            return item
+          })
+        })
+
+        // await this.fetchData()
 
         this.$whoopsNotify.positive({
           message: "Image's metadata are going to be rebuilded within a minute."

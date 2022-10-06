@@ -1,23 +1,24 @@
 {
   "name": "whoopsmonitor-image-metadata",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
-  "main": "index.js",
+  "exports": "./index.js",
+  "type": "module",
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "nodemon -L index.js"
   },
-  "author": "",
+  "author": "Daniel Rataj <info@whoopsmonitor.app>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1",
-    "console-stamp": "^3.0.0-rc4.2",
-    "execa": "^4.0.3",
+    "axios": "^0.27.2",
+    "console-stamp": "^3.0.6",
+    "execa": "^6.1.0",
     "execution-time": "^1.4.1",
-    "log-symbols": "^4.0.0",
-    "node-cron": "^2.0.3"
+    "log-symbols": "^5.1.0",
+    "node-cron": "^3.0.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.20"
   }
 }

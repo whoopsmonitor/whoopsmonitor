@@ -58,7 +58,8 @@ module.exports = {
       this.password = sails.helpers.decryptAttribute(this.password)
     }
 
-    return this
+    // must be cloned otherwise "this" is handled as refference
+    return _.clone(this)
   },
 
   beforeDestroy: async function (criteria, proceed) {

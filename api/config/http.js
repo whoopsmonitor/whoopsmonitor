@@ -52,7 +52,7 @@ module.exports.http = {
     ],
 
     poweredBy: function (req, res, next) {
-      res.header('X-Powered-By', 'Whoops Monitor <MallGroup>')
+      res.header('X-Powered-By', 'Whoops Monitor <info@whoopsmonitor.app>')
       res.header('X-Served-By', req.hostname)
       next()
     },
@@ -78,6 +78,6 @@ module.exports.http = {
     //   return middlewareFn;
     // })(),
 
-  }
+  },
 
-}
+};

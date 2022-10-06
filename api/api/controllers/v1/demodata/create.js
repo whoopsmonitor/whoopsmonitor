@@ -27,7 +27,7 @@ module.exports = {
       })
 
       // create a check that pings Google
-      await Check.create({
+      const record = await Check.create({
         enabled: true,
         name: 'ping google',
         image: image.id,
@@ -35,13 +35,13 @@ module.exports = {
         environmentVariables: {
           WM_ENDPOINT_URL: 'https://www.google.com'
         }
-      })
+      }).meta({ fetch: true })
+
+      return exits.success(record)
     } catch (error) {
       sails.log.error(error)
 
       return exits.badRequest()
     }
-
-    return exits.success({})
   }
 }

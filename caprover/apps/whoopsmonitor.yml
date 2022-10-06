@@ -9,6 +9,15 @@ services:
     volumes:
       - $$cap_appname-redis-data:/bitnami
 
+  $$cap_appname-redis-sockets:
+    caproverExtra:
+      notExposeAsWebApp: 'true'
+    image: 'bitnami/redis:6.0.8-debian-10-r6'
+    environment:
+      REDIS_PASSWORD: $$cap_APP_REDIS_SOCKETS_PASSWORD
+    volumes:
+      - $$cap_appname-redis-sockets-data:/bitnami
+
   $$cap_appname-mongodb:
     caproverExtra:
       notExposeAsWebApp: 'true'
@@ -43,9 +52,11 @@ services:
       APP_REDIS_CONNECTION_PORT: 6379
       APP_TOKEN: $$cap_APP_TOKEN
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
+      APP_REDIS_SOCKETS_PASSWORD: $cap_APP_REDIS_SOCKETS_PASSWORD
     depends_on:
       - $$cap_appname-mongodb
       - $$cap_appname-redis
+      - $$cap_appname-redis-sockets
 
   $$cap_appname-monitor:
     restart: always
@@ -165,6 +176,11 @@ caproverOneClickApp:
       description: API token that is used for securing the communication between API and external services.
       defaultValue: $$cap_gen_random_hex(64)
       id: $$cap_APP_TOKEN
+
+    - label: Redis Password for sockets
+      description: Redis password for sockets feature.
+      defaultValue: $$cap_gen_random_hex(32)
+      id: $$cap_APP_REDIS_SOCKETS_PASSWORD
 
   displayName: Whoops Monitor
   isOfficial: true

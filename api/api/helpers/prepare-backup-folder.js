@@ -59,12 +59,12 @@ module.exports = {
 
     archive.directory(`${backupFolder}/${inputs.id}`, false)
 
-    archive.on('warning', function(err) {
+    archive.on('warning', err => {
       sails.log.error(err)
       throw err
     });
 
-    archive.on('error', function (err) {
+    archive.on('error', err => {
       sails.log.error(err)
       throw err
     })

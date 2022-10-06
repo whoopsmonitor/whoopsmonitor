@@ -1,5 +1,5 @@
-FROM node:17.3.1-alpine3.15
-LABEL maintainer="Daniel Rataj <daniel.rataj@centrum.cz>"
+FROM node:18.10.0-alpine3.15
+LABEL maintainer="Daniel Rataj <info@whoopsmonitor.app>"
 LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
 
 RUN apk add --no-cache openssl=1.1.1q-r0 \
@@ -18,4 +18,4 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.s
 RUN chmod +x /opt/bin/wait-for-it.sh
 
 # start worker
-CMD ["/opt/bin/wait-for-it.sh", "localhost:1337", "--", "npm", "start"]
+CMD ["/opt/bin/wait-for-it.sh", "whoopsmonitor-api:1337", "--", "npm", "start"]

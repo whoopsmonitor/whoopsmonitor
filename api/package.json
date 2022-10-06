@@ -1,55 +1,56 @@
 {
-  "name": "api",
+  "name": "whoopsmonitor-api",
   "private": true,
-  "version": "1.0.0",
-  "description": "a Sails application",
+  "version": "2.0.0",
+  "description": "Monitoring and alerting app build upon Sails.",
   "keywords": [],
   "dependencies": {
+    "sails": "^1.5.3",
+    "grunt": "1.0.4",
+    "sails-hook-grunt": "^5.0.0",
+    "sails-hook-orm": "^4.0.2",
+    "sails-hook-sockets": "^2.0.3",
+    "@sailshq/connect-redis": "^6.1.3",
+    "@sailshq/socket.io-redis": "^5.2.1",
     "@sailshq/lodash": "^3.10.4",
-    "async": "2.0.1",
     "jsend": "^1.1.0",
-    "sails": "^1.4.0",
-    "sails-disk": "^2.1.0",
-    "sails-hook-orm": "^3.0.1",
-    "sails-mongo": "^1.2.0",
+    "sails-disk": "^2.1.2",
+    "sails-mongo": "^2.0.0",
     "execa": "^4.0.3",
     "strong-cryptor": "^2.2.0",
     "sails-hook-bull": "^1.0.0",
-    "node-cron": "^2.0.3",
+    "bull": "^4.10.0",
+    "node-cron": "^3.0.2",
     "sails-hook-mongoat2": "^2.0.0",
-    "luxon": "^1.25.0",
+    "luxon": "^3.0.4",
     "execution-time": "^1.4.1",
-    "cron-parser": "^2.16.3",
+    "cron-parser": "^4.6.0",
     "winston": "^3.3.3",
     "node-cache": "^5.1.2",
-    "archiver": "^5.0.2",
+    "archiver": "^5.3.1",
     "sails-hook-uploads": "^0.4.3",
     "unzipper": "^0.10.11",
-    "acorn": ">=5.7.4"
+    "async": "^3.2.4"
   },
   "devDependencies": {
-    "@sailshq/eslint": "^4.19.3",
-    "mocha": "^8.1.3",
-    "nodemon": "^2.0.4",
-    "nyc": "^15.1.0",
-    "supertest": "^4.0.2",
-    "sinon": "^9.0.3"
+    "eslint": "5.16.0",
+    "nodemon": "^2.0.20"
   },
   "scripts": {
     "start": "NODE_ENV=production node app.js",
     "test": "npm run lint && npm run custom-tests && echo 'Done.'",
-    "lint": "eslint . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
-    "custom-tests": "./node_modules/.bin/nyc --reporter=lcov mocha test/lifecycle.test.js test/integration/**/*.spec.js test/unit/**/*.spec.js",
+    "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
+    "custom-tests": "echo \"(No other custom tests yet.)\" && echo",
     "dev": "nodemon -L index.js"
   },
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/anonymous node/sails user/api.git"
+    "url": "git@github.com:whoopsmonitor/whoopsmonitor.git"
   },
-  "author": "anonymous node/sails user",
+  "author": "Daniel Rataj <info@whoopsmonitor.app>",
   "license": "",
   "engines": {
-    "node": ">=8.9"
+    "node": "^16.13"
   }
 }

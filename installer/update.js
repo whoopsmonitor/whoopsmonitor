@@ -54,19 +54,19 @@ questions.push({
         })
         console.log(`${logSymbols.info} (done) Downloading updates.`)
 
-        console.log(`${logSymbols.info} (start) Shutting down running containers.`)
-        await execa.command([
-          `cd ${outputDir} &&`,
-          'docker-compose -p whoopsmonitor down',
-        ].join('\\'), {
-          shell: true
-        })
-        console.log(`${logSymbols.info} (done) Shutting down running containers.`)
+        // console.log(`${logSymbols.info} (start) Shutting down running containers.`)
+        // await execa.command([
+        //   `cd ${outputDir} &&`,
+        //   'docker-compose down',
+        // ].join('\\'), {
+        //   shell: true
+        // })
+        // console.log(`${logSymbols.info} (done) Shutting down running containers.`)
 
         console.log(`${logSymbols.info} (start) Starting all containers.`)
         await execa.command([
           `cd ${outputDir} &&`,
-          'docker-compose -p whoopsmonitor up -d'
+          'docker-compose up -d --remove-orphans'
         ].join('\\'), {
           shell: true
         })

@@ -69,10 +69,11 @@ module.exports = {
       this.environmentVariables = sails.helpers.decryptAttribute(this.environmentVariables)
     }
 
-    return this
+    // must be cloned otherwise "this" is handled as refference
+    return _.clone(this)
   },
 
-  beforeCreate: async function (records, done) {
+  beforeCreate: async function (records, proceed) {
     try {
       records.order = await Check.count({})
     } catch (error) {
@@ -81,7 +82,9 @@ module.exports = {
       }
     }
 
-    return done()
+    if (typeof proceed === 'function') {
+      return proceed()
+    }
   },
 
   beforeDestroy: async function (criteria, proceed) {

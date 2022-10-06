@@ -1,5 +1,3 @@
-const JSend = require('jsend')
-
 module.exports = {
 
   friendlyName: 'Download a backup in ZIP.',

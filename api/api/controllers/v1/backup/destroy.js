@@ -1,4 +1,3 @@
-const JSend = require('jsend')
 const tmpPath = sails.config.paths.tmp
 const path = require('path')
 const backupFolder = path.join(tmpPath, 'backup')

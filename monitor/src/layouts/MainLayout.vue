@@ -243,6 +243,16 @@ export default {
     }
   },
   async created () {
+    this.$sailsIo.socket.on('isfailing', (response) => {
+      if (response.isFailing === true) {
+        // some check failing
+        document.title = this.documentTitle
+        document.title = `[✖] ${document.title}`
+      } else {
+        document.title = this.documentTitle
+      }
+    })
+
     this.documentTitle = document.title
 
     this.interval.failedCheck = setInterval(async () => {
@@ -275,15 +285,15 @@ export default {
 
     async getFailedCheck () {
       try {
-        const result = await this.$axios.get('/v1/checkstatus/isfailing').then(result => result.data)
+        // const result = await this.$axios.get('/v1/checkstatus/isfailing').then(result => result.data)
 
-        if (result === true) {
-          // some check failing
-          document.title = this.documentTitle
-          document.title = `[✖] ${document.title}`
-        } else {
-          document.title = this.documentTitle
-        }
+        // if (result === true) {
+        //   // some check failing
+        //   document.title = this.documentTitle
+        //   document.title = `[✖] ${document.title}`
+        // } else {
+        //   document.title = this.documentTitle
+        // }
       } catch (error) {
         console.error(error)
       }

@@ -12,7 +12,7 @@ jobs:
       - name: Log into registry
         run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push Redis
+      - name: Push Bitnami Redis 6
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis
           VERSION=6.0.8-debian-10-r6
@@ -26,10 +26,38 @@ jobs:
           docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
           docker push "${IMAGE_ID}:${VERSION}"
 
-      - name: Push Mongo
+      - name: Push Bitnami Redis 7
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/redis
+          VERSION=7.0.5-debian-11-r5
+          PULL_IMAGE=bitnami/redis:$VERSION
+
+          docker pull "$PULL_IMAGE"
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
+
+      - name: Push Mongo 4
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/mongodb
           VERSION=4.4.1-debian-10-r8
+          PULL_IMAGE=bitnami/mongodb:$VERSION
+
+          docker pull "$PULL_IMAGE"
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
+
+      - name: Push Mongo 6
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/mongodb
+          VERSION=6.0.2-debian-11-r3
           PULL_IMAGE=bitnami/mongodb:$VERSION
 
           docker pull "$PULL_IMAGE"

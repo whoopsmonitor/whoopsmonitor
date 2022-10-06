@@ -30,7 +30,7 @@ module.exports = {
 
     // delete restore dir in case it exists
     if (fs.existsSync(restorePath)) {
-      fs.rmdirSync(restorePath, {
+      fs.rmSync(restorePath, {
         recursive: true
       })
 

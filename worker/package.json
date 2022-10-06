@@ -1,25 +1,26 @@
 {
   "name": "whoopsmonitor-worker",
   "docker_shared_volume": "whoopsmonitor_worker_data",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
-  "main": "index.js",
+  "exports": "./index.js",
+  "type": "module",
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "nodemon -L index.js"
   },
-  "author": "",
+  "author": "Daniel Rataj <info@whoopsmonitor.app>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1",
-    "bull": "^3.18.0",
+    "axios": "^0.27.2",
+    "bull": "^4.10.0",
     "encrypted-attr": "^1.1.0",
-    "execa": "^4.0.3",
-    "log-symbols": "^4.0.0",
+    "execa": "^6.1.0",
+    "log-symbols": "^5.1.0",
     "execution-time": "^1.4.1",
-    "console-stamp": "^3.0.0-rc4.2"
+    "console-stamp": "^3.0.6"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.20"
   }
 }

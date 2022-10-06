@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0] - 2022-xx-xx
+
+### Added
+
+-   Implements sockets for the server and client.
+-   Adding new Redis container for sockets (+ installer).
+
+### Changed
+
+-   Update Docker images to the latest version with dependencies as well.
+-   Docker images of Redis upgrade (6 -> 7).
+
 ## [v1.1.1] - (2022-09-26)
 
 ### Changed

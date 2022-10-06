@@ -77,6 +77,8 @@ export default {
         this.$whoopsNotify.positive({
           message: `Cleaned ${count} record(s) in the <i>${this.name}</i> queue.`
         })
+
+        await this.fetchData()
       } catch (error) {
         if (error) {
           console.error(error)

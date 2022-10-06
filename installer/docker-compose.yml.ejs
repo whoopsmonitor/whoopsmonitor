@@ -1,97 +1,101 @@
 version: '3'
 
 services:
-  api:
-    container_name: api
-    restart: always
+  <%= APP_NAME %>-api:
+    container_name: <%= APP_NAME %>-api
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
     ports:
       - "1337:1337"
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/api:<%= APP_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/api:<%= DOCKER_IMAGE_VERSION %>
     environment:
       NODE_ENV: production
       CONFIG_CORS_ALLOW_ORIGINS: '*'
       APP_PASSWORD: <%= APP_PASSWORD %>
-      MONGO_CONNECTION: mongodb://<%= MONGODB_USERNAME %>:<%= MONGODB_PASSWORD %>@mongo:27017/<%= MONGODB_DATABASE %>?authSource=<%= APP_NAME %>
+      MONGO_CONNECTION: mongodb://<%= MONGODB_USERNAME %>:<%= MONGODB_PASSWORD %>@<%= APP_NAME %>-mongodb:27017/<%= MONGODB_DATABASE %>?authSource=<%= APP_NAME %>
       APP_DATA_ENCRYPTION_KEY: <%= APP_DATA_ENCRYPTION_KEY %>
       APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
-      APP_REDIS_CONNECTION_HOST: redis
+      APP_REDIS_CONNECTION_HOST: <%= APP_NAME %>-redis
       APP_REDIS_CONNECTION_PORT: 6379
       APP_TOKEN: <%= APP_TOKEN %>
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
       APP_QUEUE_NAME_ALERTING: alerting
+      APP_REDIS_SOCKETS_CONNECTION_HOST: <%= APP_NAME %>-redis-sockets
+      APP_REDIS_SOCKETS_CONNECTION_PORT: 6379
+      APP_REDIS_SOCKETS_PASSWORD: <%= APP_REDIS_SOCKETS_PASSWORD %>
     depends_on:
-      - mongodb
-      - redis
+      - <%= APP_NAME %>-mongodb
+      - <%= APP_NAME %>-redis
+      - <%= APP_NAME %>-redis-sockets
     networks:
-      - app-tier
+      - <%= APP_NAME %>
 
-  worker:
-    container_name: worker
-    restart: always
+  <%= APP_NAME %>-worker:
+    container_name: <%= APP_NAME %>-worker
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-      - worker_data:/<%= APP_NAME %>-worker
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker:<%= APP_VERSION %>
+      - <%= APP_NAME %>_worker_data:/<%= APP_NAME %>-worker
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker:<%= DOCKER_IMAGE_VERSION %>
     environment:
       NODE_ENV: production
       APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
-      APP_REDIS_HOST: redis
+      APP_REDIS_HOST: <%= APP_NAME %>-redis
       APP_REDIS_PORT: 6379
-      APP_API_URL: http://api:1337
+      APP_API_URL: http://<%= APP_NAME %>-api:1337
       APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
       APP_QUEUE_NAME_ALERTING: alerting
       APP_TOKEN: <%= APP_TOKEN %>
     depends_on:
-      - mongodb
-      - redis
-      - api
+      - <%= APP_NAME %>-mongodb
+      - <%= APP_NAME %>-redis
+      - <%= APP_NAME %>-api
     networks:
-      - app-tier
+      - <%= APP_NAME %>
 
-  alerting:
-    container_name: alerting
-    restart: always
+  <%= APP_NAME %>-alerting:
+    container_name: <%= APP_NAME %>-alerting
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/alerting:<%= APP_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/alerting:<%= DOCKER_IMAGE_VERSION %>
     environment:
       NODE_ENV: production
       APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
-      APP_REDIS_HOST: redis
+      APP_REDIS_HOST: <%= APP_NAME %>-redis
       APP_REDIS_PORT: 6379
-      APP_API_URL: http://api:1337
+      APP_API_URL: http://<%= APP_NAME %>-api:1337
       APP_QUEUE_NAME_ALERTING: alerting
       APP_TOKEN: <%= APP_TOKEN %>
     depends_on:
-      - mongodb
-      - redis
-      - api
+      - <%= APP_NAME %>-mongodb
+      - <%= APP_NAME %>-redis
+      - <%= APP_NAME %>-api
     networks:
-      - app-tier
+      - <%= APP_NAME %>
 
-  image-metadata:
-    container_name: image-metadata
-    restart: always
+  <%= APP_NAME %>-image-metadata:
+    container_name: <%= APP_NAME %>-image-metadata
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/image-metadata:<%= APP_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/image-metadata:<%= DOCKER_IMAGE_VERSION %>
     environment:
       NODE_ENV: production
-      API_URL: http://api:1337
+      API_URL: http://<%= APP_NAME %>-api:1337
       APP_TOKEN: <%= APP_TOKEN %>
     depends_on:
-      - mongodb
-      - redis
-      - api
+      - <%= APP_NAME %>-mongodb
+      - <%= APP_NAME %>-redis
+      - <%= APP_NAME %>-api
     networks:
-      - app-tier
+      - <%= APP_NAME %>
 
-  monitor:
-    container_name: monitor
-    restart: always
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/monitor:<%= APP_VERSION %>
+  <%= APP_NAME %>-monitor:
+    container_name: <%= APP_NAME %>-monitor
+    restart: unless-stopped
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/monitor:<%= DOCKER_IMAGE_VERSION %>
     ports:
       - "8080:80"
     environment:
@@ -105,46 +109,52 @@ services:
       BASIC_AUTH_PASSWORD: <%= BASIC_AUTH_PASSWORD %>
 <% } -%>
     depends_on:
-      - mongodb
-      - redis
-      - api
+      - <%= APP_NAME %>-mongodb
+      - <%= APP_NAME %>-redis
+      - <%= APP_NAME %>-api
     networks:
-      - app-tier
+      - <%= APP_NAME %>
 
-  mongodb:
-    container_name: mongo
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/mongodb:4.4.1-debian-10-r8
+  <%= APP_NAME %>-mongodb:
+    container_name: <%= APP_NAME %>-mongodb
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/mongodb:6.0.2-debian-11-r3
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/bitnami
+      - <%= APP_NAME %>_mongodb_data:/bitnami
     environment:
       MONGODB_ROOT_PASSWORD: <%= MONGODB_ROOT_PASSWORD %>
       MONGODB_DATABASE: <%= MONGODB_DATABASE %>
       MONGODB_USERNAME: <%= MONGODB_USERNAME %>
       MONGODB_PASSWORD: <%= MONGODB_PASSWORD %>
     networks:
-      - app-tier
+      - <%= APP_NAME %>
 
-  redis:
-    container_name: redis
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/redis:6.0.8-debian-10-r6
+  <%= APP_NAME %>-redis:
+    container_name: <%= APP_NAME %>-redis
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/redis:7.0.5-debian-11-r2
     environment:
       REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
     volumes:
-      - redis_data:/bitnami
+      - <%= APP_NAME %>_redis_data:/bitnami
     networks:
-      - app-tier
+      - <%= APP_NAME %>
+
+  <%= APP_NAME %>-redis-sockets:
+    container_name: <%= APP_NAME %>-redis-sockets
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/redis:7.0.5-debian-11-r2
+    environment:
+      REDIS_PASSWORD: <%= APP_REDIS_SOCKETS_PASSWORD %>
+    volumes:
+      - <%= APP_NAME %>_redis_sockets_data:/bitnami
+    networks:
+      - <%= APP_NAME %>
 
 volumes:
-  mongodb_data:
-    driver: local
-  redis_data:
-    driver: local
-  worker_data:
-    driver: local
+  <%= APP_NAME %>_mongodb_data:
+  <%= APP_NAME %>_redis_data:
+  <%= APP_NAME %>_redis_sockets_data:
+  <%= APP_NAME %>_worker_data:
 
 networks:
-  app-tier:
-    external:
-      name: <%= APP_NAME %>_app-tier
+  <%= APP_NAME %>:

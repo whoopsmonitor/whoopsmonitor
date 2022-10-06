@@ -1,14 +1,22 @@
 module.exports = {
 
-  friendlyName: 'Info if some check is failing at this time.',
+  friendlyName: 'Realtime - Info if some check is failing at this time.',
+
+  description: '',
 
   inputs: {
+    month: {
+      type: 'number',
+      defaultsTo: 1
+    }
   },
 
   exits: {
   },
 
-  fn: async function (_, exits) {
+  fn: async function (inputs, exits) {
+    sails.log(`[realtime-is-failing] Start.`)
+
     const checks = await Check.find({
       select: 'id',
       where: {
@@ -35,6 +43,13 @@ module.exports = {
         }
       }
     }
+
+    sails.log(`[realtime-is-failing] Broadcasting "isfailing" event with status: ${isFailing}`)
+    sails.sockets.broadcast('realtime', 'isfailing', {
+      isFailing
+    })
+
+    sails.log(`[realtime-is-failing] Done.`)
 
     return exits.success(isFailing)
   }

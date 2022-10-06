@@ -1,11 +1,15 @@
-require( 'console-stamp' )( console )
-const Queue = require('bull')
-const execa = require('execa')
-const axios = require('axios')
-const logSymbols = require('log-symbols')
-const packageJson = require('./package.json')
-const perf = require('execution-time')()
-const { DateTime, Interval } = require('luxon')
+import { readFileSync } from 'fs'
+import Queue from 'bull'
+import { execa } from 'execa'
+import axios from 'axios'
+import logSymbols from 'log-symbols'
+import c from 'console-stamp'
+import executionTime from 'execution-time'
+import { DateTime, Interval } from 'luxon'
+const packageName = JSON.parse(readFileSync('package.json')).name
+const perf = executionTime()
+c(console)
+
 const APP_TOKEN = process.env.APP_TOKEN
 
 const addToLog = async (alertId, status, output, checkStdout, checkExitCode, duration) => {
@@ -20,7 +24,7 @@ const addToLog = async (alertId, status, output, checkStdout, checkExitCode, dur
     })
   } catch (_) {
     const err = new Error()
-    err.message = `[${packageJson.name}] Alert ${alertId} not found.`
+    err.message = `[${packageName}] Alert ${alertId} not found.`
     err.name = 404
     throw err
   }
@@ -96,7 +100,7 @@ queue.process(async (job, done) => {
 
         // we do not process the alert in case the exit code and latest status are both "ok"
         if (lastStatus.checkExitCode === 0 && checkExitCode === 0) {
-          console.log(`[${packageJson.name}] [${logSymbols.success}] No notificitation needs to be sent.`)
+          console.log(`[${packageName}] [${logSymbols.success}] No notificitation needs to be sent.`)
           return done()
         }
 
@@ -168,13 +172,13 @@ queue.process(async (job, done) => {
     } catch (error) {
       const perfResult = perf.stop()
 
-      console.error(`[${packageJson.name}]`, error)
+      console.error(`[${packageName}]`, error)
 
       // make sure that the result is saved
       try {
         await addToLog(alertId, error.exitCode, error.stderr, checkStdout, checkExitCode, perfResult.time)
       } catch (error) {
-        console.error(`[${packageJson.name}]`, error)
+        console.error(`[${packageName}]`, error)
       }
     }
   }
@@ -195,5 +199,5 @@ queue.on('error', async (error) => {
 })
 
 queue.on('failed', async (job, error) => {
-  console.error(`${logSymbols.error} [${packageJson.name}]`, error)
+  console.error(`${logSymbols.error} [${packageName}]`, error)
 })

@@ -9,29 +9,16 @@
  */
 
 module.exports.routes = {
-
   /***************************************************************************
-   *                                                                          *
-   * More custom routes here...                                               *
-   * (See https://sailsjs.com/config/routes for examples.)                    *
-   *                                                                          *
-   * If a request to a URL doesn't match any of the routes in this file, it   *
-   * is matched against "shadow routes" (e.g. blueprint routes).  If it does  *
-   * not match any of those, it is matched against static assets.             *
-   *                                                                          *
-   ***************************************************************************/
-
-  //  ╔═╗╔═╗╦  ╔═╗╔╗╔╔╦╗╔═╗╔═╗╦╔╗╔╔╦╗╔═╗
-  //  ╠═╣╠═╝║  ║╣ ║║║ ║║╠═╝║ ║║║║║ ║ ╚═╗
-  //  ╩ ╩╩  ╩  ╚═╝╝╚╝═╩╝╩  ╚═╝╩╝╚╝ ╩ ╚═╝
-
-  //  ╦ ╦╔═╗╔╗ ╦ ╦╔═╗╔═╗╦╔═╔═╗
-  //  ║║║║╣ ╠╩╗╠═╣║ ║║ ║╠╩╗╚═╗
-  //  ╚╩╝╚═╝╚═╝╩ ╩╚═╝╚═╝╩ ╩╚═╝
-
-  //  ╔╦╗╦╔═╗╔═╗
-  //  ║║║║╚═╗║
-  //  ╩ ╩╩╚═╝╚═╝
+  *                                                                          *
+  * More custom routes here...                                               *
+  * (See https://sailsjs.com/config/routes for examples.)                    *
+  *                                                                          *
+  * If a request to a URL doesn't match any of the routes in this file, it   *
+  * is matched against "shadow routes" (e.g. blueprint routes).  If it does  *
+  * not match any of those, it is matched against static assets.             *
+  *                                                                          *
+  ***************************************************************************/
 
   'GET /': 'index',
   'GET /status': 'index',
@@ -44,7 +31,6 @@ module.exports.routes = {
   'GET /v1/checkstatus/aggregate/:checkId?': 'v1/checkstatus/aggregate',
   'GET /v1/checkstatus/aggregate-by-day/:checkId?': 'v1/checkstatus/aggregate-by-day',
   'GET /v1/checkstatus/aggregate-metric-by-day/:checkId?': 'v1/checkstatus/aggregate-metric-by-day',
-  'GET /v1/checkstatus/isfailing': 'v1/checkstatus/isfailing',
   'GET /v1/checkstatus': 'v1/checkstatus/find',
 
   // do login
@@ -72,4 +58,7 @@ module.exports.routes = {
 
   // install demo data
   'POST /v1/demodata': 'v1/demodata/create',
+
+  // join realtime events
+  'GET /v1/realtime/join': 'v1/realtime/join'
 }

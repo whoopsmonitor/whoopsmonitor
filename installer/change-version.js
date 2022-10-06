@@ -8,14 +8,14 @@ const outputDir = '../output'
 const composeFile = 'docker-compose.yml'
 const composeDevFile = 'docker-compose-dev.yml'
 
-const versions = require('./package.json').appVersions
+const dockerImageVersion = require('./package.json').dockerImageVersion
 
 console.log(
   boxen(
     `
     -> Whoops Monitor <-
 
-    You are about to change the version in installation (Docker Compose) files.
+    You are about to change the version in installation (Docker Compose) files to ${dockerImageVersion}.
     `,
     { padding: 1 }
   )
@@ -35,22 +35,13 @@ if (!fs.existsSync(composeDevFilePath)) {
 
 const questions = []
 
-// app version
-questions.push({
-  type: 'list',
-  choices: versions,
-  name: 'version',
-  message: 'Application version',
-  default: 0
-})
-
 inquirer.prompt(questions).then((answers) => {
   // for (const file of [composeFilePath, composeDevFilePath]) {
   for (const file of [composeFilePath]) {
     try {
       let content = fs.readFileSync(file).toString()
       // replace versions on the specified "image" line
-      content = content.replace(/(image:\sghcr\.io\/whoopsmonitor.+:).+$/gm, `$1${answers.version}`)
+      content = content.replace(/(image:\sghcr\.io\/whoopsmonitor.+:).+$/gm, `$1${dockerImageVersion}`)
 
       fs.writeFileSync(file, content)
       console.log(logSymbols.success, `File ${file} sucessfully updated.`)
@@ -64,12 +55,11 @@ inquirer.prompt(questions).then((answers) => {
   console.log(
     boxen(
       `
-        ${logSymbols.success} Version changed to ${answers.version}
+        ${logSymbols.success} Version changed to ${dockerImageVersion}
 
         You can stop and start all docker containers again:
 
-        docker-compose -p whoopsmonitor down
-        docker-compose -p whoopsmonitor up -d
+        docker-compose up -d --remove-orphans
         `, { padding: 1 })
   )
 })

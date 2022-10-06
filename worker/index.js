@@ -1,13 +1,15 @@
-require( 'console-stamp' )( console )
-const Queue = require('bull')
-const execa = require('execa')
-const axios = require('axios')
-const logSymbols = require('log-symbols')
-const fs = require('fs')
-const packageJson = require('./package.json')
-const perf = require('execution-time')()
+import fs from 'fs'
+import c from 'console-stamp'
+import Queue from 'bull'
+import { execa } from 'execa'
+import axios from 'axios'
+import logSymbols from 'log-symbols'
+import executionTime from 'execution-time'
+const packageName = JSON.parse(fs.readFileSync('package.json')).name
 const APP_TOKEN = process.env.APP_TOKEN
-const packageName = packageJson.name
+const perf = executionTime()
+
+c(console)
 
 const markProgress = async (checkId, progressStatus) => {
   if (!checkId) {
@@ -20,7 +22,7 @@ const markProgress = async (checkId, progressStatus) => {
     })
   } catch (_) {
     const err = new Error()
-    err.message = `Check ${checkId} not found.`
+    err.message = `[mark progress] Check ${checkId} not found.`
     err.name = 404
     throw err
   }
@@ -34,9 +36,10 @@ const addToLog = async (checkId, status, output, duration) => {
       output: output,
       duration
     })
-  } catch (_) {
+  } catch (originalError) {
+    console.log(originalError)
     const err = new Error()
-    err.message = `Check ${checkId} not found.`
+    err.message = `[checkstatus] Check ${checkId} not found.`
     err.name = 404
     throw err
   }
@@ -54,27 +57,6 @@ const removeJobFromQueue = async (job) => {
     if (error) {
       console.error('ERROR:', error)
     }
-  }
-}
-
-const getLastStatus = async (checkId) => {
-  try {
-    return await axiosInstance.get('/v1/checkstatus', {
-      params: {
-        where: {
-          check: checkId
-        },
-        populate: false,
-        sort: 'createdAt desc',
-        limit: 1,
-        select: 'status,createdAt'
-      }
-    }).then(res => res.data[0])
-  } catch (_) {
-    const err = new Error()
-    err.message = `[${packageJson.name}] Check ${checkId} not found.`
-    err.name = 404
-    throw err
   }
 }
 
@@ -179,9 +161,6 @@ executeCheckQueue.process(async (job, done) => {
     })
   }
 
-  // get the latest status
-  latestStatus = await getLastStatus(check.id)
-
   try {
     // mark check as a progress
     await markProgress(checkId, true)
@@ -194,10 +173,10 @@ executeCheckQueue.process(async (job, done) => {
 
     if (check.file && check.file.name && check.file.content) {
       const file = check.file
-      const fromDir = `/${packageJson.name}/${checkId}/`
+      const fromDir = `/${packageName}/${checkId}/`
       const filePathFrom = `${fromDir}/${file.name}`
-      const volumeDirFrom = packageJson.docker_shared_volume // shared volume
-      const volumeDirTo = `/${packageJson.name}`
+      const volumeDirFrom = packageName.docker_shared_volume // shared volume
+      const volumeDirTo = `/${packageName.name}`
 
       // make sure the file dir exists on filesystem
       if (fs.existsSync(fromDir)) {
@@ -253,14 +232,14 @@ executeCheckQueue.process(async (job, done) => {
     // console.log('Running commands: ', commands)
 
     console.log(`[${packageName}] [${logSymbols.info}] Running check "${check.name}".`)
-    const { stdout, exitCode } = await execa.command(commands.join('\\'), {
+    const { stdout, exitCode } = await execa(commands.join('\\'), {
       shell: true
     })
 
     await alertingQueue.add({
       checkId: check.id,
       checkName: check.name,
-      alerts: check.alerts.map(alert => alert.id),
+      alerts: check.alerts.map(alert => alert.id),
       exitCode,
       stdout
     })
@@ -288,7 +267,7 @@ executeCheckQueue.process(async (job, done) => {
       await alertingQueue.add({
         checkId: check.id,
         checkName: check.name,
-        alerts: check.alerts.map(alert => alert.id),
+        alerts: check.alerts.map(alert => alert.id),
         exitCode: error.exitCode,
         stdout: error.stdout
       })

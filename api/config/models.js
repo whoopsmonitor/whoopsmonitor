@@ -15,9 +15,10 @@
 
 module.exports.models = {
 
+
   /***************************************************************************
   *                                                                          *
-  * Whether the `.create()` and `.update()` model methods should ignore      *
+  * Whether model methods like `.create()` and `.update()` should ignore     *
   * (and refuse to persist) unrecognized data-- i.e. properties other than   *
   * those explicitly defined by attributes in the model definition.          *
   *                                                                          *
@@ -36,6 +37,7 @@ module.exports.models = {
 
   schema: true,
 
+
   /***************************************************************************
   *                                                                          *
   * How and whether Sails will attempt to automatically rebuild the          *
@@ -53,6 +55,7 @@ module.exports.models = {
 
   migrate: 'alter',
 
+
   /***************************************************************************
   *                                                                          *
   * Base attributes that are included in all of your models by default.      *
@@ -66,10 +69,11 @@ module.exports.models = {
   ***************************************************************************/
 
   attributes: {
-    createdAt: { type: 'number', autoCreatedAt: true },
-    updatedAt: { type: 'number', autoUpdatedAt: true },
+    createdAt: { type: 'number', autoCreatedAt: true, },
+    updatedAt: { type: 'number', autoUpdatedAt: true, },
     id: { type: 'string', columnName: '_id' }
-    // --------------------------------------------------------------------------
+    // id: { type: 'number', autoIncrement: true, }
+    //--------------------------------------------------------------------------
     //  /\   Using MongoDB?
     //  ||   Replace `id` above with this instead:
     //
@@ -79,8 +83,9 @@ module.exports.models = {
     //
     // Plus, don't forget to configure MongoDB as your default datastore:
     // https://sailsjs.com/docs/tutorials/using-mongo-db
-    // --------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
   },
+
 
   /******************************************************************************
   *                                                                             *
@@ -100,6 +105,7 @@ module.exports.models = {
     default: process.env.APP_DATA_ENCRYPTION_KEY
   },
 
+
   /***************************************************************************
   *                                                                          *
   * Whether or not implicit records for associations should be cleaned up    *
@@ -115,4 +121,5 @@ module.exports.models = {
 
   cascadeOnDestroy: true
 
-}
+
+};

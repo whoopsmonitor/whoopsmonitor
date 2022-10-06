@@ -28,6 +28,7 @@ module.exports = {
       this.value = sails.helpers.decryptAttribute(this.value)
     }
 
-    return this
+    // must be cloned otherwise "this" is handled as refference
+    return _.clone(this)
   }
 }

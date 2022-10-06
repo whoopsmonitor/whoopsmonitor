@@ -13,14 +13,14 @@ const outputDir = '../output'
 const composeFile = 'docker-compose.yml'
 const composeDevFile = 'docker-compose-dev.yml'
 
-const versions = require('./package.json').appVersions
+const dockerImageVersion = require('./package.json').dockerImageVersion
 
 console.log(
   boxen(
     `
     Thank you for chosing
 
-    -> Whoops Monitor <-
+    -> Whoops Monitor, version ${dockerImageVersion} <-
 
     Instalation continues bellow.
 
@@ -40,10 +40,16 @@ const APP_REDIS_PASSWORD = generatePassword.generate({
   numbers: true
 })
 
+const APP_REDIS_SOCKETS_PASSWORD = generatePassword.generate({
+  length: 32,
+  numbers: true
+})
+
 const randomString = generatePassword.generate({
   length: 32,
   numbers: true
 })
+
 let buff = Buffer.from(randomString)
 let APP_DATA_ENCRYPTION_KEY = buff.toString('base64')
 
@@ -92,15 +98,6 @@ if (fs.existsSync(composeFilePath) || fs.existsSync(composeDevFilePath)) {
     default: false
   })
 }
-
-// app version
-questions.push({
-  type: 'list',
-  choices: versions,
-  name: 'version',
-  message: 'Application version',
-  default: 0
-})
 
 questions.push({
   type: 'input',
@@ -151,7 +148,7 @@ inquirer.prompt(questions).then((answers) => {
 
   for (const file of [`${composeFile}.ejs`, `${composeDevFile}.ejs`]) {
     ejs.renderFile(file, {
-      APP_VERSION: answers.version,
+      DOCKER_IMAGE_VERSION: dockerImageVersion,
       APP_NAME,
       APP_PASSWORD,
       APP_REDIS_PASSWORD,
@@ -163,7 +160,8 @@ inquirer.prompt(questions).then((answers) => {
       MONGODB_USERNAME,
       MONGODB_PASSWORD,
       BASIC_AUTH_USERNAME,
-      BASIC_AUTH_PASSWORD
+      BASIC_AUTH_PASSWORD,
+      APP_REDIS_SOCKETS_PASSWORD
     }, {}, function (err, str) {
       if (err) {
         console.error(err)
@@ -190,8 +188,7 @@ inquirer.prompt(questions).then((answers) => {
       console.log(`${logSymbols.info} Starting all containers on background.`)
       await execa.command([
         `cd ${outputDir} &&`,
-        `docker network create -d bridge ${APP_NAME}_app-tier &&`,
-        `docker-compose -p ${APP_NAME} up -d`
+        `docker-compose up -d --remove-orphans`
       ].join('\\'), {
         shell: true
       })
@@ -200,16 +197,6 @@ inquirer.prompt(questions).then((answers) => {
       // port "80" is the inner port - we're on the same network
       await waitForUrl('http://monitor:80', 'monitor')
       console.log(`${logSymbols.info} (done) Waiting for Monitor to start.`)
-
-      // restart API container - it is probably dead during Mongo connection
-      console.log(`${logSymbols.info} (start) Restarting API container.`)
-      await execa.command([
-        `cd ${outputDir} &&`,
-        `docker-compose -p whoopsmonitor restart api`
-      ].join('\\'), {
-        shell: true
-      })
-      console.log(`${logSymbols.info} (done) Restarting API container.`)
     } catch (error) {
       console.error(error)
       process.exit(2)
@@ -222,6 +209,7 @@ inquirer.prompt(questions).then((answers) => {
 
         Don't forget your credentials:
 
+        - URL: http://localhost:8080
         - Monitor Login: ${APP_PASSWORD}
         ${BASIC_AUTH_USERNAME ? '- Basic Auth (username): ' + BASIC_AUTH_USERNAME : ''}
         ${BASIC_AUTH_PASSWORD ? '- Basic Auth (password): ' + BASIC_AUTH_PASSWORD : ''}

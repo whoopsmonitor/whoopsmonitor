@@ -1,6 +1,6 @@
 const LIST_ENDPOINT = 'https://raw.githubusercontent.com/whoopsmonitor/image-indexer/master/dist/images.json'
 const https = require('https')
-const NodeCache = require( "node-cache" )
+const NodeCache = require('node-cache')
 const myCache = new NodeCache({
   stdTTL: 60 * 15 // stored for 15 minutes
 })
@@ -48,7 +48,7 @@ module.exports = {
         }
       })
     }).on('error', err => {
-      sails.log.error(error)
+      sails.log.error(err)
       return exits.badRequest()
     })
   }

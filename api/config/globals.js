@@ -15,7 +15,6 @@ module.exports.globals = {
   *                                                                           *
   * Whether to expose the locally-installed Lodash as a global variable       *
   * (`_`), making  it accessible throughout your app.                         *
-  * (See the link above for help.)                                            *
   *                                                                           *
   ****************************************************************************/
 
@@ -23,9 +22,10 @@ module.exports.globals = {
 
   /****************************************************************************
   *                                                                           *
-  * Whether to expose the locally-installed `async` as a global variable      *
-  * (`async`), making it accessible throughout your app.                      *
-  * (See the link above for help.)                                            *
+  * This app was generated without a dependency on the "async" NPM package.   *
+  *                                                                           *
+  * > Don't worry!  This is totally unrelated to JavaScript's "async/await".  *
+  * > Your code can (and probably should) use `await` as much as possible.    *
   *                                                                           *
   ****************************************************************************/
 
@@ -47,6 +47,6 @@ module.exports.globals = {
   *                                                                           *
   ****************************************************************************/
 
-  sails: true,
+  sails: true
 
 };

@@ -1,6 +1,7 @@
 {
-  "name": "installer",
-  "version": "1.1.0",
+  "name": "whoopsmonitor-installer",
+  "version": "2.0.0",
+  "dockerImageVersion": "2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,7 +9,7 @@
     "change-version": "NODE_ENV=production node change-version.js",
     "update": "NODE_ENV=production node update.js"
   },
-  "author": "",
+  "author": "Daniel Rataj <info@whoopsmonitor.app>",
   "license": "ISC",
   "dependencies": {
     "log-symbols": "^4.0.0",
@@ -17,9 +18,5 @@
     "boxen": "^4.2.0",
     "inquirer": "^7.3.3",
     "execa": "^4.0.3"
-  },
-  "appVersions": [
-    "1.0",
-    "1.1"
-  ]
+  }
 }

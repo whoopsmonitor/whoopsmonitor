@@ -1,9 +1,9 @@
 {
-  "name": "whoopsmonitor",
-  "version": "0.0.1",
-  "description": "monitor",
+  "name": "whoopsmonitor-monitor",
+  "version": "2.0.0",
+  "description": "Monitor App",
   "productName": "Whoops Monitor",
-  "author": "Daniel Rataj <daniel.rataj@mall.cz>",
+  "author": "Daniel Rataj <info@whoopsmonitor.app>",
   "private": true,
   "scripts": {
     "dev": "QENV=development quasar dev",

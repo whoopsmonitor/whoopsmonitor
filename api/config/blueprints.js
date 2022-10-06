@@ -19,6 +19,7 @@ module.exports.blueprints = {
 
   // actions: false,
 
+
   /***************************************************************************
   *                                                                          *
   * Automatically expose RESTful routes for your models?                     *
@@ -54,4 +55,4 @@ module.exports.blueprints = {
 
     return queryOptions
   }
-}
+};
