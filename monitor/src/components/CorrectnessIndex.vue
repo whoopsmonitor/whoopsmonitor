@@ -81,7 +81,9 @@
 <script>
 import { DateTime } from 'luxon'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'HealthIndex',
   props: {
     hours: {
@@ -190,7 +192,7 @@ export default {
             check: threshold.check || this.check
           }
 
-          this.$set(this.form.threshold, threshold.option, option)
+          this.form.threshold[threshold.option] = option
         }
       }
     }
@@ -210,12 +212,12 @@ export default {
       this.loading = true
 
       try {
-        this.aggregatedResults = await this.$axios.get(`/v1/checkstatus/aggregate/${this.check || ''}`, {
-          params: {
-            from: startOfInterval.valueOf(),
-            to: date.valueOf()
-          }
-        }).then(result => result.data)
+        await this.$sailsIo.socket.get(`/v1/checkstatus/aggregate/${this.check || ''}`, {
+          from: startOfInterval.valueOf(),
+          to: date.valueOf()
+        }, result => {
+          this.aggregatedResults = result
+        })
       } catch (error) {
         console.error(error)
       } finally {
@@ -237,19 +239,17 @@ export default {
               delete level.id
               level.option = levelKey // warning, critical...
 
-              const result = await this.$axios.post('/v1/healthindex', level)
-                .then(result => result.data)
-
-              // update model
-              this.$set(this.form.threshold, result.option, {
-                id: result.id,
-                value: result.value,
-                hours: result.hours,
-                check: result.check.id
+              await this.$sailsIo.socket.post('/v1/healthindex', level, result => {
+                this.form.threshold[result.option] = {
+                  id: result.id,
+                  value: result.value,
+                  hours: result.hours,
+                  check: result.check.id
+                }
               })
             } else {
               // update
-              await this.$axios.patch(`/v1/healthindex/${level.id}`, {
+              await this.$sailsIo.socket.patch(`/v1/healthindex/${level.id}`, {
                 value: level.value || 0
               })
             }
@@ -261,7 +261,7 @@ export default {
           }
 
           // re-set thresholds to update a view
-          this.$nextTick(() => this.$set(this.thresholds, levelKey, this.thresholds[levelKey]))
+          this.$nextTick(() => this.thresholds[levelKey] = this.thresholds[levelKey])
         }
       }
 
@@ -282,5 +282,5 @@ export default {
       return this.aggregatedResults.filter(result => result.status === id)[0] || { total: 0, status: 0 }
     }
   }
-}
+})
 </script>

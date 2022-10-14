@@ -1,3 +1,5 @@
+import { boot } from 'quasar/wrappers'
+
 import axios from 'axios'
 const MAX_REQUESTS_COUNT = 10
 const INTERVAL_MS = 20
@@ -5,6 +7,12 @@ let PENDING_REQUESTS = 0
 const API_URL = process.env.APP_API_URL
 const API_TOKEN = process.env.API_TOKEN
 
+// Be careful when using SSR for cross-request state pollution
+// due to creating a Singleton instance here;
+// If any client changes this (global) instance, it might be a
+// good idea to move this instance creation inside of the
+// "export default () => {}" function below (which runs individually
+// for each client)
 const client = async function (API_URL, API_TOKEN) {
   let url = ''
   let token = ''
@@ -49,8 +57,9 @@ const axiosFnc = async function () {
   return http
 }
 
-export default async ({ Vue }) => {
-  Vue.prototype.$axios = await client(API_URL, API_TOKEN)
-}
+export default boot(async ({ app }) => {
+  // for use inside Vue files (Options API) through this.$axios
+  app.config.globalProperties.$axios = await client(API_URL, API_TOKEN)
+})
 
 export { axiosFnc }

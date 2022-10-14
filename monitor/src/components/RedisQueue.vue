@@ -29,7 +29,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'LoginBoxComponent',
   props: {
     name: {
@@ -52,14 +54,16 @@ export default {
     }
   },
   async created () {
-    await this.fetchData()
+    this.fetchData()
   },
   methods: {
-    async fetchData () {
+    fetchData () {
       this.loading.find = true
 
       try {
-        this.count = await this.$axios.get(`/v1/queue/${this.name}`).then(result => result.data.data.count)
+        this.$sailsIo.socket.get(`/v1/queue/${this.name}`, result => {
+          this.count = result.data.count
+        })
       } catch (error) {
         if (error) {
           console.error(error)
@@ -69,16 +73,17 @@ export default {
       this.loading.find = false
     },
 
-    async clean () {
+    clean () {
       this.loading.clean = true
 
       try {
-        const count = await this.$axios.delete(`/v1/queue/${this.name}`).then(result => result.data.data)
-        this.$whoopsNotify.positive({
-          message: `Cleaned ${count} record(s) in the <i>${this.name}</i> queue.`
-        })
+        this.$sailsIo.socket.delete(`/v1/queue/${this.name}`, result => {
+          this.$whoopsNotify.positive({
+            message: `Cleaned ${result.data} record(s) in the <i>${this.name}</i> queue.`
+          })
 
-        await this.fetchData()
+          this.fetchData()
+        })
       } catch (error) {
         if (error) {
           console.error(error)
@@ -92,5 +97,5 @@ export default {
       this.loading.clean = false
     }
   }
-}
+})
 </script>

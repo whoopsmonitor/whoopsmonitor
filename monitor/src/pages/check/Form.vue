@@ -42,13 +42,12 @@
             <template v-slot:option="scope">
               <q-item
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
               >
                 <q-item-section avatar v-if="scope.opt.icon">
                   <q-icon :name="scope.opt.icon" />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label v-html="scope.opt.label" />
+                  <q-item-label>{{ scope.opt.label }}</q-item-label>
                   <q-item-label caption v-if="scope.opt.description">{{ scope.opt.description }}</q-item-label>
                 </q-item-section>
               </q-item>
@@ -100,7 +99,7 @@
               :rules="[ val => val && val.length > 0 && validateCron(val) || 'You should enter valid cron notation for your check to trigger correctly.']"
             />
             <div v-if="form.cron" class="text-caption">
-              You entered <i>{{ form.cron | translateCron }}</i>.
+              You entered <i>{{ translateCron(form.cron) }}</i>.
             </div>
           </template>
         </q-tab-panel>
@@ -153,7 +152,7 @@
             :rules="[ val => val && val.length > 0 && validateCron(val) || 'You should enter valid cron notation for your check to trigger correctly.']"
           />
           <div v-if="form.cron" class="text-caption">
-            You entered <i>{{ form.cron | translateCron }}</i>.
+            You entered <i>{{ translateCron(form.cron) }}</i>.
           </div>
         </q-tab-panel>
 
@@ -281,16 +280,15 @@
 <script>
 import { isValidCron } from 'cron-validator'
 import ini from 'ini'
-import translateCron from '../../filters/translateCron'
 import SharedVariables from '../../components/SharedVariables.vue'
+import translateCron from '../../filters/translateCron'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageCheckCreate',
   components: {
     SharedVariables
-  },
-  filters: {
-    translateCron
   },
   data () {
     return {
@@ -392,12 +390,12 @@ export default {
 
   async created () {
     if (this.edit) {
-      await this.fetchData()
+      this.fetchData()
     }
 
-    await this.fetchImages()
-    await this.fetchAlerts()
-    await this.fetchTags()
+    this.fetchImages()
+    this.fetchAlerts()
+    this.fetchTags()
   },
 
   methods: {
@@ -424,40 +422,40 @@ export default {
       })
     },
 
-    async fetchData () {
+    fetchData () {
       try {
-        const item = await this.$axios.get(`/v1/check/${this.$route.params.id}`).then((response) => response.data)
+        this.$sailsIo.socket.get(`/v1/check/${this.$route.params.id}`, item => {
+          if (item) {
+            this.form.enabled = item.enabled
+            this.form.name = item.name
+            this.form.description = item.description
+            this.form.sharedEnvironmentVariables = item.sharedEnvironmentVariables.map(i => i.id)
+            this.form.image = {
+              label: item.image.image,
+              value: item.image.id
+            }
+            this.form.file = item.file || {
+              name: '',
+              content: ''
+            }
+            this.form.cron = item.cron
+            this.form.environmentVariables = ini.stringify(item.environmentVariables)
+            this.form.tags = item.tags
 
-        if (item) {
-          this.form.enabled = item.enabled
-          this.form.name = item.name
-          this.form.description = item.description
-          this.form.sharedEnvironmentVariables = item.sharedEnvironmentVariables.map(i => i.id)
-          this.form.image = {
-            label: item.image.image,
-            value: item.image.id
-          }
-          this.form.file = item.file || {
-            name: '',
-            content: ''
-          }
-          this.form.cron = item.cron
-          this.form.environmentVariables = ini.stringify(item.environmentVariables)
-          this.form.tags = item.tags
-
-          if (item.alerts.length) {
-            this.form.alerts = item.alerts.map(alert => alert.id)
-          }
-
-          if (item.display) {
-            // set the default value in case "trend" has not been setup yet (due to compatibility)
-            if (typeof item.display.trend === 'undefined') {
-              item.display.trend = this.form.display.trend
+            if (item.alerts.length) {
+              this.form.alerts = item.alerts.map(alert => alert.id)
             }
 
-            this.form.display = item.display
+            if (item.display) {
+              // set the default value in case "trend" has not been setup yet (due to compatibility)
+              if (typeof item.display.trend === 'undefined') {
+                item.display.trend = this.form.display.trend
+              }
+
+              this.form.display = item.display
+            }
           }
-        }
+        })
       } catch (error) {
         console.error(error)
 
@@ -469,50 +467,46 @@ export default {
       }
     },
 
-    async fetchTags () {
+    fetchTags () {
       try {
-        this.tags = await this.$axios.get('/v1/check/tags').then(response => response.data)
+        this.$sailsIo.socket.get('/v1/check/tags', tags => this.tags = tags)
       } catch (error) {
         console.error(error)
       }
     },
 
-    async fetchImages () {
+    fetchImages () {
       try {
-        const images = await this.$axios.get('/v1/dockerimage', {
-          params: {
-            select: 'image,metadata',
-            where: {
-              type: 'check',
-              healthyStatus: 0 // "0" means success in unix world
+        this.$sailsIo.socket.get('/v1/dockerimage', {
+          select: 'image,metadata',
+          where: {
+            type: 'check',
+            healthyStatus: 0 // "0" means success in unix world
+          }
+        }, images => this.images = images)
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    fetchAlerts () {
+      try {
+        this.$sailsIo.socket.get('/v1/alert', {
+          select: 'name,description,image,createdAt,environmentVariables'
+        }, result => {
+          this.alerts = result.filter(alert => alert.image).map((alert) => {
+            return {
+              label: alert.name,
+              value: alert.id
             }
-          }
-        }).then(result => result.data)
-
-        this.images = images
+          })
+        })
       } catch (error) {
         console.error(error)
       }
     },
 
-    async fetchAlerts () {
-      try {
-        this.alerts = await this.$axios.get('/v1/alert', {
-          params: {
-            select: 'name,description,image,createdAt,environmentVariables'
-          }
-        }).then(result => result.data.filter(alert => alert.image).map((alert) => {
-          return {
-            label: alert.name,
-            value: alert.id
-          }
-        }))
-      } catch (error) {
-        console.error(error)
-      }
-    },
-
-    async onSubmit () {
+    onSubmit () {
       const method = this.edit ? 'patch' : 'post'
       const form = JSON.parse(JSON.stringify(this.form))
 
@@ -529,13 +523,13 @@ export default {
         // make sure image is just an ID
         form.image = form.image.value
 
-        await this.$axios[method]('/v1/check' + (this.edit ? `/${this.$route.params.id}` : ''), form)
+        this.$sailsIo.socket[method]('/v1/check' + (this.edit ? `/${this.$route.params.id}` : ''), form, _ => {
+          this.$whoopsNotify.positive({
+            message: this.edit ? 'Check details successfully updated.' : 'New check has been successfully added.'
+          })
 
-        this.$whoopsNotify.positive({
-          message: this.edit ? 'Check details successfully updated.' : 'New check has been successfully added.'
+          this.$router.push({ name: 'check.index' })
         })
-
-        this.$router.push({ name: 'check.index' })
       } catch (error) {
         console.error(error)
         this.$whoopsNotify.negative({
@@ -558,18 +552,6 @@ export default {
       update(() => {
         this.filterImagesString = val
       })
-    },
-
-    async addAlertOption () {
-      const alert = JSON.parse(JSON.stringify(this.alerts[0]))
-
-      try {
-        await this.$axios.put(`/v1/check/${this.$route.params.id}/alerts/${alert.value}`)
-
-        this.form.alerts.push(alert)
-      } catch (error) {
-        console.error(error)
-      }
     },
 
     async loadEnvVars () {
@@ -596,13 +578,18 @@ export default {
           message: 'There are no environment variables in this image that we could use.'
         })
       }
+    },
+
+    translateCron (cron) {
+      return translateCron(cron)
     }
   }
-}
+})
 </script>
 
-<style lang="stylus" scoped>
-  .highlight
-    width 90%
-    height 400px
+<style lang="scss">
+.highlight {
+  width: 90%;
+  height: 400px;
+}
 </style>

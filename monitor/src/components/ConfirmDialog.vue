@@ -17,7 +17,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'ConfirmDialog',
   props: {
     open: {
@@ -45,5 +47,5 @@ export default {
       this.closeDialog()
     }
   }
-}
+})
 </script>

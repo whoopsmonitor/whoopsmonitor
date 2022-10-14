@@ -19,8 +19,8 @@ const $whoopsNotify = {
   }
 }
 
-export default ({ Vue }) => {
-  Vue.prototype.$whoopsNotify = $whoopsNotify
+export default ({ app }) => {
+  app.config.globalProperties.$whoopsNotify = $whoopsNotify
 }
 
 export { $whoopsNotify }

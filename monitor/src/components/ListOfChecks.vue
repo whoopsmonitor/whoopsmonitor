@@ -7,7 +7,7 @@
             <q-chip
               v-for="tag in tags" :key="tag.id"
               clickable
-              :selected.sync="selectedTags[tag.id]"
+              v-model:selected="selectedTags[tag.id]"
               icon="radio_button_unchecked"
               :disable="onlyFailing"
             >
@@ -61,9 +61,9 @@
                 <q-item-section>
                   <q-item-label caption v-if="check.status">
                     <span>
-                      {{ check.status.createdAt | timeAgo }}
+                      {{ timeago(check.status.createdAt) }}
                       <q-tooltip>
-                        {{ check.status.createdAt | datetime }}
+                        {{ datetime(check.status.createdAt) }}
                       </q-tooltip>
                     </span>
                   </q-item-label>
@@ -75,7 +75,9 @@
                   </q-item-label>
                   <q-item-label caption :lines="2" v-if="!check.display || check.display === null">
                     <div v-if="check.status">
-                      <div :class="colorizeTextClass(check.status)" v-html="truncate(check.status.output.replace(/\n/g, '<br />'), 100) || 'no output yet'" />
+                      <div :class="colorizeTextClass(check.status)">
+                        {{ truncate(check.status.output.replace(/\n/g, '<br />'), 100) || 'no output yet' }}
+                      </div>
                     </div>
                     <div v-else>
                       <div v-if="!check.enabled">
@@ -86,7 +88,7 @@
                       </div>
                     </div>
                   </q-item-label>
-                  <q-item-label v-if="check.statusHistory.length">
+                  <q-item-label v-if="check.statusHistory && check.statusHistory.length">
                     <q-avatar
                       v-for="status in check.statusHistory"
                       :key="status.id"
@@ -135,16 +137,14 @@
 import truncate from 'truncate'
 import { map } from 'lodash'
 import trend from 'trend'
-import timeAgo from '../filters/timeAgo'
 import datetime from '../filters/datetime'
-import SkeletonList from '../components/SkeletonList'
+import timeago from '../filters/timeAgo'
+import SkeletonList from '../components/SkeletonList.vue'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'ListOfChecks',
-  filters: {
-    timeAgo,
-    datetime
-  },
   components: {
     SkeletonList
   },
@@ -154,7 +154,35 @@ export default {
       interval: undefined,
       loading: false,
       onlyFailing: false,
-      selectedTags: {}
+      selectedTags: {},
+      sockets: {
+        handler: {
+          check: ({ verb, id, data }) => {
+            // mark "progress" when update is received
+            if (verb === 'updated') {
+              if ('progress' in data) {
+                for (const check of this.checks) {
+                  if (check.id === id) {
+                    check.progress = data.progress
+                  }
+                }
+              }
+            }
+          },
+          checkstatus: ({ verb, id, data }) => {
+            if (verb === 'created') {
+              for (const check of this.checks) {
+                if (check.id === data.check.id) {
+                  const status = JSON.parse(JSON.stringify(data))
+                  delete status.check
+
+                  check.status = status
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   computed: {
@@ -228,95 +256,51 @@ export default {
     }
   },
   async created () {
-    await this.fetchData({
-      loading: true
-    })
-
-    this.interval = setInterval(async () => {
-      await this.fetchData({
-        loading: false
-      })
-    }, 10000)
+    await this.fetchData()
 
     this.selectedTags = JSON.parse(JSON.stringify(this.$store.state.config.selectedTags))
+
+    this.$sailsIo.socket.on('check', this.sockets.handler.check)
+    this.$sailsIo.socket.on('checkstatus', this.sockets.handler.checkstatus)
   },
-  destroyed () {
-    clearInterval(this.interval)
+  unmounted () {
+    this.$sailsIo.socket.off('check', this.sockets.handler.check)
+    this.$sailsIo.socket.off('check', this.sockets.handler.checkstatus)
   },
   methods: {
-    async fetchData (options) {
-      let loading = false
-      if (options.loading) {
-        loading = options.loading
-      }
-
-      if (loading) {
-        this.loading = true
-      }
+    async fetchData () {
+      this.loading = true
 
       try {
-        const checks = await this.$axios.get('/v1/check', {
-          params: {
-            populate: false,
-            select: 'name,description,progress,enabled,display,tags',
-            sort: 'order ASC'
-          }
-        }).then((res) => res.data)
-
-        for (const check of checks) {
-          const status = await this.$axios.get('/v1/checkstatus', {
-            params: {
+        this.$sailsIo.socket.get('/v1/check', {
+          populate: false,
+          select: 'name,description,progress,enabled,display,tags',
+          sort: 'order ASC'
+        }, async (checks) => {
+          for (const check of checks) {
+            this.$sailsIo.socket.get('/v1/checkstatus', {
               populate: false,
               select: 'output,status,createdAt',
-              where: {
-                check: check.id
-              },
+              where: JSON.stringify({
+                check: check.id // must be send as string
+              }),
               sort: 'createdAt desc',
               limit: 10
-            }
-          }).then((res) => res.data)
+            }, (status) => {
+              check.status = status[0]
+              check.statusHistory = status.reverse()
 
-          check.status = status[0]
-          check.statusHistory = status.reverse()
+              if (check.display && check.display.trend && check.status) {
+                const outputs = map(check.statusHistory, history => history.output * 1)
+                check.status.trend = trend(outputs, {
+                  avgPoints: 5
+                }) || false
+              }
 
-          if (check.display && check.display.trend && check.status) {
-            const outputs = map(check.statusHistory, history => history.output * 1)
-            check.status.trend = trend(outputs, {
-              avgPoints: 5
-            }) || false
+              this.checks.push(check)
+            })
           }
-        }
-
-        this.checks = checks
-
-        // assign when we have all the data
-        // this.checks = sortBy(checks, [
-        //   (check) => {
-        //     let sortable = 0
-
-        //     if (!check.enabled) {
-        //       sortable = 3
-        //     }
-
-        //     if (check.status) {
-        //       if (typeof check.status.status === 'number') {
-        //         switch (check.status.status) {
-        //           case 0:
-        //             sortable = 2
-        //             break
-        //           case 1:
-        //             sortable = 1
-        //             break
-        //           case 2:
-        //             sortable = 0
-        //             break
-        //         }
-        //       }
-        //     }
-
-        //     return sortable
-        //   }
-        // ])
+        })
       } catch (error) {
         console.error(error)
 
@@ -326,9 +310,7 @@ export default {
         }
       }
 
-      if (loading) {
-        this.loading = false
-      }
+      this.loading = false
     },
     colorizeTextClass (status) {
       return {
@@ -415,7 +397,15 @@ export default {
       }
 
       console.error('No URL specified.')
-    }
+    },
+
+    timeago (time) {
+      return timeago(time)
+    },
+
+    datetime (time) {
+      return datetime(time)
+    },
   }
-}
+})
 </script>

@@ -54,7 +54,9 @@
 <script>
 import { DateTime } from 'luxon'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'StatusBox',
   data () {
     return {
@@ -83,7 +85,7 @@ export default {
       await this.fetchData()
     }, 60000)
   },
-  destroyed () {
+  unmounted () {
     clearInterval(this.interval)
   },
   methods: {
@@ -93,18 +95,17 @@ export default {
         hours: 24
       })
 
-      this.results = await this.$axios.get('/v1/checkstatus/aggregate', {
-        params: {
-          from: startOfInterval.valueOf(),
-          to: date.valueOf()
-        }
-      }).then(result => result.data)
-
-      this.$emit('ready', this.results)
+      await this.$sailsIo.socket.get('/v1/checkstatus/aggregate', {
+        from: startOfInterval.valueOf(),
+        to: date.valueOf()
+      }, results => {
+        this.results = results
+        this.$emit('ready', this.results)
+      })
     },
     findStatusById (id) {
       return this.results.filter(result => result.status === id)[0] || { total: 0, status: 0 }
     }
   }
-}
+})
 </script>

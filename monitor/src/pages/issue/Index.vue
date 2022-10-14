@@ -5,7 +5,7 @@
       <p>There are some errors in the application. Please check bellow:</p>
 
       <div v-for="(message, id) in output" :key="id">
-        <q-icon name="info" class="on-left" /> <span v-html="message"></span>
+        <q-icon name="info" class="on-left" /> <span>{{ message }}</span>
       </div>
     </div>
     <div v-else class="text-italic">
@@ -15,7 +15,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'IssueIndex',
   computed: {
     count () {
@@ -25,5 +27,5 @@ export default {
       return this.$store.state.issue.output
     }
   }
-}
+})
 </script>

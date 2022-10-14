@@ -219,7 +219,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'MainLayout',
   data () {
     return {
@@ -269,7 +271,7 @@ export default {
 
     await this.getHealthIndexData()
   },
-  destroyed () {
+  unmounted () {
     clearInterval(this.interval.failedCheck)
     clearInterval(this.interval.issues)
   },
@@ -343,5 +345,5 @@ export default {
       }
     }
   }
-}
+})
 </script>

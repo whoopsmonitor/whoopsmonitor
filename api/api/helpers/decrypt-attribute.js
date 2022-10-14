@@ -30,7 +30,16 @@ module.exports = {
       if (result) {
         // result is a string, so try to parse it as JSON
         if (typeof result === 'string') {
-          return exits.success(JSON.parse(result))
+          try {
+            return exits.success(JSON.parse(result))
+          } catch (err) {
+            if (err) {
+              // nothing to do
+            }
+
+            // decrypted value is not a JSON but probably a string
+            return exits.success(result)
+          }
         }
 
         // already an object

@@ -21,12 +21,14 @@
 </template>
 
 <script>
-import ListOfChecks from '../components/ListOfChecks'
-import StatusBox from '../components/StatusBox'
-import CorrectnessIndex from '../components/CorrectnessIndex'
-import QuickDemo from '../components/QuickDemo'
+import ListOfChecks from '../components/ListOfChecks.vue'
+import StatusBox from '../components/StatusBox.vue'
+import CorrectnessIndex from '../components/CorrectnessIndex.vue'
+import QuickDemo from '../components/QuickDemo.vue'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'DashboardIndex',
   components: {
     ListOfChecks,
@@ -61,5 +63,5 @@ export default {
       }
     }
   }
-}
+})
 </script>

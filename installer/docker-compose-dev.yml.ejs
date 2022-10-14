@@ -29,6 +29,7 @@ services:
       APP_REDIS_SOCKETS_CONNECTION_HOST: <%= APP_NAME %>-redis-sockets
       APP_REDIS_SOCKETS_CONNECTION_PORT: 6379
       APP_REDIS_SOCKETS_PASSWORD: <%= APP_REDIS_SOCKETS_PASSWORD %>
+      APP_SOCKETS_ALLOW_ORIGINS: http://localhost:9000
     depends_on:
       - <%= APP_NAME %>-mongodb
       - <%= APP_NAME %>-redis

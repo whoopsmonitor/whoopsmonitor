@@ -1,13 +1,11 @@
 const LIST_ENDPOINT = 'https://raw.githubusercontent.com/whoopsmonitor/image-indexer/master/dist/images.json'
 const https = require('https')
-const NodeCache = require('node-cache')
-const myCache = new NodeCache({
-  stdTTL: 60 * 15 // stored for 15 minutes
-})
-const CACHE_KEY = 'docker.images'
 
 module.exports = {
-  friendlyName: 'List all images from GitHub.',
+
+  friendlyName: 'Load available Whoops Monitor images from GitHub.',
+
+  description: '',
 
   inputs: {
   },
@@ -18,14 +16,9 @@ module.exports = {
     }
   },
 
-  fn: async function (_, exits) {
-    let results = myCache.get(CACHE_KEY)
-
-    if (results) {
-      return exits.success(results)
-    }
-
+  fn: async function (inputs, exits) {
     let rawData = ''
+
     https.get(LIST_ENDPOINT, {
       headers: {
         'user-agent': 'whoopsmonitor <https://github.com/whoopsmonitor>'
@@ -37,18 +30,29 @@ module.exports = {
 
       res.setEncoding('utf8')
 
-      res.on('end', () => {
+      res.on('end', async () => {
         try {
-          const output = JSON.parse(rawData)
-          myCache.set(CACHE_KEY, output)
-          return exits.success(output)
+          const results = JSON.parse(rawData)
+
+          // remove all records first
+          await WhoopsMonitorImages.destroy({})
+
+          // insert new ones
+          await WhoopsMonitorImages.createEach(results)
+
+          sails.log('[whoopsmonitor-images-from-github] Done.')
+
+          return exits.success(true)
         } catch (error) {
           sails.log.error(error)
+
+          sails.log('[whoopsmonitor-images-from-github] Done, error.')
           return exits.badRequest()
         }
       })
     }).on('error', err => {
       sails.log.error(err)
+      sails.log('[whoopsmonitor-images-from-github] Done, error.')
       return exits.badRequest()
     })
   }

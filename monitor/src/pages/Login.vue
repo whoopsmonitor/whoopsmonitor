@@ -36,16 +36,19 @@
 import LoginBox from '../components/LoginBox.vue'
 import LoginLogo from '../components/LoginLogo.vue'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'LoginPage',
   components: {
     LoginBox,
     LoginLogo
   }
-}
+})
 </script>
 
-<style lang="sass">
-  .bg
-    background-color: #2D4F6C
+<style lang="scss">
+.bg {
+  background-color: #2D4F6C;
+}
 </style>

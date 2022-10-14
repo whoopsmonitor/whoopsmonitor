@@ -39,13 +39,12 @@
           <template v-slot:option="scope">
             <q-item
               v-bind="scope.itemProps"
-              v-on="scope.itemEvents"
             >
               <q-item-section avatar v-if="scope.opt.icon">
                 <q-icon :name="scope.opt.icon" />
               </q-item-section>
               <q-item-section>
-                <q-item-label v-html="scope.opt.label" />
+                <q-item-label>{{ scope.opt.label }}</q-item-label>
                 <q-item-label caption v-if="scope.opt.description">{{ scope.opt.description }}</q-item-label>
               </q-item-section>
             </q-item>
@@ -149,7 +148,9 @@ import ini from 'ini'
 import SharedVariables from '../../components/SharedVariables.vue'
 const levels = [0, 1, 2]
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageCheckCreate',
   components: {
     SharedVariables
@@ -218,19 +219,19 @@ export default {
   methods: {
     async fetchImages () {
       try {
-        this.images = await this.$axios.get('/v1/dockerimage', {
-          params: {
-            select: 'image,metadata',
-            where: {
-              type: 'alert'
-            },
-            healthyStatus: 0 // "0" means success in unix world
-          }
-        }).then(result => result.data)
+        await this.$sailsIo.socket.get('/v1/dockerimage', {
+          select: 'image,metadata',
+          where: {
+            type: 'alert'
+          },
+          healthyStatus: 0 // "0" means success in unix world
+        }, (result) => {
+          this.images = result
 
-        if (this.images.length) {
-          this.hasImages = true
-        }
+          if (this.images.length) {
+            this.hasImages = true
+          }
+        })
       } catch (error) {
         console.error(error)
       }
@@ -238,23 +239,25 @@ export default {
 
     async fetchData () {
       try {
-        const item = await this.$axios.get(`/v1/alert/${this.$route.params.id}`).then((response) => response.data)
+        await this.$sailsIo.socket.get(`/v1/alert/${this.$route.params.id}`, response => {
+          const item = response
 
-        if (item) {
-          this.form.enabled = (typeof item.enabled === 'boolean' ? item.enabled : false)
-          this.form.name = item.name
-          this.form.description = item.description
-          if (item.image) {
-            this.form.image = {
-              label: item.image.image,
-              value: item.image.id
+          if (item) {
+            this.form.enabled = (typeof item.enabled === 'boolean' ? item.enabled : false)
+            this.form.name = item.name
+            this.form.description = item.description
+            if (item.image) {
+              this.form.image = {
+                label: item.image.image,
+                value: item.image.id
+              }
             }
+            this.form.repeat = item.repeat
+            this.form.environmentVariables = ini.stringify(item.environmentVariables)
+            this.form.sharedEnvironmentVariables = item.sharedEnvironmentVariables.map(i => i.id)
+            this.form.level = (typeof item.level === 'undefined' ? levels : item.level)
           }
-          this.form.repeat = item.repeat
-          this.form.environmentVariables = ini.stringify(item.environmentVariables)
-          this.form.sharedEnvironmentVariables = item.sharedEnvironmentVariables.map(i => i.id)
-          this.form.level = (typeof item.level === 'undefined' ? levels : item.level)
-        }
+        })
       } catch (error) {
         console.error(error)
 
@@ -282,7 +285,7 @@ export default {
           form.level = [0, 1, 2]
         }
 
-        await this.$axios[method]('/v1/alert' + (this.edit ? `/${this.$route.params.id}` : ''), form)
+        await this.$sailsIo.socket[method]('/v1/alert' + (this.edit ? `/${this.$route.params.id}` : ''), form)
 
         this.$whoopsNotify.positive({
           message: this.edit ? 'Alert details successfully updated.' : 'New alert has been successfully added.'
@@ -311,19 +314,21 @@ export default {
 
     async loadEnvVars () {
       try {
-        const envProps = await this.$axios.get(`/v1/dockerimage/${this.form.image.value}/envvars`).then(result => result.data)
+        await this.$sailsIo.socket.get(`/v1/dockerimage/${this.form.image.value}/envvars`, result => {
+          const envProps = result
 
-        if (Object.keys(envProps).length) {
-          this.form.environmentVariables = ini.stringify(envProps)
+          if (Object.keys(envProps).length) {
+            this.form.environmentVariables = ini.stringify(envProps)
 
-          this.$whoopsNotify.positive({
-            message: 'Environment veriables loaded to the textarea field.'
-          })
-        } else {
-          this.$whoopsNotify.positive({
-            message: 'There are no environment variables.'
-          })
-        }
+            this.$whoopsNotify.positive({
+              message: 'Environment veriables loaded to the textarea field.'
+            })
+          } else {
+            this.$whoopsNotify.positive({
+              message: 'There are no environment variables.'
+            })
+          }
+        })
       } catch (error) {
         console.error(error)
         this.$whoopsNotify.negative({
@@ -332,5 +337,5 @@ export default {
       }
     }
   }
-}
+})
 </script>

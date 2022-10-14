@@ -1,6 +1,7 @@
 const fs = require('fs')
 const cron = require('node-cron')
 const path = require('path')
+const async = require('async')
 
 /**
  * Seed Function
@@ -69,6 +70,17 @@ module.exports.bootstrap = async function () {
   cron.schedule('*/30 * * * * *', async () => {
     sails.log('[realime-is-failing] Run cronjob to setup realtime events.')
     await sails.helpers.realtimeIsFailing()
+  })
+
+  // every 30 minutes
+  cron.schedule('*/30 * * * *', async () => {
+    sails.log('[whoopsmonitor-images-from-github] Load Whoops Monitor images from GitHub.')
+    await sails.helpers.whoopsmonitorImagesGithub()
+  })
+
+  async.nextTick(async () => {
+    sails.log('[whoopsmonitor-images-from-github] Load Whoops Monitor images from GitHub.')
+    await sails.helpers.whoopsmonitorImagesGithub()
   })
 
   // reorder "0" checks

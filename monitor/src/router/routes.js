@@ -83,7 +83,7 @@ const routes = [
 
   {
     path: '/server-error',
-    component: () => import('pages/Error500.vue'),
+    component: () => import('pages/ErrorCode500.vue'),
     name: 'error.500',
     meta: { auth: false }
   },
@@ -91,9 +91,8 @@ const routes = [
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '*',
-    component: () => import('pages/Error404.vue'),
-    meta: { auth: false }
+    path: '/:catchAll(.*)*',
+    component: () => import('pages/ErrorCode404.vue')
   }
 ]
 

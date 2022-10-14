@@ -17,12 +17,12 @@
 
       <q-separator inset />
 
-      <q-card-section v-if="filteredItems.length">
+      <q-card-section v-if="processedItems.length">
         <q-list bordered separator>
-          <q-item v-for="check in filteredItems" :key="check.id">
+          <q-item v-for="check in processedItems" :key="check.id">
             <q-item-section side top>
               <q-toggle
-                @input="switchStatus(check)"
+                @update:model-value="switchStatus(check)"
                 v-model="enabled[check.id]"
                 checked-icon="check"
                 color="green"
@@ -39,7 +39,7 @@
                 <router-link :to="{ name: 'check.detail', params: { id: check.id }}">{{ check.name }}</router-link>
               </q-item-label>
               <q-item-label caption>
-                <q-icon name="event_note" /> {{ check.createdAt | datetime }}
+                <q-icon name="event_note" /> {{ datetime(check.createdAt) }}
               </q-item-label>
               <q-item-label v-if="check.tags && check.tags.length">
                 <q-chip
@@ -113,7 +113,7 @@
         </q-list>
       </q-card-section>
 
-      <q-card-section v-if="!loading.fetch && !filteredItems.length">
+      <q-card-section v-if="!loading.fetch && !processedItems.length">
         <p>
           There are no checks to select from.
         </p>
@@ -142,21 +142,20 @@
 
 <script>
 import FilterResults from '../../components/FilterResults.vue'
-import SkeletonList from '../../components/SkeletonList'
-import ConfirmDialog from '../../components/ConfirmDialog'
-import DateTime from '../../filters/datetime'
+import SkeletonList from '../../components/SkeletonList.vue'
+import ConfirmDialog from '../../components/ConfirmDialog.vue'
+import datetime from '../../filters/datetime'
 import filteredItems from '../../helpers/filteredItems'
 import { runNow, switchStatus as checkSwitchStatus } from '../../helpers/check'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageCheckIndex',
   components: {
     FilterResults,
     SkeletonList,
     ConfirmDialog
-  },
-  filters: {
-    datetime: DateTime
   },
   data () {
     return {
@@ -179,19 +178,24 @@ export default {
     }
   },
   computed: {
-    ...filteredItems
-  },
-  async created () {
-    await this.fetchData({
-      verbose: true
-    })
+    ...filteredItems,
+    processedItems () {
+      return this.filteredItems.map(check => {
+        try {
+          check.image.metadata = JSON.parse(check.image.metadata)
+        } catch (error) {
+          if (error) {
+            // do nothing
+          }
+        }
 
-    this.interval = setInterval(async () => {
-      await this.fetchData()
-    }, 10000)
+        return check
+      })
+    }
   },
-  destroyed () {
-    clearInterval(this.interval)
+
+  created () {
+    this.fetchData()
   },
   methods: {
     runNow,
@@ -199,7 +203,7 @@ export default {
       await checkSwitchStatus({
         check,
         onBefore: () => {
-          this.$set(this.enabled, check.id, this.enabled[check.id])
+          this.enabled[check.id] = this.enabled[check.id]
         },
         onSuccess: () => {
           this.$whoopsNotify.positive({
@@ -213,46 +217,30 @@ export default {
         }
       })
     },
-    async fetchData (config) {
-      config = config || {}
 
-      if (config.verbose) {
-        this.loading.fetch = true
-      }
+    fetchData () {
+      this.loading.fetch = true
 
       try {
-        const checks = await this.$axios.get('/v1/check', {
-          params: {
-            select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display,order,tags',
-            populate: 'image',
-            sort: 'order ASC'
-          }
-        }).then(response => response.data)
+        this.$sailsIo.socket.get('/v1/check', {
+          select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display,order,tags',
+          populate: 'image',
+          sort: 'order ASC'
+        }, checks => {
+          this.loading.fetch = false
+          this.items = checks
 
-        this.items = checks.map(check => {
-          try {
-            check.image.metadata = JSON.parse(check.image.metadata)
-          } catch (error) {
-            if (error) {
-              // do nothing
-            }
+          for (const check of this.items) {
+            this.enabled[check.id] = check.enabled
           }
-
-          return check
         })
-
-        for (const check of this.items) {
-          this.$set(this.enabled, check.id, check.enabled)
-        }
       } catch (error) {
+        this.loading.fetch = false
         console.error(error)
+
         this.$whoopsNotify.negative({
           message: 'It is not possible to find checks. Please reload the page.'
         })
-      } finally {
-        if (config.verbose) {
-          this.loading.fetch = false
-        }
       }
     },
 
@@ -266,32 +254,35 @@ export default {
       this.destroyId = ''
     },
 
-    async destroyConfirm () {
+    destroyConfirm () {
       this.loading.destroy = true
 
       try {
-        await this.$axios.delete(`/v1/check/${this.destroyId}`)
+        this.$sailsIo.socket.delete(`/v1/check/${this.destroyId}`, result => {
+          this.loading.destroy = false
 
-        await this.forceOrdering()
+          this.destroyCancel()
+          this.forceOrdering()
 
-        await this.fetchData({
-          verbose: false
-        })
+          this.items = this.items.filter(item => item.id !== result.id)
 
-        this.$whoopsNotify.positive({
-          message: 'Check successfully deleted.'
+          this.fetchData()
+
+          this.$whoopsNotify.positive({
+            message: 'Check successfully deleted.'
+          })
         })
       } catch (error) {
+        this.loading.destroy = false
+
         console.error(error)
         this.$whoopsNotify.negative({
           message: 'It is not possible to delete a check. Please try it again.'
         })
-      } finally {
-        this.destroyCancel()
       }
     },
 
-    async duplicate (check) {
+    duplicate (check) {
       const record = JSON.parse(JSON.stringify(check))
       delete record.id
       delete record.createdAt
@@ -302,15 +293,13 @@ export default {
       record.order = this.items.length // order at the end
 
       try {
-        await this.$axios.post('/v1/check', record)
+        this.$sailsIo.socket.post('/v1/check', record, _ => {
+          this.$whoopsNotify.positive({
+            message: 'Check successfully duplicated.'
+          })
 
-        this.$whoopsNotify.positive({
-          message: 'Check successfully duplicated.'
-        })
-
-        await this.forceOrdering()
-        await this.fetchData({
-          verbose: false
+          this.forceOrdering()
+          this.fetchData()
         })
       } catch (error) {
         console.error(error)
@@ -321,7 +310,7 @@ export default {
       }
     },
 
-    async move (check, howMuch) {
+    move (check, howMuch) {
       const newOrder = check.order + howMuch
       const changeOrderInElementOnOrder = check.order + howMuch
       const changeOrderInElementOnOrderValue = check.order
@@ -342,42 +331,40 @@ export default {
       }
 
       try {
-        this.loading.order = true
         for (const change of changes) {
-          await this.$axios.patch(`/v1/check/${change.id}`, {
+          this.$sailsIo.socket.patch(`/v1/check/${change.id}`, {
             order: change.order
+          }, _ => {
+            this.fetchData()
           })
         }
-
-        await this.fetchData({
-          verbose: false
-        })
       } catch (error) {
         console.error(error)
 
         this.$whoopsNotify.negative({
           message: 'It is not possible to change the ordering. Please try it again.'
         })
-      } finally {
-        this.loading.order = false
       }
     },
 
-    async forceOrdering () {
+    forceOrdering () {
       try {
         this.loading.order = true
-        await this.$axios.post('/v1/check/reorder-all')
-        await this.fetchData({
-          verbose: false
+        this.$sailsIo.socket.post('/v1/check/reorder-all', _ => {
+          this.fetchData()
+          this.loading.order = false
         })
       } catch (error) {
+        this.loading.order = false
         this.$whoopsNotify.negative({
           message: 'It is not possible to force a new ordering. Please try it again.'
         })
-      } finally {
-        this.loading.order = false
       }
+    },
+
+    datetime (date) {
+      return datetime(date)
     }
   }
-}
+})
 </script>

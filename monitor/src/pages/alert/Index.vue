@@ -22,7 +22,7 @@
           <q-item v-for="alert in filteredItems" :key="alert.id">
             <q-item-section side top>
               <q-toggle
-                @input="switchStatus(alert)"
+                @update:model-value="switchStatus(alert)"
                 v-model="enabled[alert.id]"
                 checked-icon="check"
                 color="green"
@@ -39,7 +39,7 @@
                 <router-link :to="{ name: 'alert.detail', params: { id: alert.id }}">{{ alert.name }}</router-link>
               </q-item-label>
               <q-item-label caption>
-                <q-icon name="event_note" /> {{ alert.createdAt | datetime }}
+                <q-icon name="event_note" /> {{ datetime(alert.createdAt) }}
               </q-item-label>
               <q-item-label caption v-if="alert.level && alert.level.length">
                 <q-chip v-if="alert.level.indexOf(0) > -1" color="green" text-color="white" size="sm">success</q-chip>
@@ -108,20 +108,19 @@
 
 <script>
 import FilterResults from '../../components/FilterResults.vue'
-import SkeletonList from '../../components/SkeletonList'
-import ConfirmDialog from '../../components/ConfirmDialog'
-import DateTime from '../../filters/datetime'
+import SkeletonList from '../../components/SkeletonList.vue'
+import ConfirmDialog from '../../components/ConfirmDialog.vue'
+import datetime from '../../filters/datetime'
 import filteredItems from '../../helpers/filteredItems'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageCheckIndex',
   components: {
     FilterResults,
     SkeletonList,
     ConfirmDialog
-  },
-  filters: {
-    datetime: DateTime
   },
   data () {
     return {
@@ -154,7 +153,7 @@ export default {
       await this.fetchData()
     }, 10000)
   },
-  destroyed () {
+  unmounted () {
     clearInterval(this.interval)
   },
   methods: {
@@ -166,21 +165,21 @@ export default {
       }
 
       try {
-        const alerts = await this.$axios.get('/v1/alert', {
-          params: {
-            select: 'enabled,name,description,image,environmentVariables,createdAt,level',
-            populate: 'image'
+        await this.$sailsIo.socket.get('/v1/alert', {
+          select: 'enabled,name,description,image,environmentVariables,createdAt,level',
+          populate: 'image'
+        }, response => {
+          const alerts = response
+
+          this.items = alerts.map(alert => {
+            alert.image.metadata = JSON.parse(alert.image.metadata)
+            return alert
+          })
+
+          for (const alert of this.items) {
+            this.enabled[alert.id] = alert.enabled
           }
-        }).then(response => response.data)
-
-        this.items = alerts.map(alert => {
-          alert.image.metadata = JSON.parse(alert.image.metadata)
-          return alert
         })
-
-        for (const alert of this.items) {
-          this.$set(this.enabled, alert.id, alert.enabled)
-        }
       } catch (error) {
         console.error(error)
         this.$whoopsNotify.negative({
@@ -207,13 +206,12 @@ export default {
       this.loading.destroy = true
 
       try {
-        await this.$axios.delete(`/v1/alert/${this.destroyId}`)
-        await this.fetchData({
-          verbose: false
-        })
+        await this.$sailsIo.socket.delete(`/v1/alert/${this.destroyId}`, (deleted) => {
+          this.items = this.items.filter(item => item.id !== deleted.id)
 
-        this.$whoopsNotify.positive({
-          message: 'Alert successfully deleted.'
+          this.$whoopsNotify.positive({
+            message: 'Alert successfully deleted.'
+          })
         })
       } catch (error) {
         console.error(error)
@@ -226,20 +224,14 @@ export default {
     },
 
     async switchStatus (alert) {
-      this.$set(this.enabled, alert.id, this.enabled[alert.id])
-
       try {
         // update state
-        await this.$axios.patch(`/v1/alert/${alert.id}`, {
-          enabled: this.enabled[alert.id]
-        }, {
-          params: {
-            select: 'enabled'
-          }
-        })
-
-        this.$whoopsNotify.positive({
-          message: `Alert "${alert.name}" successfully ${this.enabled[alert.id] ? 'enabled' : 'disabled'}.`
+        await this.$sailsIo.socket.patch(`/v1/alert/${alert.id}`, {
+          enabled: !this.enabled[alert.id]
+        }, () => {
+          this.$whoopsNotify.positive({
+            message: `Alert "${alert.name}" successfully ${this.enabled[alert.id] ? 'enabled' : 'disabled'}.`
+          })
         })
       } catch (error) {
         console.error(error)
@@ -277,7 +269,11 @@ export default {
           message: 'It is not possible to duplicate this alert. Please try it again.'
         })
       }
+    },
+
+    datetime (value) {
+      return datetime(value)
     }
   }
-}
+})
 </script>

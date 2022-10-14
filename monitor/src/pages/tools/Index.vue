@@ -31,7 +31,9 @@
 <script>
 import RedisQueue from '../../components/RedisQueue.vue'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'BackupRestoreIndex',
   components: {
     RedisQueue
@@ -41,5 +43,5 @@ export default {
       tab: 'queue'
     }
   }
-}
+})
 </script>

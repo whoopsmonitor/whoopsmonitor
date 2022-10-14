@@ -1,7 +1,7 @@
 const APP_API_URL = process.env.APP_API_URL
 const API_TOKEN = process.env.API_TOKEN
 
-export default ({ Vue }) => {
+export default ({ app }) => {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script')
     script.src = 'js/sails.io.js'
@@ -14,7 +14,7 @@ export default ({ Vue }) => {
         Authorization: `Bearer ${API_TOKEN}`
       }
 
-      Vue.prototype.$sailsIo = window.io
+      app.config.globalProperties.$sailsIo = window.io
 
       resolve()
     }

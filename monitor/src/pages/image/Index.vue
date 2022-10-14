@@ -33,7 +33,7 @@
                 </router-link>
               </q-item-label>
               <q-item-label caption>
-                <q-icon name="event_note" /> {{ image.createdAt | datetime }}
+                <q-icon name="event_note" /> {{ datetime(image.createdAt) }}
                 <q-icon
                   :color="colorOftheStatus(image.healthyStatus)"
                   name="lens"
@@ -98,20 +98,19 @@
 
 <script>
 import FilterResults from '../../components/FilterResults.vue'
-import SkeletonList from '../../components/SkeletonList'
-import ConfirmDialog from '../../components/ConfirmDialog'
-import DateTime from '../../filters/datetime'
+import SkeletonList from '../../components/SkeletonList.vue'
+import ConfirmDialog from '../../components/ConfirmDialog.vue'
+import datetime from '../../filters/datetime'
 import filteredItems from '../../helpers/filteredItems'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageImageIndex',
   components: {
     FilterResults,
     SkeletonList,
     ConfirmDialog
-  },
-  filters: {
-    datetime: DateTime
   },
   data () {
     return {
@@ -135,12 +134,9 @@ export default {
     ...filteredItems
   },
   async created () {
-    await this.fetchData({
-      verbose: true
-    })
+    await this.fetchData()
 
     this.$sailsIo.socket.on('dockerimage', response => {
-      console.log(response)
       const action = response.verb
       const id = response.id
       const data = response.data
@@ -160,16 +156,12 @@ export default {
       }
     })
   },
-  destroyed () {
+  unmounted () {
     this.$sailsIo.socket.off('dockerimage')
   },
   methods: {
-    async fetchData (config) {
-      config = config || {}
-
-      if (config.verbose) {
-        this.loading.fetch = true
-      }
+    async fetchData () {
+      this.loading.fetch = true
 
       try {
         this.$sailsIo.socket.get('/v1/dockerimage', {
@@ -188,9 +180,7 @@ export default {
           message: 'It is not possible to find Docker images. Please reload the page.'
         })
       } finally {
-        if (config.verbose) {
-          this.loading.fetch = false
-        }
+        this.loading.fetch = false
       }
     },
 
@@ -241,8 +231,6 @@ export default {
           })
         })
 
-        // await this.fetchData()
-
         this.$whoopsNotify.positive({
           message: "Image's metadata are going to be rebuilded within a minute."
         })
@@ -288,7 +276,11 @@ export default {
       }
 
       return color
+    },
+
+    datetime (value) {
+      return datetime(value)
     }
   }
-}
+})
 </script>

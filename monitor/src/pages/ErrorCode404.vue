@@ -2,11 +2,11 @@
   <div class="fullscreen bg-primary text-white text-center q-pa-md flex flex-center">
     <div>
       <div style="font-size: 30vh">
-        500
+        404
       </div>
 
       <div class="text-h2" style="opacity:.4">
-        Whoops. Something went wrong.
+        Whoops. Nothing here.
       </div>
 
       <q-btn
@@ -15,7 +15,7 @@
         text-color="blue"
         unelevated
         to="/"
-        label="Try again"
+        label="Try Homepage"
         no-caps
       />
     </div>
@@ -23,7 +23,9 @@
 </template>
 
 <script>
-export default {
-  name: 'Error500'
-}
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'ErrorCode404'
+})
 </script>

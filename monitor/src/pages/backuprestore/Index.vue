@@ -85,9 +85,11 @@
 </template>
 
 <script>
-import SkeletonList from '../../components/SkeletonList'
+import SkeletonList from '../../components/SkeletonList.vue'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'BackupRestoreIndex',
   components: {
     SkeletonList
@@ -119,7 +121,9 @@ export default {
       this.loading.list = true
 
       try {
-        this.backups = await this.$axios.get('/v1/backup').then(response => response.data.data)
+         await this.$sailsIo.socket.get('/v1/backup', response => {
+          this.backups = response.data
+        })
       } catch (error) {
         console.error(error)
 
@@ -131,25 +135,27 @@ export default {
       }
     },
 
-    async createBackup () {
+    createBackup () {
       this.loading.create = true
 
       try {
-        await this.$axios.post('/v1/backup').then(response => response.data)
+        this.$sailsIo.socket.post('/v1/backup', async () => {
+          this.loading.create = false
 
-        await this.fetchData()
+          await this.fetchData()
 
-        this.$whoopsNotify.positive({
-          message: 'Backup successfully created.'
+          this.$whoopsNotify.positive({
+            message: 'Backup successfully created.'
+          })
         })
       } catch (error) {
+        this.loading.create = false
+
         console.error(error)
 
         this.$whoopsNotify.negative({
           message: 'It is not possible to create a new backup. Please try it again.'
         })
-      } finally {
-        this.loading.create = false
       }
     },
 
@@ -197,16 +203,17 @@ export default {
       }
     },
 
-    async remove (backup) {
+    remove (backup) {
       try {
         this.loading.remove = true
         this.backups = []
 
-        await this.$axios.delete(`/v1/backup/${backup}`)
-        await this.fetchData()
+        this.$sailsIo.socket.delete(`/v1/backup/${backup}`, () => {
+          this.fetchData()
 
-        this.$whoopsNotify.positive({
-          message: 'Backup removed.'
+          this.$whoopsNotify.positive({
+            message: 'Backup removed.'
+          })
         })
       } catch (error) {
         console.error(error)
@@ -219,7 +226,5 @@ export default {
       }
     }
   }
-}
+})
 </script>
-
-    SkeletonList

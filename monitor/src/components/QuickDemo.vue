@@ -22,7 +22,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'QuickStart',
   props: {
   },
@@ -52,5 +54,5 @@ export default {
       window.location.reload()
     }
   }
-}
+})
 </script>

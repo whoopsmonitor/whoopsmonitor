@@ -21,7 +21,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'LoginBoxComponent',
   data () {
     return {
@@ -36,28 +38,33 @@ export default {
       this.loading = true
 
       try {
-        await this.$axios.post('/v1/auth/login', {
-          password: this.form.password
-        }).then(result => result.data)
+        await this.$sailsIo.socket.post('/v1/auth/login', {
+          password: this.form.password.toString().trim()
+        }, (_, jwres) => {
+          if ('statusCode' in jwres) {
+            if (jwres.statusCode === 401) {
+              return this.$whoopsNotify.negative({
+                message: 'Wrong credentials. Please try it again.'
+              })
+            }
+          }
 
-        this.$store.commit('auth/setToken', this.form.password)
+          this.$store.commit('auth/setToken', this.form.password)
 
-        this.$whoopsNotify.positive({
-          message: 'Welcome back!'
-        })
+          this.$whoopsNotify.positive({
+            message: 'Welcome back!'
+          })
 
-        this.$router.replace({
-          name: 'dashboard'
+          this.$router.replace({
+            name: 'dashboard'
+          })
         })
       } catch (error) {
         console.error(error)
-        this.$whoopsNotify.negative({
-          message: 'Wrong credentials. Please try it again.'
-        })
       } finally {
         this.loading = false
       }
     }
   }
-}
+})
 </script>

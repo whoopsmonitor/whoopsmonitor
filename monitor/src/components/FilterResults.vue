@@ -1,8 +1,8 @@
 <template>
   <div>
     <q-input
-      :value="value"
-      @input="doUpdate"
+      :model-value="modelValue"
+      @update:model-value="doUpdate"
       filled
       type="search"
       placeholder="filter..."
@@ -19,10 +19,12 @@
 <script>
 import { SessionStorage } from 'quasar'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'FilterResults',
   props: {
-    value: {
+    modelValue: {
       type: String
     },
     cacheKey: {
@@ -44,8 +46,8 @@ export default {
       }
 
       SessionStorage.set(this.cacheKey, value)
-      this.$emit('input', value)
+      this.$emit('update:modelValue', value)
     }
   }
-}
+})
 </script>

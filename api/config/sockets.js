@@ -86,5 +86,5 @@ module.exports.sockets = {
 
   // grant3rdPartyCookie: true,
 
-  onlyAllowOrigins: [ 'http://localhost:8080' ]
+  onlyAllowOrigins: process.env.APP_SOCKETS_ALLOW_ORIGINS.split(',') || []
 };

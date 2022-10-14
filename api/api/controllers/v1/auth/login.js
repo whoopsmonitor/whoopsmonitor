@@ -10,16 +10,19 @@ module.exports = {
   },
 
   exits: {
-    notFound: {
-      responseType: 'notFound'
+    unauthorized: {
+      responseType: 'unauthorized'
+    },
+    badRequest: {
+      responseType: 'badRequest'
     }
   },
 
   fn: async function ({ password }, exits) {
     if (password === process.env.APP_PASSWORD) {
-      return exits.success()
+      return exits.success(true)
     }
 
-    return exits.notFound()
+    return exits.unauthorized()
   }
 }

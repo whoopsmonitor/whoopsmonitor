@@ -50,7 +50,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageSharedEnvVarsCreate',
   data () {
     return {
@@ -69,20 +71,20 @@ export default {
       return this.$route.meta.edit || false
     }
   },
-  async created () {
+  created () {
     if (this.edit) {
-      await this.fetchData()
+      this.fetchData()
     }
   },
   methods: {
-    async fetchData () {
+    fetchData () {
       try {
-        const item = await this.$axios.get(`/v1/environmentvariables/${this.$route.params.id}`).then(response => response.data)
-
-        if (item) {
-          this.form.key = item.key
-          this.form.value = item.value
-        }
+        this.$sailsIo.socket.get(`/v1/environmentvariables/${this.$route.params.id}`, item => {
+          if (item) {
+            this.form.key = item.key
+            this.form.value = item.value
+          }
+        })
       } catch (error) {
         console.error(error)
 
@@ -94,29 +96,29 @@ export default {
       }
     },
 
-    async onSubmit () {
+    onSubmit () {
       const method = this.edit ? 'patch' : 'post'
       const form = JSON.parse(JSON.stringify(this.form))
 
       try {
         this.loading.update = true
 
-        await this.$axios[method]('/v1/environmentvariables' + (this.edit ? `/${this.$route.params.id}` : ''), form)
+        this.$sailsIo.socket[method]('/v1/environmentvariables' + (this.edit ? `/${this.$route.params.id}` : ''), form, _ => {
+          this.$whoopsNotify.positive({
+            message: (this.edit ? 'Variable details successfully updated.' : 'New variable has been successfully added.')
+          })
 
-        this.$whoopsNotify.positive({
-          message: (this.edit ? 'Variable details successfully updated.' : 'New variable has been successfully added.')
+          this.$router.push({ name: 'sharedenvvars.index' })
         })
-
-        this.$router.push({ name: 'sharedenvvars.index' })
       } catch (error) {
+        this.loading.update = false
+
         console.error(error)
         this.$whoopsNotify.negative({
           message: this.edit ? 'It is not possible to update details of the variable. Please try it again.' : 'It is not possible to create a new variable. Please try it again.'
         })
-      } finally {
-        this.loading.update = false
       }
     }
   }
-}
+})
 </script>

@@ -1,4 +1,4 @@
-const { DateTime } = require('luxon')
+import { DateTime } from 'luxon'
 
 export default (timestamp) => {
   const date = DateTime.fromMillis(timestamp)

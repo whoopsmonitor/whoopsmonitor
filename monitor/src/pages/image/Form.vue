@@ -38,13 +38,12 @@
             <template v-slot:option="scope">
               <q-item
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
               >
                 <q-item-section avatar>
                   <q-icon :name="scope.opt.icon" />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label v-html="scope.opt.label" />
+                  <q-item-label>{{ scope.opt.label }}</q-item-label>
                 </q-item-section>
               </q-item>
             </template>
@@ -67,7 +66,7 @@
             hint="Enter full path to the docker image. You can use the tag as well."
             lazy-rules
             :rules="[ val => val && val.length > 0 || 'Please enter the path to the image.']"
-            @input="updateDockerImagePath"
+            @update:model-value="updateDockerImagePath"
           />
 
           <q-select
@@ -83,13 +82,12 @@
             <template v-slot:option="scope">
               <q-item
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents"
               >
                 <q-item-section avatar v-if="scope.opt.icon">
                   <q-icon :name="scope.opt.icon" />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label v-html="scope.opt.label" />
+                  <q-item-label>{{ scope.opt.label }}</q-item-label>
                   <q-item-label caption v-if="scope.opt.description">{{ scope.opt.description }}</q-item-label>
                 </q-item-section>
               </q-item>
@@ -147,7 +145,9 @@
 <script>
 import { pick } from 'lodash'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageImageCreate',
   data () {
     return {
@@ -233,13 +233,11 @@ export default {
   methods: {
     async fetchData () {
       try {
-        const item = await this.$axios.get(`/v1/dockerimage/${this.$route.params.id}`, {
+        await this.$sailsIo.socket.get(`/v1/dockerimage/${this.$route.params.id}`, {
           params: {
             select: 'id,image,username,password,type,local,metadata'
           }
-        }).then((response) => response.data)
-
-        if (item) {
+        }, (item) => {
           this.form.type = item.type // make sure it is first because it is "watched"
 
           this.$nextTick(() => {
@@ -251,7 +249,7 @@ export default {
 
             this.metadata = item.metadata ? JSON.parse(item.metadata) : ''
           })
-        }
+        })
       } catch (error) {
         console.error(error)
 
@@ -265,13 +263,14 @@ export default {
 
     async fetchImages () {
       try {
-        this.images = await this.$axios.get('v1/dockerimage/list').then(res => res.data)
-        this.images.map(image => {
-          if (image.icon) {
-            image.icon = `img:${image.icon}`
-          }
+        await this.$sailsIo.socket.get('/v1/whoopsmonitorimages', (images) => {
+          this.images = images.map(image => {
+            if (image.icon) {
+              image.icon = `img:${image.icon}`
+            }
 
-          return image
+            return image
+          })
         })
       } catch (error) {
         console.error(error)
@@ -307,13 +306,13 @@ export default {
       try {
         this.loading.update = true
 
-        await this.$axios[method]('/v1/dockerimage' + (this.edit ? `/${this.$route.params.id}` : ''), form)
+        await this.$sailsIo.socket[method]('/v1/dockerimage' + (this.edit ? `/${this.$route.params.id}` : ''), form, (response) => {
+          this.$whoopsNotify.positive({
+            message: (this.edit ? 'Image details successfully updated.' : 'New image has been successfully added.') + ' Please wait a minute - so the image can be processed.'
+          })
 
-        this.$whoopsNotify.positive({
-          message: (this.edit ? 'Image details successfully updated.' : 'New image has been successfully added.') + ' Please wait a minute - so the image can be processed.'
+          this.$router.push({ name: 'image.index' })
         })
-
-        this.$router.push({ name: 'image.index' })
       } catch (error) {
         console.error(error)
         this.$whoopsNotify.negative({
@@ -345,5 +344,5 @@ export default {
       }
     }
   }
-}
+})
 </script>

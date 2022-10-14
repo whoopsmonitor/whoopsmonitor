@@ -72,20 +72,18 @@
 
 <script>
 import FilterResults from '../../components/FilterResults.vue'
-import SkeletonList from '../../components/SkeletonList'
-import ConfirmDialog from '../../components/ConfirmDialog'
-import DateTime from '../../filters/datetime'
+import SkeletonList from '../../components/SkeletonList.vue'
+import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import filteredItems from '../../helpers/filteredItems'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageSharedEnvVarsIndex',
   components: {
     SkeletonList,
     ConfirmDialog,
     FilterResults
-  },
-  filters: {
-    datetime: DateTime
   },
   data () {
     return {
@@ -107,30 +105,25 @@ export default {
   computed: {
     ...filteredItems
   },
-  async created () {
-    await this.fetchData({
-      verbose: true
-    })
+  created () {
+    this.fetchData()
   },
   methods: {
-    async fetchData (config) {
-      config = config || {}
-
-      if (config.verbose) {
-        this.loading.fetch = true
-      }
+    fetchData () {
+      this.loading.fetch = true
 
       try {
-        this.items = await this.$axios.get('/v1/environmentvariables').then(response => response.data)
+        this.$sailsIo.socket.get('/v1/environmentvariables', items => {
+          this.loading.fetch = false
+          this.items = items
+        })
       } catch (error) {
+        this.loading.fetch = false
+
         console.error(error)
         this.$whoopsNotify.negative({
           message: 'It is not possible to find load environment variables. Please reload the page.'
         })
-      } finally {
-        if (config.verbose) {
-          this.loading.fetch = false
-        }
       }
     },
 
@@ -144,26 +137,27 @@ export default {
       this.destroyId = ''
     },
 
-    async destroyConfirm () {
+    destroyConfirm () {
       this.loading.destroy = true
 
       try {
-        await this.$axios.delete(`/v1/environmentvariables/${this.destroyId}`)
-        await this.fetchData({
-          verbose: false
-        })
-        this.$whoopsNotify.positive({
-          message: 'Environment variable successfully deleted.'
+        this.$sailsIo.socket.delete(`/v1/environmentvariables/${this.destroyId}`, record => {
+          this.destroyCancel()
+          this.items = this.items.filter(item => item.id !== record.id)
+
+          this.$whoopsNotify.positive({
+            message: 'Environment variable successfully deleted.'
+          })
         })
       } catch (error) {
+        this.destroyCancel()
+
         console.error(error)
         this.$whoopsNotify.negative({
           message: 'It is not possible to delete an environment variable. Please try it again.'
         })
-      } finally {
-        this.destroyCancel()
       }
     }
   }
-}
+})
 </script>

@@ -1,10 +1,11 @@
 <template>
-  <div id="q-app">
-    <router-view />
-  </div>
+  <router-view />
 </template>
+
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'App',
   created () {
     this.$store.commit('config/setApiUrl', process.env.APP_API_URL)
@@ -13,5 +14,5 @@ export default {
     // join realtime events
     this.$sailsIo.socket.get('/v1/realtime/join')
   }
-}
+})
 </script>

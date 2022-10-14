@@ -31,7 +31,6 @@ module.exports.routes = {
   'GET /v1/checkstatus/aggregate/:checkId?': 'v1/checkstatus/aggregate',
   'GET /v1/checkstatus/aggregate-by-day/:checkId?': 'v1/checkstatus/aggregate-by-day',
   'GET /v1/checkstatus/aggregate-metric-by-day/:checkId?': 'v1/checkstatus/aggregate-metric-by-day',
-  'GET /v1/checkstatus': 'v1/checkstatus/find',
 
   // do login
   'POST /v1/auth/login': 'v1/auth/login',
@@ -42,7 +41,6 @@ module.exports.routes = {
   },
 
   'GET /v1/dockerimage/:id/envvars': 'v1/dockerimage/envvars',
-  'GET /v1/dockerimage/list': 'v1/dockerimage/list',
 
   // count records
   'GET /v1/queue/:name': 'v1/queue/find',

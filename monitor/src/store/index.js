@@ -1,5 +1,5 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { store } from 'quasar/wrappers'
+import { createStore } from 'vuex'
 import VuexPersistence from 'vuex-persist'
 
 import config from './config'
@@ -7,8 +7,6 @@ import auth from './auth'
 import guide from './guide'
 import issue from './issue'
 import healthindex from './healthindex'
-
-Vue.use(Vuex)
 
 const vuexLocal = new VuexPersistence({
   storage: window.localStorage
@@ -23,8 +21,8 @@ const vuexLocal = new VuexPersistence({
  * with the Store instance.
  */
 
-export default function (/* { ssrContext } */) {
-  const Store = new Vuex.Store({
+export default store(function (/* { ssrContext } */) {
+  const Store = createStore({
     modules: {
       config,
       auth,
@@ -37,9 +35,9 @@ export default function (/* { ssrContext } */) {
     ],
 
     // enable strict mode (adds overhead!)
-    // for dev mode only
-    strict: process.env.DEV
+    // for dev mode and --debug builds only
+    strict: process.env.DEBUGGING
   })
 
   return Store
-}
+})

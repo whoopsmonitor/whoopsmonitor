@@ -48,7 +48,7 @@ module.exports = {
   customToJSON: function () {
     // encrypt env vars in case it is a encrypted string, skip otherwise
     if (this.environmentVariables) {
-      this.environmentVariables = sails.helpers.decryptAttribute(this.environmentVariables.toString())
+      this.environmentVariables = sails.helpers.decryptAttribute(this.environmentVariables)
     }
 
     // must be cloned otherwise "this" is handled as refference

@@ -10,7 +10,7 @@
         :key="item.id"
         :val="item.id"
         :label="item.key"
-        @input="select"
+        @update:model-value="select"
       />
     </div>
     <div v-if="!loading && !variables.length">
@@ -20,10 +20,12 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'SharedVariablesComponent',
   props: {
-    value: {
+    modelValue: {
       type: Array,
       defaultsTo: []
     }
@@ -36,29 +38,30 @@ export default {
     }
   },
   async created () {
-    await this.fetch()
+    this.fetch()
 
     // mark the default "value" as "selected"
-    this.selected = this.value
+    this.selected = this.modelValue
   },
   methods: {
-    async fetch () {
+    fetch () {
       this.loading = true
+
       try {
-        this.variables = await this.$axios.get('/v1/environmentvariables', {
-          params: {
-            select: 'key,value'
-          }
-        }).then(result => result.data)
+        this.$sailsIo.socket.get('/v1/environmentvariables', {
+          select: 'key,value'
+        }, variables => {
+          this.variables = variables
+          this.loading = false
+        })
       } catch (error) {
-        console.error(error)
-      } finally {
         this.loading = false
+        console.error(error)
       }
     },
     select (val) {
-      this.$emit('input', val)
+      this.$emit('update:modelValue', val)
     }
   }
-}
+})
 </script>

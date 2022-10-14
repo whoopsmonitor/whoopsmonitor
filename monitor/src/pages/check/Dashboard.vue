@@ -19,7 +19,7 @@
 
                   <q-toggle
                     v-if="loggedIn"
-                    @input="switchStatus(detail)"
+                    @update:model-value="switchStatus(detail)"
                     v-model="detail.enabled"
                     checked-icon="check"
                     color="green"
@@ -31,8 +31,7 @@
                   {{ detail.name }}
 
                   <q-chip v-if="loggedIn">
-                    <!-- <q-icon name="schedule" class="q-mr-sm" /> {{ detail.cron | translateCron }} -->
-                    <q-icon name="schedule" class="q-mr-sm" /> {{ detail.cron | translateCron }}
+                    <q-icon name="schedule" class="q-mr-sm" /> {{ translateCron(detail.cron) }}
                   </q-chip>
 
                   <q-btn
@@ -101,7 +100,7 @@
         <div class="col-12">
           <q-table
             title="Latest Results (50 records)"
-            :data="tableData"
+            :rows="tableData"
             :columns="table.columns"
             row-key="id"
             :rows-per-page-options="[100]"
@@ -109,7 +108,7 @@
             <template v-slot:top>
               <q-toggle
                 v-model="logsStatusOnlyFailed"
-                @input="fetchLatestLogs"
+                @update:model-value="fetchLatestLogs"
                 checked-icon="check"
                 color="green"
                 unchecked-icon="clear"
@@ -130,8 +129,8 @@
                   >delete</q-btn> -->
                 </q-td>
                 <q-td key="output" :props="props">
-                  <div v-html="props.row.output.replace(/\n/g, '<br />')" />
-                  <div>{{ props.row.createdAt | dateformat }}</div>
+                  <div>{{ props.row.output.replace(/\n/g, '<br />') }}</div>
+                  <div>{{ dateformat(props.row.createdAt) }}</div>
                 </q-td>
               </q-tr>
             </template>
@@ -153,25 +152,23 @@
 import { DateTime } from 'luxon'
 import { sortBy } from 'lodash'
 import ini from 'ini'
-import VueApexCharts from 'vue-apexcharts'
+import VueApexCharts from 'vue3-apexcharts'
 import dateformat from '../../filters/datetime'
 import translateCron from '../../filters/translateCron'
-import CorrectnessIndex from '../../components/CorrectnessIndex'
-import ConfirmDialog from '../../components/ConfirmDialog'
-import SkeletonList from '../../components/SkeletonList'
+import CorrectnessIndex from '../../components/CorrectnessIndex.vue'
+import ConfirmDialog from '../../components/ConfirmDialog.vue'
+import SkeletonList from '../../components/SkeletonList.vue'
 import { runNow, switchStatus as checkSwitchStatus } from '../../helpers/check'
 
-export default {
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'PageCheckDashboard',
   components: {
     apexchart: VueApexCharts,
     CorrectnessIndex,
     ConfirmDialog,
     SkeletonList
-  },
-  filters: {
-    translateCron,
-    dateformat
   },
   data () {
     return {
@@ -344,33 +341,34 @@ export default {
   methods: {
     runNow,
     async fetchData () {
-      await this.fetchDetails()
-
-      if (this.detail.display === null) {
-        await this.fetchAggregates()
-      } else {
-        await this.fetchMetricAggregates()
-      }
-
-      await this.fetchLatestLogs()
+      this.fetchDetails()
+      this.fetchLatestLogs()
     },
-    async fetchDetails () {
+
+    fetchDetails () {
       this.loading.details = true
+
       try {
-        this.detail = await this.$axios.get(`/v1/check/${this.$route.params.id}`, {
-          params: {
-            select: 'enabled,name,progress,environmentVariables,cron,display',
-            populate: 'image'
+        this.$sailsIo.socket.get(`/v1/check/${this.$route.params.id}`, {
+          select: 'enabled,name,progress,environmentVariables,cron,display',
+          populate: 'image'
+        }, detail => {
+          this.loading.details = false
+          this.detail = detail
+
+          if (typeof this.detail === 'object' && this.detail.display === null) {
+            this.fetchAggregates()
+          } else {
+            this.fetchMetricAggregates()
           }
-        }).then((response) => response.data)
+        })
       } catch (error) {
-        console.error(error)
-      } finally {
         this.loading.details = false
+        console.error(error)
       }
     },
 
-    async fetchAggregates () {
+    fetchAggregates () {
       const date = DateTime.local()
       const startOfDay = date.minus({ months: 1 }).startOf('day')
       const endOfDay = date.endOf('day')
@@ -378,22 +376,20 @@ export default {
       this.loading.aggregates = true
 
       try {
-        const items = await this.$axios.get(`/v1/checkstatus/aggregate-by-day/${this.$route.params.id}`, {
-          params: {
-            from: startOfDay.valueOf(),
-            to: endOfDay.valueOf()
-          }
-        }).then((response) => response.data)
-
-        this.items = sortBy(items, 'date')
+        this.$sailsIo.socket.get(`/v1/checkstatus/aggregate-by-day/${this.$route.params.id}`, {
+          from: startOfDay.valueOf(),
+          to: endOfDay.valueOf()
+        }, items => {
+          this.loading.aggregates = false
+          this.items = sortBy(items, 'date')
+        })
       } catch (error) {
-        console.error(error)
-      } finally {
         this.loading.aggregates = false
+        console.error(error)
       }
     },
 
-    async fetchMetricAggregates () {
+    fetchMetricAggregates () {
       const date = DateTime.local()
       const startOfDay = date.minus({ months: 1 }).startOf('day')
       const endOfDay = date.endOf('day')
@@ -401,40 +397,39 @@ export default {
       this.loading.aggregates = true
 
       try {
-        const items = await this.$axios.get(`/v1/checkstatus/aggregate-metric-by-day/${this.$route.params.id}`, {
-          params: {
-            from: startOfDay.valueOf(),
-            to: endOfDay.valueOf()
-          }
-        }).then((response) => response.data)
+        this.$sailsIo.socket.get(`/v1/checkstatus/aggregate-metric-by-day/${this.$route.params.id}`, {
+          from: startOfDay.valueOf(),
+          to: endOfDay.valueOf()
+        }, items => {
+          this.loading.aggregates = false
+          this.items = sortBy(items, 'date')
+        })
 
-        this.items = sortBy(items, 'date')
       } catch (error) {
-        console.error(error)
-      } finally {
         this.loading.aggregates = false
+        console.error(error)
       }
     },
 
-    async fetchLatestLogs () {
+    fetchLatestLogs () {
       this.loading.latest = true
       try {
-        this.logs = await this.$axios.get('/v1/checkstatus', {
-          params: {
-            limit: 50,
-            sort: 'createdAt desc',
-            select: 'output,status,createdAt',
-            populate: false,
-            where: {
-              check: this.$route.params.id,
-              status: this.logsStatusOnlyFailed ? [1, 2] : [0, 1, 2]
-            }
+        this.$sailsIo.socket.get('/v1/checkstatus', {
+          limit: 50,
+          sort: 'createdAt desc',
+          select: 'output,status,createdAt',
+          populate: false,
+          where: {
+            check: this.$route.params.id,
+            status: this.logsStatusOnlyFailed ? [1, 2] : [0, 1, 2]
           }
-        }).then((response) => response.data)
+        }, logs => {
+          this.loading.latest = false
+          this.logs = logs
+        })
       } catch (error) {
-        console.error(error)
-      } finally {
         this.loading.latest = false
+        console.error(error)
       }
     },
 
@@ -484,7 +479,7 @@ export default {
       this.destroyId = ''
     },
 
-    async destroyConfirm () {
+    destroyConfirm () {
       if (!this.loggedIn) {
         return false
       }
@@ -492,22 +487,22 @@ export default {
       this.loading.destroy = true
 
       try {
-        await this.$axios.delete(`/v1/checkstatus/${this.destroyId}`)
+        this.$sailsIo.socket.delete(`/v1/checkstatus/${this.destroyId}`, _ => {
+          this.destroyCancel()
 
-        this.$whoopsNotify.positive({
-          message: 'Log successfully deleted.'
-        })
+          this.$whoopsNotify.positive({
+            message: 'Log successfully deleted.'
+          })
 
-        await this.fetchData({
-          verbose: false
+          this.fetchData({
+            verbose: false
+          })
         })
       } catch (error) {
         console.error(error)
         this.$whoopsNotify.negative({
           message: 'It is not possible to delete a log. Please try it again.'
         })
-      } finally {
-        this.destroyCancel()
       }
     },
 
@@ -528,7 +523,15 @@ export default {
           })
         }
       })
+    },
+
+    dateformat (date) {
+      return dateformat(date)
+    },
+
+    translateCron (cron) {
+      return translateCron(cron)
     }
   }
-}
+})
 </script>

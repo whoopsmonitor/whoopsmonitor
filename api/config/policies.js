@@ -44,7 +44,6 @@ module.exports.policies = {
   'v1/check/run': 'token',
   'v1/check/tags': 'token',
 
-  'v1/checkstatus/find': 'token',
   'v1/checkstatus/aggregate': 'token',
   'v1/checkstatus/aggregate-by-day': 'token',
   'v1/checkstatus/aggregate-metric-by-day': 'token',
