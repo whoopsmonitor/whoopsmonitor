@@ -11,9 +11,7 @@ module.exports = {
   },
 
   exits: {
-    badRequest: {
-      responseType: 'badRequest'
-    }
+    badRequest: {}
   },
 
   fn: async function (inputs, exits) {

@@ -14,22 +14,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-api
+    env_file:
+      - .env
     environment:
-      NODE_ENV: development
-      CONFIG_CORS_ALLOW_ORIGINS: '*'
-      APP_PASSWORD: <%= APP_PASSWORD %>
-      MONGO_CONNECTION: mongodb://<%= MONGODB_USERNAME %>:<%= MONGODB_PASSWORD %>@<%= APP_NAME %>-mongodb:27017/<%= MONGODB_DATABASE %>?authSource=<%= APP_NAME %>
-      APP_DATA_ENCRYPTION_KEY: <%= APP_DATA_ENCRYPTION_KEY %>
-      APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
-      APP_REDIS_CONNECTION_HOST: <%= APP_NAME %>-redis
-      APP_REDIS_CONNECTION_PORT: 6379
-      APP_TOKEN: <%= APP_TOKEN %>
-      APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
-      APP_QUEUE_NAME_ALERTING: alerting
-      APP_REDIS_SOCKETS_CONNECTION_HOST: <%= APP_NAME %>-redis-sockets
-      APP_REDIS_SOCKETS_CONNECTION_PORT: 6379
-      APP_REDIS_SOCKETS_PASSWORD: <%= APP_REDIS_SOCKETS_PASSWORD %>
-      APP_SOCKETS_ALLOW_ORIGINS: http://localhost:9000
+      - APP_NAME=${APP_NAME_API}
     depends_on:
       - <%= APP_NAME %>-mongodb
       - <%= APP_NAME %>-redis
@@ -37,31 +25,23 @@ services:
     networks:
       - <%= APP_NAME %>
 
-  <%= APP_NAME %>-worker:
-    container_name: <%= APP_NAME %>-worker
+  <%= APP_NAME %>-worker-aggregate:
+    container_name: <%= APP_NAME %>-worker-aggregate
     restart: unless-stopped
     volumes:
-      - ./worker:/app
+      - ./api:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-      - <%= APP_NAME %>_worker_data:/<%= APP_NAME %>-worker
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-api:1337", "--", "npm", "run" ,"dev"]
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker:aggregate"]
     build:
       context: .
-      dockerfile: Dockerfile-worker
+      dockerfile: Dockerfile-worker-aggregate
+    env_file:
+      - .env
     environment:
-      NODE_ENV: development
-      APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
-      APP_REDIS_HOST: <%= APP_NAME %>-redis
-      APP_REDIS_PORT: 6379
-      APP_API_URL: http://<%= APP_NAME %>-api:1337
-      APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
-      APP_QUEUE_NAME_ALERTING: alerting
-      APP_TOKEN: <%= APP_TOKEN %>
+      - APP_NAME=${APP_NAME_WORKER_AGGREGATE}
     depends_on:
       - <%= APP_NAME %>-mongodb
-      - <%= APP_NAME %>-redis
-      - <%= APP_NAME %>-api
     networks:
       - <%= APP_NAME %>
 
@@ -76,14 +56,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-alerting
-    environment:
-      NODE_ENV: development
-      APP_REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
-      APP_REDIS_HOST: <%= APP_NAME %>-redis
-      APP_REDIS_PORT: 6379
-      APP_API_URL: http://<%= APP_NAME %>-api:1337
-      APP_QUEUE_NAME_ALERTING: alerting
-      APP_TOKEN: <%= APP_TOKEN %>
+    env_file:
+      - .env
     depends_on:
       - <%= APP_NAME %>-mongodb
       - <%= APP_NAME %>-redis
@@ -102,10 +76,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-image-metadata
-    environment:
-      NODE_ENV: development
-      API_URL: http://<%= APP_NAME %>-api:1337
-      APP_TOKEN: <%= APP_TOKEN %>
+    env_file:
+      - .env
     depends_on:
       - <%= APP_NAME %>-mongodb
       - <%= APP_NAME %>-redis
@@ -120,11 +92,8 @@ services:
       - "27017:27017"
     volumes:
       - <%= APP_NAME %>_mongodb_data:/bitnami
-    environment:
-      MONGODB_ROOT_PASSWORD: <%= MONGODB_ROOT_PASSWORD %>
-      MONGODB_DATABASE: <%= MONGODB_DATABASE %>
-      MONGODB_USERNAME: <%= MONGODB_USERNAME %>
-      MONGODB_PASSWORD: <%= MONGODB_PASSWORD %>
+    env_file:
+      - .env
     networks:
       - <%= APP_NAME %>
 
@@ -132,7 +101,7 @@ services:
     container_name: <%= APP_NAME %>-redis
     image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/redis:7.0.5-debian-11-r2
     environment:
-      REDIS_PASSWORD: <%= APP_REDIS_PASSWORD %>
+      REDIS_PASSWORD: ${APP_REDIS_PASSWORD}
     volumes:
       - <%= APP_NAME %>_redis_data:/bitnami
     networks:
@@ -142,7 +111,7 @@ services:
     container_name: <%= APP_NAME %>-redis-sockets
     image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/redis:7.0.5-debian-11-r2
     environment:
-      REDIS_PASSWORD: <%= APP_REDIS_SOCKETS_PASSWORD %>
+      REDIS_PASSWORD: ${APP_REDIS_SOCKETS_PASSWORD}
     volumes:
       - <%= APP_NAME %>_redis_sockets_data:/bitnami
     networks:

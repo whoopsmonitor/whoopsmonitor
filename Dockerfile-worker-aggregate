@@ -1,0 +1,30 @@
+FROM node:18.10.0-alpine3.15
+LABEL maintainer="Daniel Rataj <info@whoopsmonitor.app>"
+LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
+
+RUN apk add --no-cache openssl=1.1.1q-r0 \
+  docker-cli=20.10.16-r0 \
+  bash=5.1.16-r0 \
+  && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+COPY api/package.json .
+RUN npm install --quiet
+
+# copy required app files
+COPY api/api ./api
+COPY api/config/ ./config
+COPY api/static/ ./static
+COPY api/views/ ./views
+# COPY api/test/ ./test
+COPY api/app.js .
+COPY api/worker-aggregate.js .
+COPY api/.sailsrc .
+
+# wait for container
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /opt/bin/
+RUN chmod +x /opt/bin/wait-for-it.sh
+
+# start Sails app
+CMD ["/opt/bin/wait-for-it.sh", "whoopsmonitor-mongodb:27017", "--", "npm", "run", "worker:aggregate"]

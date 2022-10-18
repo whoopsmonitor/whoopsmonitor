@@ -12,6 +12,21 @@ const APP_NAME = 'whoopsmonitor'
 const outputDir = '../output'
 const composeFile = 'docker-compose.yml'
 const composeDevFile = 'docker-compose-dev.yml'
+const envFile = '.env'
+const NODE_ENV = process.env.NODE_ENV || 'production'
+const CONFIG_CORS_ALLOW_ORIGINS = "'*'"
+const MONGODB_PORT = 27017
+const MONGODB_HOST = 'whoopsmonitor-mongodb'
+const APP_REDIS_CONNECTION_HOST = 'whoopsmonitor-redis'
+const APP_REDIS_CONNECTION_PORT = 6379
+const APP_QUEUE_NAME_EXECUTE_CHECK = 'execute-check'
+const APP_QUEUE_NAME_ALERTING = 'alerting'
+const APP_REDIS_SOCKETS_CONNECTION_HOST = 'whoopsmonitor-redis-sockets'
+const APP_REDIS_SOCKETS_CONNECTION_PORT = 6379
+const APP_SOCKETS_ALLOW_ORIGINS = 'http://localhost:8080,http://localhost:9000'
+const APP_NAME_API = 'api'
+const APP_NAME_WORKER_AGGREGATE = 'worker-aggregate'
+const ADMIN_URL = 'http://localhost:9000'
 
 const dockerImageVersion = require('./package.json').dockerImageVersion
 
@@ -146,8 +161,10 @@ inquirer.prompt(questions).then((answers) => {
     BASIC_AUTH_PASSWORD = undefined
   }
 
-  for (const file of [`${composeFile}.ejs`, `${composeDevFile}.ejs`]) {
-    ejs.renderFile(file, {
+  for (const file of [`${composeFile}.ejs`, `${composeDevFile}.ejs`, `${envFile}.ejs`]) {
+    ejs.renderFile(`templates/${file}`, {
+      NODE_ENV,
+      CONFIG_CORS_ALLOW_ORIGINS,
       DOCKER_IMAGE_VERSION: dockerImageVersion,
       APP_NAME,
       APP_PASSWORD,
@@ -159,9 +176,20 @@ inquirer.prompt(questions).then((answers) => {
       MONGODB_DATABASE,
       MONGODB_USERNAME,
       MONGODB_PASSWORD,
+      MONGODB_PORT,
+      MONGODB_HOST,
+      APP_REDIS_CONNECTION_HOST,
+      APP_REDIS_CONNECTION_PORT,
+      APP_QUEUE_NAME_EXECUTE_CHECK,
+      APP_QUEUE_NAME_ALERTING,
       BASIC_AUTH_USERNAME,
       BASIC_AUTH_PASSWORD,
-      APP_REDIS_SOCKETS_PASSWORD
+      APP_REDIS_SOCKETS_PASSWORD,
+      APP_REDIS_SOCKETS_CONNECTION_HOST,
+      APP_REDIS_SOCKETS_CONNECTION_PORT,
+      APP_SOCKETS_ALLOW_ORIGINS,
+      APP_NAME_API,
+      APP_NAME_WORKER_AGGREGATE
     }, {}, function (err, str) {
       if (err) {
         console.error(err)
@@ -194,8 +222,7 @@ inquirer.prompt(questions).then((answers) => {
       })
 
       console.log(`${logSymbols.info} (start) Waiting for Monitor to start.`)
-      // port "80" is the inner port - we're on the same network
-      await waitForUrl('http://monitor:80', 'monitor')
+      await waitForUrl(ADMIN_URL, 'monitor')
       console.log(`${logSymbols.info} (done) Waiting for Monitor to start.`)
     } catch (error) {
       console.error(error)
@@ -209,7 +236,7 @@ inquirer.prompt(questions).then((answers) => {
 
         Don't forget your credentials:
 
-        - URL: http://localhost:8080
+        - URL: ${ADMIN_URL}
         - Monitor Login: ${APP_PASSWORD}
         ${BASIC_AUTH_USERNAME ? '- Basic Auth (username): ' + BASIC_AUTH_USERNAME : ''}
         ${BASIC_AUTH_PASSWORD ? '- Basic Auth (password): ' + BASIC_AUTH_PASSWORD : ''}

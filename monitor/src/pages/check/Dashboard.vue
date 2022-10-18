@@ -64,7 +64,10 @@
             <div class="col-12">
               <q-card flat bordered>
                 <q-card-section>
-                  <div v-if="detail.display === null" class="text-h6">Summary</div>
+                  <div v-if="detail.display === null">
+                    <div class="text-h6">Summary</div>
+                    <div class="caption text-italic">updated every 5 minutes</div>
+                  </div>
                   <div v-else class="text-h6">History</div>
                 </q-card-section>
 
@@ -377,11 +380,11 @@ export default defineComponent({
 
       try {
         this.$sailsIo.socket.get(`/v1/checkstatus/aggregate-by-day/${this.$route.params.id}`, {
-          from: startOfDay.valueOf(),
-          to: endOfDay.valueOf()
+          from: startOfDay.valueOf(), // send ms timestamp
+          to: endOfDay.valueOf() // send ms timestamp
         }, items => {
           this.loading.aggregates = false
-          this.items = sortBy(items, 'date')
+          this.items = sortBy(items.data, 'date')
         })
       } catch (error) {
         this.loading.aggregates = false

@@ -29,7 +29,7 @@ module.exports.routes = {
   'GET /v1/check/tags': 'v1/check/tags',
 
   'GET /v1/checkstatus/aggregate/:checkId?': 'v1/checkstatus/aggregate',
-  'GET /v1/checkstatus/aggregate-by-day/:checkId?': 'v1/checkstatus/aggregate-by-day',
+  'GET /v1/checkstatus/aggregate-by-day/:check?': 'v1/checkstatus/aggregate-by-day',
   'GET /v1/checkstatus/aggregate-metric-by-day/:checkId?': 'v1/checkstatus/aggregate-metric-by-day',
 
   // do login

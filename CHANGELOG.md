@@ -11,6 +11,7 @@
 
 -   Update Docker images to the latest version with dependencies as well.
 -   Docker images of Redis upgrade (6 -> 7).
+-   Using .env file to pass all environment variables to the containers.
 
 ## [v1.1.1] - (2022-09-26)
 

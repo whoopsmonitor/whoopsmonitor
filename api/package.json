@@ -38,10 +38,12 @@
   },
   "scripts": {
     "start": "NODE_ENV=production node app.js",
+    "worker:aggregate": "NODE_ENV=production node worker-aggregate.js",
     "test": "npm run lint && npm run custom-tests && echo 'Done.'",
     "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
     "custom-tests": "echo \"(No other custom tests yet.)\" && echo",
-    "dev": "nodemon -L index.js"
+    "dev": "nodemon -L app.js",
+    "dev:worker:aggregate": "nodemon -L worker-aggregate.js"
   },
   "main": "app.js",
   "repository": {
