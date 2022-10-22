@@ -86,5 +86,5 @@ module.exports.sockets = {
 
   // grant3rdPartyCookie: true,
 
-  onlyAllowOrigins: 'APP_SOCKETS_ALLOW_ORIGINS' in process.env ? (process.env.APP_SOCKETS_ALLOW_ORIGINS.split(',') || []) : []
+  onlyAllowOrigins: process.env.APP_SOCKETS_ALLOW_ORIGINS.split(',') || []
 };

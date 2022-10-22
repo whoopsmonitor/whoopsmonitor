@@ -424,7 +424,11 @@ export default defineComponent({
 
     fetchData () {
       try {
-        this.$sailsIo.socket.get(`/v1/check/${this.$route.params.id}`, item => {
+        this.$sailsIo.socket.get(`/v1/check/${this.$route.params.id}`, (item, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           if (item) {
             this.form.enabled = item.enabled
             this.form.name = item.name
@@ -469,7 +473,13 @@ export default defineComponent({
 
     fetchTags () {
       try {
-        this.$sailsIo.socket.get('/v1/check/tags', tags => this.tags = tags)
+        this.$sailsIo.socket.get('/v1/check/tags', (tags, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
+          this.tags = tags
+        })
       } catch (error) {
         console.error(error)
       }
@@ -483,7 +493,13 @@ export default defineComponent({
             type: 'check',
             healthyStatus: 0 // "0" means success in unix world
           }
-        }, images => this.images = images)
+        }, (images, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
+          this.images = images
+        })
       } catch (error) {
         console.error(error)
       }
@@ -493,7 +509,11 @@ export default defineComponent({
       try {
         this.$sailsIo.socket.get('/v1/alert', {
           select: 'name,description,image,createdAt,environmentVariables'
-        }, result => {
+        }, (result, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.alerts = result.filter(alert => alert.image).map((alert) => {
             return {
               label: alert.name,
@@ -523,7 +543,11 @@ export default defineComponent({
         // make sure image is just an ID
         form.image = form.image.value
 
-        this.$sailsIo.socket[method]('/v1/check' + (this.edit ? `/${this.$route.params.id}` : ''), form, _ => {
+        this.$sailsIo.socket[method]('/v1/check' + (this.edit ? `/${this.$route.params.id}` : ''), form, (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.$whoopsNotify.positive({
             message: this.edit ? 'Check details successfully updated.' : 'New check has been successfully added.'
           })

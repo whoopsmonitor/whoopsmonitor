@@ -16,8 +16,6 @@ RUN npm install --quiet
 COPY api/api ./api
 COPY api/config/ ./config
 COPY api/static/ ./static
-COPY api/views/ ./views
-# COPY api/test/ ./test
 COPY api/app.js ./app.js
 COPY api/.sailsrc ./.sailsrc
 

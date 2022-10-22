@@ -20,4 +20,4 @@ RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
 
 # expose port for Node server
-EXPOSE 80
+EXPOSE 9000

@@ -4,7 +4,7 @@
       <div class="col-9 col-md-9 col-sm-12 col-xs-12">
         <list-of-checks />
         <p></p>
-        <quick-demo v-if="!checks.length" />
+        <quick-demo v-if="loggedIn && !checks.length" />
       </div>
       <div class="col-3 col-md-3 col-sm-12 col-xs-12">
         <div class="row q-col-gutter-sm">
@@ -44,6 +44,9 @@ export default defineComponent({
   },
 
   computed: {
+    loggedIn () {
+      return this.$store.getters['auth/loggedIn']
+    },
     hasChecks () {
       return this.checks.length > 0
     }
@@ -51,12 +54,16 @@ export default defineComponent({
 
   async created () {
     try {
-      this.checks = await this.$axios.get('/v1/check', {
-        params: {
-          populate: false,
-          select: 'id'
+      await this.$sailsIo.socket.get('/v1/check', {
+        populate: false,
+        select: 'id'
+      }, (result, response) => {
+        if (response.statusCode !== 200) {
+          return false
         }
-      }).then((res) => res.data)
+
+        this.checks = result
+      })
     } catch (error) {
       if (error) {
         console.error(error)

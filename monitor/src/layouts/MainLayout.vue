@@ -228,7 +228,6 @@ export default defineComponent({
       leftDrawerOpen: false,
       documentTitle: '',
       interval: {
-        failedCheck: undefined,
         issues: undefined
       }
     }
@@ -257,12 +256,6 @@ export default defineComponent({
 
     this.documentTitle = document.title
 
-    this.interval.failedCheck = setInterval(async () => {
-      await this.getFailedCheck()
-    }, 10000)
-
-    await this.getFailedCheck()
-
     this.interval.issue = setInterval(async () => {
       await this.findIssues()
     }, 10000)
@@ -272,7 +265,6 @@ export default defineComponent({
     await this.getHealthIndexData()
   },
   unmounted () {
-    clearInterval(this.interval.failedCheck)
     clearInterval(this.interval.issues)
   },
   methods: {
@@ -285,37 +277,27 @@ export default defineComponent({
       this.$store.dispatch('auth/logout')
     },
 
-    async getFailedCheck () {
-      try {
-        // const result = await this.$axios.get('/v1/checkstatus/isfailing').then(result => result.data)
-
-        // if (result === true) {
-        //   // some check failing
-        //   document.title = this.documentTitle
-        //   document.title = `[✖] ${document.title}`
-        // } else {
-        //   document.title = this.documentTitle
-        // }
-      } catch (error) {
-        console.error(error)
-      }
-    },
-
     async findIssues () {
       try {
-        const overall = await this.$axios.get('/').then(result => result.data.data.overall)
+        await this.$sailsIo.socket.get('/', (result, response) => {
+          if (response.statusCode !== 200) {
+            console.error(err)
+          }
 
-        if (overall.issues) {
-          this.$store.commit('issue/setCount', overall.issues)
-        } else {
-          this.$store.commit('issue/setCount', 0)
-        }
+          const overall = result.data
 
-        if (overall.output) {
-          this.$store.commit('issue/setOutput', overall.output)
-        } else {
-          this.$store.commit('issue/setOutput', [])
-        }
+          if (overall.issues) {
+            this.$store.commit('issue/setCount', overall.issues)
+          } else {
+            this.$store.commit('issue/setCount', 0)
+          }
+
+          if (overall.output) {
+            this.$store.commit('issue/setOutput', overall.output)
+          } else {
+            this.$store.commit('issue/setOutput', [])
+          }
+        })
       } catch (error) {
         console.error(error)
       }
@@ -332,14 +314,17 @@ export default defineComponent({
 
     async getHealthIndexData () {
       try {
-        const thresholds = await this.$axios.get('/v1/healthindex', {
-          params: {
-            select: 'option,value,hours,check',
-            populate: false
+        await this.$sailsIo.socket.get('/v1/healthindex', {
+          select: 'option,value,hours,check',
+          populate: false
+        }, (thresholds, response) => {
+          if (response.statusCode !== 200) {
+            console.error(err)
+            return false
           }
-        }).then(result => result.data)
 
-        this.$store.commit('healthindex/items', thresholds)
+          this.$store.commit('healthindex/items', thresholds)
+        })
       } catch (error) {
         console.error(error)
       }

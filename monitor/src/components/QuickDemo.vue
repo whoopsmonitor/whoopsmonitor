@@ -40,9 +40,13 @@ export default defineComponent({
       try {
         this.loading = true
 
-        await this.$axios.post('/v1/demodata')
+        await this.$sailsIo.socket.post('/v1/demodata', (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
 
-        this.installed = true
+          this.installed = true
+        })
       } catch (error) {
         console.error(error)
       }

@@ -25,6 +25,26 @@ services:
     networks:
       - <%= APP_NAME %>
 
+  <%= APP_NAME %>-worker:
+    container_name: <%= APP_NAME %>-worker
+    restart: unless-stopped
+    volumes:
+      - ./worker:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-api:1337", "--", "npm", "run" ,"dev"]
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    env_file:
+      - .env
+    depends_on:
+      - <%= APP_NAME %>-mongodb
+      - <%= APP_NAME %>-redis
+      - <%= APP_NAME %>-api
+    networks:
+      - <%= APP_NAME %>
+
   <%= APP_NAME %>-worker-aggregate:
     container_name: <%= APP_NAME %>-worker-aggregate
     restart: unless-stopped

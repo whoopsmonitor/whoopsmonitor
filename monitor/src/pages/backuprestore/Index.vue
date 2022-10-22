@@ -110,19 +110,23 @@ export default defineComponent({
     }
   },
 
-  async created () {
-    await this.fetchData()
+  created () {
+    this.fetchData()
   },
 
   methods: {
-    async fetchData () {
+    fetchData () {
       this.backups = []
 
       this.loading.list = true
 
       try {
-         await this.$sailsIo.socket.get('/v1/backup', response => {
-          this.backups = response.data
+         this.$sailsIo.socket.get('/v1/backup', (backups, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
+          this.backups = backups.data
         })
       } catch (error) {
         console.error(error)
@@ -139,10 +143,14 @@ export default defineComponent({
       this.loading.create = true
 
       try {
-        this.$sailsIo.socket.post('/v1/backup', async () => {
+        this.$sailsIo.socket.post('/v1/backup', async (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.loading.create = false
 
-          await this.fetchData()
+          this.fetchData()
 
           this.$whoopsNotify.positive({
             message: 'Backup successfully created.'
@@ -177,6 +185,7 @@ export default defineComponent({
 
         this.loading.restore = true
 
+        // keep axios here instead of sockets
         await this.$axios.post(`/v1/backup/${this.form.backup.name}/restore`, formData, {
           timeout: 60 * 5 * 1000,
           headers: {
@@ -208,7 +217,11 @@ export default defineComponent({
         this.loading.remove = true
         this.backups = []
 
-        this.$sailsIo.socket.delete(`/v1/backup/${backup}`, () => {
+        this.$sailsIo.socket.delete(`/v1/backup/${backup}`, (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.fetchData()
 
           this.$whoopsNotify.positive({

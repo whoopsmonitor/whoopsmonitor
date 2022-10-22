@@ -5,13 +5,13 @@ import cron from 'node-cron'
 import axios from 'axios'
 import c from 'console-stamp'
 const packageName = JSON.parse(readFileSync('package.json')).name
-const API_URL = process.env.API_URL
+const APP_API_URL = process.env.APP_API_URL
 const APP_TOKEN = process.env.APP_TOKEN
 
 c(console)
 
 const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: APP_API_URL,
   timeout: 3000,
   headers: {
     'Authorization': `Bearer ${APP_TOKEN}`

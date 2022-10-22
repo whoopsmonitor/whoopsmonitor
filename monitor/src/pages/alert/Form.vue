@@ -225,7 +225,11 @@ export default defineComponent({
             type: 'alert'
           },
           healthyStatus: 0 // "0" means success in unix world
-        }, (result) => {
+        }, (result, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.images = result
 
           if (this.images.length) {
@@ -239,8 +243,10 @@ export default defineComponent({
 
     async fetchData () {
       try {
-        await this.$sailsIo.socket.get(`/v1/alert/${this.$route.params.id}`, response => {
-          const item = response
+        await this.$sailsIo.socket.get(`/v1/alert/${this.$route.params.id}`, (item, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
 
           if (item) {
             this.form.enabled = (typeof item.enabled === 'boolean' ? item.enabled : false)
@@ -314,7 +320,11 @@ export default defineComponent({
 
     async loadEnvVars () {
       try {
-        await this.$sailsIo.socket.get(`/v1/dockerimage/${this.form.image.value}/envvars`, result => {
+        await this.$sailsIo.socket.get(`/v1/dockerimage/${this.form.image.value}/envvars`, (result, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           const envProps = result
 
           if (Object.keys(envProps).length) {

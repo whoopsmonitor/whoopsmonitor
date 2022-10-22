@@ -6,11 +6,14 @@
 
 -   Implements sockets for the server and client.
 -   Adding new Redis container for sockets (+ installer).
+-   Adding new container to handle the aggregation of data.
 
 ### Changed
 
+-   Monitor is running on port 9000.
 -   Update Docker images to the latest version with dependencies as well.
 -   Docker images of Redis upgrade (6 -> 7).
+-   Docker images of Mongo upgrade (4 -> 6).
 -   Using .env file to pass all environment variables to the containers.
 
 ## [v1.1.1] - (2022-09-26)

@@ -355,7 +355,11 @@ export default defineComponent({
         this.$sailsIo.socket.get(`/v1/check/${this.$route.params.id}`, {
           select: 'enabled,name,progress,environmentVariables,cron,display',
           populate: 'image'
-        }, detail => {
+        }, (detail, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.loading.details = false
           this.detail = detail
 
@@ -382,7 +386,11 @@ export default defineComponent({
         this.$sailsIo.socket.get(`/v1/checkstatus/aggregate-by-day/${this.$route.params.id}`, {
           from: startOfDay.valueOf(), // send ms timestamp
           to: endOfDay.valueOf() // send ms timestamp
-        }, items => {
+        }, (items, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.loading.aggregates = false
           this.items = sortBy(items.data, 'date')
         })
@@ -403,7 +411,11 @@ export default defineComponent({
         this.$sailsIo.socket.get(`/v1/checkstatus/aggregate-metric-by-day/${this.$route.params.id}`, {
           from: startOfDay.valueOf(),
           to: endOfDay.valueOf()
-        }, items => {
+        }, (items, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.loading.aggregates = false
           this.items = sortBy(items, 'date')
         })
@@ -426,7 +438,11 @@ export default defineComponent({
             check: this.$route.params.id,
             status: this.logsStatusOnlyFailed ? [1, 2] : [0, 1, 2]
           }
-        }, logs => {
+        }, (logs, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.loading.latest = false
           this.logs = logs
         })
@@ -490,8 +506,12 @@ export default defineComponent({
       this.loading.destroy = true
 
       try {
-        this.$sailsIo.socket.delete(`/v1/checkstatus/${this.destroyId}`, _ => {
+        this.$sailsIo.socket.delete(`/v1/checkstatus/${this.destroyId}`, (_, response) => {
           this.destroyCancel()
+
+          if (response.statusCode !== 200) {
+            return false
+          }
 
           this.$whoopsNotify.positive({
             message: 'Log successfully deleted.'

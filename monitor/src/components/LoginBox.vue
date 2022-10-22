@@ -40,13 +40,11 @@ export default defineComponent({
       try {
         await this.$sailsIo.socket.post('/v1/auth/login', {
           password: this.form.password.toString().trim()
-        }, (_, jwres) => {
-          if ('statusCode' in jwres) {
-            if (jwres.statusCode === 401) {
-              return this.$whoopsNotify.negative({
-                message: 'Wrong credentials. Please try it again.'
-              })
-            }
+        }, (_, response) => {
+          if (response.statusCode === 401) {
+            return this.$whoopsNotify.negative({
+              message: 'Wrong credentials. Please try it again.'
+            })
           }
 
           this.$store.commit('auth/setToken', this.form.password)

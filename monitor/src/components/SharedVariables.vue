@@ -50,7 +50,11 @@ export default defineComponent({
       try {
         this.$sailsIo.socket.get('/v1/environmentvariables', {
           select: 'key,value'
-        }, variables => {
+        }, (variables, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.variables = variables
           this.loading = false
         })

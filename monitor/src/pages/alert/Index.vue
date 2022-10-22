@@ -144,20 +144,20 @@ export default defineComponent({
   computed: {
     ...filteredItems
   },
-  async created () {
-    await this.fetchData({
+  created () {
+    this.fetchData({
       verbose: true
     })
 
-    this.interval = setInterval(async () => {
-      await this.fetchData()
+    this.interval = setInterval(() => {
+      this.fetchData()
     }, 10000)
   },
   unmounted () {
     clearInterval(this.interval)
   },
   methods: {
-    async fetchData (config) {
+    fetchData (config) {
       config = config || {}
 
       if (config.verbose) {
@@ -165,11 +165,13 @@ export default defineComponent({
       }
 
       try {
-        await this.$sailsIo.socket.get('/v1/alert', {
+        this.$sailsIo.socket.get('/v1/alert', {
           select: 'enabled,name,description,image,environmentVariables,createdAt,level',
           populate: 'image'
-        }, response => {
-          const alerts = response
+        }, (alerts, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
 
           this.items = alerts.map(alert => {
             alert.image.metadata = JSON.parse(alert.image.metadata)
@@ -206,7 +208,11 @@ export default defineComponent({
       this.loading.destroy = true
 
       try {
-        await this.$sailsIo.socket.delete(`/v1/alert/${this.destroyId}`, (deleted) => {
+        await this.$sailsIo.socket.delete(`/v1/alert/${this.destroyId}`, (deleted, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.items = this.items.filter(item => item.id !== deleted.id)
 
           this.$whoopsNotify.positive({
@@ -228,7 +234,11 @@ export default defineComponent({
         // update state
         await this.$sailsIo.socket.patch(`/v1/alert/${alert.id}`, {
           enabled: !this.enabled[alert.id]
-        }, () => {
+        }, (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.$whoopsNotify.positive({
             message: `Alert "${alert.name}" successfully ${this.enabled[alert.id] ? 'enabled' : 'disabled'}.`
           })
@@ -253,14 +263,18 @@ export default defineComponent({
       record.repeat = alert.repeat
 
       try {
-        await this.$axios.post('/v1/alert', record)
+        await this.$sailsIo.socket.post('/v1/alert', record, (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
 
-        this.$whoopsNotify.positive({
-          message: 'Alert successfully duplicated.'
-        })
+          this.$whoopsNotify.positive({
+            message: 'Alert successfully duplicated.'
+          })
 
-        await this.fetchData({
-          verbose: false
+          this.fetchData({
+            verbose: false
+          })
         })
       } catch (error) {
         console.error(error)

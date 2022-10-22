@@ -215,7 +215,11 @@ export default defineComponent({
         await this.$sailsIo.socket.get(`/v1/checkstatus/aggregate/${this.check || ''}`, {
           from: startOfInterval.valueOf(),
           to: date.valueOf()
-        }, result => {
+        }, (result, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.aggregatedResults = result
         })
       } catch (error) {
@@ -239,7 +243,11 @@ export default defineComponent({
               delete level.id
               level.option = levelKey // warning, critical...
 
-              await this.$sailsIo.socket.post('/v1/healthindex', level, result => {
+              await this.$sailsIo.socket.post('/v1/healthindex', level, (result, response) => {
+                if (response.statusCode !== 200) {
+                  return false
+                }
+
                 this.form.threshold[result.option] = {
                   id: result.id,
                   value: result.value,

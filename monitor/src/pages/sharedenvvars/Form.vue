@@ -79,7 +79,11 @@ export default defineComponent({
   methods: {
     fetchData () {
       try {
-        this.$sailsIo.socket.get(`/v1/environmentvariables/${this.$route.params.id}`, item => {
+        this.$sailsIo.socket.get(`/v1/environmentvariables/${this.$route.params.id}`, (item, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           if (item) {
             this.form.key = item.key
             this.form.value = item.value
@@ -103,7 +107,11 @@ export default defineComponent({
       try {
         this.loading.update = true
 
-        this.$sailsIo.socket[method]('/v1/environmentvariables' + (this.edit ? `/${this.$route.params.id}` : ''), form, _ => {
+        this.$sailsIo.socket[method]('/v1/environmentvariables' + (this.edit ? `/${this.$route.params.id}` : ''), form, (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.$whoopsNotify.positive({
             message: (this.edit ? 'Variable details successfully updated.' : 'New variable has been successfully added.')
           })

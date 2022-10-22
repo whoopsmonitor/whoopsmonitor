@@ -113,7 +113,11 @@ export default defineComponent({
       this.loading.fetch = true
 
       try {
-        this.$sailsIo.socket.get('/v1/environmentvariables', items => {
+        this.$sailsIo.socket.get('/v1/environmentvariables', (items, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.loading.fetch = false
           this.items = items
         })
@@ -141,8 +145,13 @@ export default defineComponent({
       this.loading.destroy = true
 
       try {
-        this.$sailsIo.socket.delete(`/v1/environmentvariables/${this.destroyId}`, record => {
+        this.$sailsIo.socket.delete(`/v1/environmentvariables/${this.destroyId}`, (record, response) => {
           this.destroyCancel()
+
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.items = this.items.filter(item => item.id !== record.id)
 
           this.$whoopsNotify.positive({

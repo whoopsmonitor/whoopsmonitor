@@ -237,7 +237,11 @@ export default defineComponent({
           params: {
             select: 'id,image,username,password,type,local,metadata'
           }
-        }, (item) => {
+        }, (item, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.form.type = item.type // make sure it is first because it is "watched"
 
           this.$nextTick(() => {
@@ -263,7 +267,11 @@ export default defineComponent({
 
     async fetchImages () {
       try {
-        await this.$sailsIo.socket.get('/v1/whoopsmonitorimages', (images) => {
+        await this.$sailsIo.socket.get('/v1/whoopsmonitorimages', (images, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.images = images.map(image => {
             if (image.icon) {
               image.icon = `img:${image.icon}`
@@ -306,7 +314,11 @@ export default defineComponent({
       try {
         this.loading.update = true
 
-        await this.$sailsIo.socket[method]('/v1/dockerimage' + (this.edit ? `/${this.$route.params.id}` : ''), form, (response) => {
+        await this.$sailsIo.socket[method]('/v1/dockerimage' + (this.edit ? `/${this.$route.params.id}` : ''), form, (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.$whoopsNotify.positive({
             message: (this.edit ? 'Image details successfully updated.' : 'New image has been successfully added.') + ' Please wait a minute - so the image can be processed.'
           })

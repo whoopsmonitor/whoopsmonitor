@@ -23,10 +23,11 @@ const APP_QUEUE_NAME_EXECUTE_CHECK = 'execute-check'
 const APP_QUEUE_NAME_ALERTING = 'alerting'
 const APP_REDIS_SOCKETS_CONNECTION_HOST = 'whoopsmonitor-redis-sockets'
 const APP_REDIS_SOCKETS_CONNECTION_PORT = 6379
-const APP_SOCKETS_ALLOW_ORIGINS = 'http://localhost:8080,http://localhost:9000'
+const APP_SOCKETS_ALLOW_ORIGINS = 'http://localhost:9000'
 const APP_NAME_API = 'api'
 const APP_NAME_WORKER_AGGREGATE = 'worker-aggregate'
 const ADMIN_URL = 'http://localhost:9000'
+const APP_API_URL = 'http://whoopsmonitor-api:1337'
 
 const dockerImageVersion = require('./package.json').dockerImageVersion
 
@@ -114,13 +115,6 @@ if (fs.existsSync(composeFilePath) || fs.existsSync(composeDevFilePath)) {
   })
 }
 
-questions.push({
-  type: 'input',
-  name: 'apiUrl',
-  message: 'API URL where the monitor is accessible from the browser (with the port 1337 at the end).',
-  default: 'http://localhost:1337'
-})
-
 // base auth
 questions.push({
   type: 'confirm',
@@ -171,7 +165,7 @@ inquirer.prompt(questions).then((answers) => {
       APP_REDIS_PASSWORD,
       APP_DATA_ENCRYPTION_KEY,
       APP_TOKEN,
-      APP_API_URL: answers.apiUrl,
+      APP_API_URL,
       MONGODB_ROOT_PASSWORD,
       MONGODB_DATABASE,
       MONGODB_USERNAME,

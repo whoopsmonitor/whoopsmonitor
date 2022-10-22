@@ -136,10 +136,14 @@ export default defineComponent({
   async created () {
     await this.fetchData()
 
-    this.$sailsIo.socket.on('dockerimage', response => {
-      const action = response.verb
-      const id = response.id
-      const data = response.data
+    this.$sailsIo.socket.on('dockerimage', (result, response) => {
+      if (response.statusCode !== 200) {
+        return false
+      }
+
+      const action = result.verb
+      const id = result.id
+      const data = result.data
 
       switch (action) {
         case 'updated':
@@ -166,7 +170,11 @@ export default defineComponent({
       try {
         this.$sailsIo.socket.get('/v1/dockerimage', {
           select: 'image,createdAt,username,password,type,healthyStatus,healthyStatusOutput,metadata'
-        }, images => {
+        }, (images, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.items = images.map(image => {
             if (image.metadata) {
               image.metadata = JSON.parse(image.metadata)
@@ -198,7 +206,11 @@ export default defineComponent({
       this.loading.destroy = true
 
       try {
-        this.$sailsIo.socket.delete(`/v1/dockerimage/${this.destroyId}`, responseItem => {
+        this.$sailsIo.socket.delete(`/v1/dockerimage/${this.destroyId}`, (responseItem, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.items = this.items.filter(item => item.id !== responseItem.id)
         })
 
@@ -221,10 +233,14 @@ export default defineComponent({
       record.healthyStatusOutput = ''
 
       try {
-        this.$sailsIo.socket.patch(`/v1/dockerimage/${image.id}`, record, response => {
+        this.$sailsIo.socket.patch(`/v1/dockerimage/${image.id}`, record, (responseItem, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.items = this.items.map(item => {
-            if (item.id === response.id) {
-              item = response
+            if (item.id === responseItem.id) {
+              item = responseItem
             }
 
             return item

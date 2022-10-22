@@ -226,7 +226,11 @@ export default defineComponent({
           select: 'enabled,name,progress,environmentVariables,createdAt,image,cron,display,order,tags',
           populate: 'image',
           sort: 'order ASC'
-        }, checks => {
+        }, (checks, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.loading.fetch = false
           this.items = checks
 
@@ -258,7 +262,11 @@ export default defineComponent({
       this.loading.destroy = true
 
       try {
-        this.$sailsIo.socket.delete(`/v1/check/${this.destroyId}`, result => {
+        this.$sailsIo.socket.delete(`/v1/check/${this.destroyId}`, (result, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.loading.destroy = false
 
           this.destroyCancel()
@@ -293,7 +301,11 @@ export default defineComponent({
       record.order = this.items.length // order at the end
 
       try {
-        this.$sailsIo.socket.post('/v1/check', record, _ => {
+        this.$sailsIo.socket.post('/v1/check', record, (_, respose) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.$whoopsNotify.positive({
             message: 'Check successfully duplicated.'
           })
@@ -334,7 +346,11 @@ export default defineComponent({
         for (const change of changes) {
           this.$sailsIo.socket.patch(`/v1/check/${change.id}`, {
             order: change.order
-          }, _ => {
+          }, (_, response) => {
+            if (response.statusCode !== 200) {
+            return false
+          }
+
             this.fetchData()
           })
         }
@@ -350,7 +366,11 @@ export default defineComponent({
     forceOrdering () {
       try {
         this.loading.order = true
-        this.$sailsIo.socket.post('/v1/check/reorder-all', _ => {
+        this.$sailsIo.socket.post('/v1/check/reorder-all', (_, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.fetchData()
           this.loading.order = false
         })

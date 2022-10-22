@@ -20,6 +20,21 @@ services:
     networks:
       - <%= APP_NAME %>
 
+  <%= APP_NAME %>-worker:
+    container_name: <%= APP_NAME %>-worker
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker:<%= DOCKER_IMAGE_VERSION %>
+    env_file:
+      - .env
+    depends_on:
+      - <%= APP_NAME %>-mongodb
+      - <%= APP_NAME %>-redis
+      - <%= APP_NAME %>-api
+    networks:
+      - <%= APP_NAME %>
+
   <%= APP_NAME %>-worker-aggregate:
     container_name: <%= APP_NAME %>-worker-aggregate
     restart: unless-stopped
@@ -70,11 +85,11 @@ services:
     restart: unless-stopped
     image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/monitor:<%= DOCKER_IMAGE_VERSION %>
     ports:
-      - "8080:80"
+      - "9000:9000"
+    env_file:
+      - .env
     environment:
-      NODE_ENV: production
-      API_TOKEN: <%= APP_TOKEN %>
-      APP_API_URL: <%= APP_API_URL %>
+      API_TOKEN: ${APP_TOKEN}
 <% if (BASIC_AUTH_USERNAME) { -%>
       BASIC_AUTH_USERNAME: <%= BASIC_AUTH_USERNAME %>
 <% } -%>

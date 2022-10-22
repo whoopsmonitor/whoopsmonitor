@@ -61,7 +61,11 @@ export default defineComponent({
       this.loading.find = true
 
       try {
-        this.$sailsIo.socket.get(`/v1/queue/${this.name}`, result => {
+        this.$sailsIo.socket.get(`/v1/queue/${this.name}`, (result, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.count = result.data.count
         })
       } catch (error) {
@@ -77,7 +81,11 @@ export default defineComponent({
       this.loading.clean = true
 
       try {
-        this.$sailsIo.socket.delete(`/v1/queue/${this.name}`, result => {
+        this.$sailsIo.socket.delete(`/v1/queue/${this.name}`, (result, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           this.$whoopsNotify.positive({
             message: `Cleaned ${result.data} record(s) in the <i>${this.name}</i> queue.`
           })

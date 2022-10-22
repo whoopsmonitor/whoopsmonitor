@@ -35,7 +35,7 @@
       <div
         v-if="!loading && !checks.length"
       >
-        <p>
+        <p v-if="loggedIn">
           Currently there are no checks configured. Add a <router-link :to="{ name: 'check.create' }">new one</router-link>.
           <br>
           We also recommend to read a quick tutorial.
@@ -43,6 +43,7 @@
             <q-tooltip>show guide in new window</q-tooltip>
           </q-btn>
         </p>
+        <p v-else>No results here yet.</p>
       </div>
 
       <div class="row q-col-gutter-sm" v-if="checks.length">
@@ -276,7 +277,11 @@ export default defineComponent({
           populate: false,
           select: 'name,description,progress,enabled,display,tags',
           sort: 'order ASC'
-        }, async (checks) => {
+        }, async (checks, response) => {
+          if (response.statusCode !== 200) {
+            return false
+          }
+
           for (const check of checks) {
             this.$sailsIo.socket.get('/v1/checkstatus', {
               populate: false,
@@ -286,7 +291,11 @@ export default defineComponent({
               }),
               sort: 'createdAt desc',
               limit: 10
-            }, (status) => {
+            }, (status, response) => {
+              if (response.statusCode !== 200) {
+                return false
+              }
+
               check.status = status[0]
               check.statusHistory = status.reverse()
 

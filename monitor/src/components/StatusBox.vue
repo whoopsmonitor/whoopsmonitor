@@ -98,7 +98,10 @@ export default defineComponent({
       await this.$sailsIo.socket.get('/v1/checkstatus/aggregate', {
         from: startOfInterval.valueOf(),
         to: date.valueOf()
-      }, results => {
+      }, (results, response) => {
+        if (response.statusCode !== 200) {
+          return false
+        }
         this.results = results
         this.$emit('ready', this.results)
       })

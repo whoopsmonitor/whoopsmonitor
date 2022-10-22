@@ -21,3 +21,4 @@ coverage
 output
 docker-compose-dev.yml
 docker-compose.yml
+.env
