@@ -1,43 +1,69 @@
-name: image-metadata
+name: dockerhub-mirror
 
-on:
-  push:
-    paths:
-      - 'image-metadata/**'
-    tags:
-      - v*
+on: workflow_dispatch
+
 jobs:
-
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
-  push:
+  mirror:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build image
-        run: docker build . --file Dockerfile-image-metadata --tag image
-
       - name: Log into registry
         run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push image
+      - name: Push Bitnami Redis 6
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}/image-metadata
+          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis
+          VERSION=6.0.8-debian-10-r6
+          PULL_IMAGE=bitnami/redis:$VERSION
 
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          # keep only the major.minor release, no patch
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/\.[0-9]*$//')
+          docker pull "$PULL_IMAGE"
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-          docker tag image $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
+
+      - name: Push Bitnami Redis 7
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/redis
+          VERSION=7.0.5-debian-11-r5
+          PULL_IMAGE=bitnami/redis:$VERSION
+
+          docker pull "$PULL_IMAGE"
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
+
+      - name: Push Mongo 4
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/mongodb
+          VERSION=4.4.1-debian-10-r8
+          PULL_IMAGE=bitnami/mongodb:$VERSION
+
+          docker pull "$PULL_IMAGE"
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
+
+      - name: Push Mongo 6
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/mongodb
+          VERSION=6.0.2-debian-11-r3
+          PULL_IMAGE=bitnami/mongodb:$VERSION
+
+          docker pull "$PULL_IMAGE"
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
+          docker push "${IMAGE_ID}:${VERSION}"
