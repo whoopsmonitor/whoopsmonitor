@@ -6,9 +6,9 @@
 
 # Whoops Monitor
 
-I guess you have your own monitoring solution running at your company. Maybe not. However, you can always try Whoops Monitor to achieve some clarity on your systems. It is an excellent tool for helpdesk operators or even for the managers when configured adequately by your IT department.
+I guess you have your monitoring solution running at your company. Maybe not. However, you can always try Whoops Monitor to achieve some clarity on your systems. It is an excellent tool for helpdesk operators or even for managers when configured adequately by your IT department.
 
-What Whoops Monitor does is dead simple. It runs any Docker image at regular cron interval and saves the result. That's it!
+What Whoops Monitor does is dead simple. It runs any Docker image at regular cron intervals and saves the result. That's it!
 
 So you can even write your own Docker container with the check for your internal process (like the latest order on the shop) and then run the check every minute to get the result.
 
@@ -20,7 +20,7 @@ It shows on the main dashboard, where you can see the results of all of your che
   <img src="/docs/img/check-detail.png" alt="logo" width="256" height="128" />
 </div>
 
-## Prerequisities
+## Prerequisites
 
 You need
 
@@ -39,9 +39,9 @@ It will ask for some simple questions and generate a `docker-compose.yml` file r
 
 Now you can access the monitor right from URL <http://localhost:8080>.
 
-### Install with Caprover
+<!-- ### Install with Caprover
 
-You can also install Whoops Monitor with [CapRover](https://caprover.com/) on the One Click Apps page.
+You can also install Whoops Monitor with [CapRover](https://caprover.com/) on the One Click Apps page. -->
 
 ## Quick Start
 
@@ -53,10 +53,10 @@ Please read our [upgrade guide](/docs/upgrade-guide.md).
 
 ## Useful links
 
--   [How to create a my own alert](./docs/custom-alert.md)
--   [How to create a my own check](./docs/custom-check.md)
+-   [How to create my alert](./docs/custom-alert.md)
+-   [How to create my check](./docs/custom-check.md)
 -   [Local Development](/docs/development.md)
--   [Docker volumes and loosing data](/docs/volumes.md)
+-   [Docker volumes and losing data](/docs/volumes.md)
 
 ## Ready to contribute?
 

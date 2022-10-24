@@ -27,6 +27,7 @@ const APP_SOCKETS_ALLOW_ORIGINS = 'http://localhost:9000'
 const APP_NAME_API = 'api'
 const APP_NAME_WORKER_AGGREGATE = 'worker-aggregate'
 const ADMIN_URL = 'http://localhost:9000'
+const APP_API_URL_WEB = 'http://localhost:1337'
 const APP_API_URL = 'http://whoopsmonitor-api:1337'
 
 const dockerImageVersion = require('./package.json').dockerImageVersion
@@ -91,16 +92,6 @@ const MONGODB_PASSWORD = generatePassword.generate({
   numbers: true
 })
 
-let BASIC_AUTH_USERNAME = generatePassword.generate({
-  length: 32,
-  numbers: true
-})
-
-let BASIC_AUTH_PASSWORD = generatePassword.generate({
-  length: 32,
-  numbers: true
-})
-
 let questions = []
 
 const composeFilePath = path.join(outputDir, composeFile)
@@ -114,14 +105,6 @@ if (fs.existsSync(composeFilePath) || fs.existsSync(composeDevFilePath)) {
     default: false
   })
 }
-
-// base auth
-questions.push({
-  type: 'confirm',
-  name: 'baseAuth',
-  default: false,
-  message: 'Would like to protect the entire administration panel on production with base auth credentials?'
-})
 
 inquirer.prompt(questions).then((answers) => {
   if (!fs.existsSync(outputDir)) {
@@ -150,11 +133,6 @@ inquirer.prompt(questions).then((answers) => {
     process.exit(0)
   }
 
-  if (!answers.baseAuth) {
-    BASIC_AUTH_USERNAME = undefined
-    BASIC_AUTH_PASSWORD = undefined
-  }
-
   for (const file of [`${composeFile}.ejs`, `${composeDevFile}.ejs`, `${envFile}.ejs`]) {
     ejs.renderFile(`templates/${file}`, {
       NODE_ENV,
@@ -166,6 +144,7 @@ inquirer.prompt(questions).then((answers) => {
       APP_DATA_ENCRYPTION_KEY,
       APP_TOKEN,
       APP_API_URL,
+      APP_API_URL_WEB,
       MONGODB_ROOT_PASSWORD,
       MONGODB_DATABASE,
       MONGODB_USERNAME,
@@ -176,8 +155,6 @@ inquirer.prompt(questions).then((answers) => {
       APP_REDIS_CONNECTION_PORT,
       APP_QUEUE_NAME_EXECUTE_CHECK,
       APP_QUEUE_NAME_ALERTING,
-      BASIC_AUTH_USERNAME,
-      BASIC_AUTH_PASSWORD,
       APP_REDIS_SOCKETS_PASSWORD,
       APP_REDIS_SOCKETS_CONNECTION_HOST,
       APP_REDIS_SOCKETS_CONNECTION_PORT,
@@ -232,8 +209,6 @@ inquirer.prompt(questions).then((answers) => {
 
         - URL: ${ADMIN_URL}
         - Monitor Login: ${APP_PASSWORD}
-        ${BASIC_AUTH_USERNAME ? '- Basic Auth (username): ' + BASIC_AUTH_USERNAME : ''}
-        ${BASIC_AUTH_PASSWORD ? '- Basic Auth (password): ' + BASIC_AUTH_PASSWORD : ''}
         `.trimEnd(`
         `),
         { padding: 1 }

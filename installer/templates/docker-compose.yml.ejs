@@ -20,12 +20,12 @@ services:
     networks:
       - <%= APP_NAME %>
 
-  <%= APP_NAME %>-worker:
-    container_name: <%= APP_NAME %>-worker
+  <%= APP_NAME %>-worker-checks:
+    container_name: <%= APP_NAME %>-worker-checks
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker:<%= DOCKER_IMAGE_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker-checks:<%= DOCKER_IMAGE_VERSION %>
     env_file:
       - .env
     depends_on:
@@ -90,12 +90,6 @@ services:
       - .env
     environment:
       API_TOKEN: ${APP_TOKEN}
-<% if (BASIC_AUTH_USERNAME) { -%>
-      BASIC_AUTH_USERNAME: <%= BASIC_AUTH_USERNAME %>
-<% } -%>
-<% if (BASIC_AUTH_PASSWORD) { -%>
-      BASIC_AUTH_PASSWORD: <%= BASIC_AUTH_PASSWORD %>
-<% } -%>
     depends_on:
       - <%= APP_NAME %>-mongodb
       - <%= APP_NAME %>-redis
@@ -105,7 +99,8 @@ services:
 
   <%= APP_NAME %>-mongodb:
     container_name: <%= APP_NAME %>-mongodb
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/mongodb:6.0.2-debian-11-r3
+    <!-- image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/mongodb:6.0.2 -->
+    image: ghcr.io/zcube/bitnami-compat/mongodb:6.0.2
     ports:
       - "27017:27017"
     volumes:
@@ -117,7 +112,7 @@ services:
 
   <%= APP_NAME %>-redis:
     container_name: <%= APP_NAME %>-redis
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/redis:7.0.5-debian-11-r2
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/redis:7.0.5
     environment:
       REDIS_PASSWORD: ${APP_REDIS_PASSWORD}
     volumes:

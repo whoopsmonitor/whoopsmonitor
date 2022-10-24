@@ -1,4 +1,4 @@
-FROM node:18.10.0-alpine3.15
+FROM node:19.0.0-alpine3.15
 LABEL maintainer="Daniel Rataj <info@whoopsmonitor.app>"
 LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
 
@@ -10,7 +10,7 @@ RUN apk add --no-cache openssl=1.1.1q-r0 \
 WORKDIR /app
 
 # copy required app files
-COPY worker/ .
+COPY worker-checks/ .
 RUN npm install --quiet
 
 # wait for container

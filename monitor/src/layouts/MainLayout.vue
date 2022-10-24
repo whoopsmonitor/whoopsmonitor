@@ -319,7 +319,7 @@ export default defineComponent({
           populate: false
         }, (thresholds, response) => {
           if (response.statusCode !== 200) {
-            console.error(err)
+            console.error(response)
             return false
           }
 

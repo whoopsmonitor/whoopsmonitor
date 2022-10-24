@@ -11,8 +11,6 @@ const perf = executionTime()
 
 c(console)
 
-console.log(APP_TOKEN)
-
 const markProgress = async (checkId, progressStatus) => {
   if (!checkId) {
     throw new Error(`Check data not found.`)

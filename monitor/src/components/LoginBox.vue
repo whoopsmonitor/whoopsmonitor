@@ -35,6 +35,11 @@ export default defineComponent({
   },
   methods: {
     async login () {
+
+      if (!this.form.password) {
+        return false
+      }
+
       this.loading = true
 
       try {

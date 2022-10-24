@@ -4,8 +4,8 @@ import axios from 'axios'
 const MAX_REQUESTS_COUNT = 10
 const INTERVAL_MS = 20
 let PENDING_REQUESTS = 0
-const API_URL = process.env.APP_API_URL
-const API_TOKEN = process.env.API_TOKEN
+const API_URL = process.env.APP_API_URL_WEB
+const API_TOKEN = process.env.APP_TOKEN
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;

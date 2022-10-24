@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -eou pipefail
+
 # Create all docker images at once to help local development
 
 set -uo pipefail

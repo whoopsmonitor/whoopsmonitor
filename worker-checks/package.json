@@ -1,6 +1,6 @@
 {
-  "name": "whoopsmonitor-worker",
-  "docker_shared_volume": "whoopsmonitor_worker_data",
+  "name": "whoopsmonitor-worker-checks",
+  "docker_shared_volume": "whoopsmonitor_worker_checks_data",
   "version": "2.0.0",
   "description": "",
   "exports": "./index.js",

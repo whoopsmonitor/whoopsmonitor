@@ -26,10 +26,10 @@ jobs:
           docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
           docker push "${IMAGE_ID}:${VERSION}"
 
-      - name: Push Bitnami Redis 7
+      - name: Push Bitnami Redis 7.0.5
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/redis
-          VERSION=7.0.5-debian-11-r5
+          VERSION=7.0.5
           PULL_IMAGE=bitnami/redis:$VERSION
 
           docker pull "$PULL_IMAGE"
@@ -54,10 +54,10 @@ jobs:
           docker tag "$PULL_IMAGE" "${IMAGE_ID}:${VERSION}"
           docker push "${IMAGE_ID}:${VERSION}"
 
-      - name: Push Mongo 6
+      - name: Push Mongo 6.0.2
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/mongodb
-          VERSION=6.0.2-debian-11-r3
+          VERSION=6.0.2
           PULL_IMAGE=bitnami/mongodb:$VERSION
 
           docker pull "$PULL_IMAGE"
