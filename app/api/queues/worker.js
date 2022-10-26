@@ -2,7 +2,7 @@ const fs = require('fs')
 const executionTime = require('execution-time')
 const execa = require('execa')
 const perf = executionTime()
-const queueName = process.env.APP_QUEUE_NAME_EXECUTE_CHECK
+const queueName = process.env.APP_QUEUE_NAME_WORKER
 const APP_NAME = process.env.APP_NAME
 
 const removeJobFromQueue = async (job) => {
@@ -10,7 +10,7 @@ const removeJobFromQueue = async (job) => {
     sails.log.info(`(START) Removing job from queue`)
     if (job.opts && job.opts.jobId) {
       sails.log.info(`(PROGRESS) Removing job from queue, job ID [${job.opts.jobId}]`)
-      await sails.hooks.bulljs.executeCheck.removeRepeatable(job.opts.repeat, job.opts.jobId)
+      await sails.hooks.bulljs.worker.removeRepeatable(job.opts.repeat, job.opts.jobId)
     }
 
     sails.log.info(`(END) Removing job from queue`)
@@ -145,14 +145,14 @@ module.exports = {
 
       if (check.file && check.file.name && check.file.content) {
         const file = check.file
-        const fromDir = `/${APP_NAME}/${checkId}/`
+        const fromDir = `${sails.config.paths.tmp}/worker/${checkId}/`
         const filePathFrom = `${fromDir}/${file.name}`
-        const volumeDirFrom = APP_NAME // shared volume
-        const volumeDirTo = `/${APP_NAME}`
+        const volumeDirFrom = `whoopsmonitor_worker_data` // docker volume in docker-compose file
+        const volumeDirTo = '/worker/'
 
         // make sure the file dir exists on filesystem
         if (fs.existsSync(fromDir)) {
-          fs.rmdirSync(fromDir, {
+          fs.rmSync(fromDir, {
             recursive: true
           })
         }
@@ -204,7 +204,7 @@ module.exports = {
         shell: true
       })
 
-      await sails.hooks.bulljs.alertingQueue.add({
+      await sails.hooks.bulljs.alerting.add({
         checkId: check.id,
         checkName: check.name,
         alerts: check.alerts.map(alert => alert.id),
@@ -218,6 +218,7 @@ module.exports = {
 
       return
     } catch (error) {
+      sails.log.error(error)
       perfResult = perf.stop()
 
       // also make sure the status code is 2 in case of the higher number
@@ -229,13 +230,15 @@ module.exports = {
         await markProgress(check.id, false)
 
         // add to alert queue
-        await sails.bulljs.alertingQueue.add({
+        sails.log.info(`(START) Adding error result of check "${check.name}" to alert queue.`)
+        await sails.hooks.bulljs.alerting.add({
           checkId: check.id,
           checkName: check.name,
           alerts: check.alerts.map(alert => alert.id),
           exitCode: error.exitCode,
           stdout: error.stdout
         })
+        sails.log.info(`(DONE) Adding error result of check "${check.name}" to alert queue.`)
 
         throw error
       } catch (error) {

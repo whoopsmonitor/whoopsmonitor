@@ -1,8 +1,5 @@
-const cron = require('node-cron')
-const { nextTick } = require('process');
-
 /**
- * app.js
+ * worker.js
  *
  * Use `app.js` to run your app without `sails lift`.
  * To start the server, run: `node app.js`.
@@ -56,13 +53,6 @@ sails.load(rc('sails'), async (err, sails) => {
     console.error('Error occurred loading Sails app:', err);
     return;
   }
-
-  // every 5 minutes
-  cron.schedule('*/1 * * * *', async () => {
-  })
-
-  nextTick(async () => {
-  })
 
   // --•
   sails.log.info('Sails app loaded successfully!');

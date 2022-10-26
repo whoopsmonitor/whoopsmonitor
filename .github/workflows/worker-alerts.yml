@@ -1,9 +1,9 @@
-name: alerting
+name: worker-alerts
 
 on:
   push:
     paths:
-      - 'alerting/**'
+      - 'worker-alerts/**'
     tags:
       - v*
 jobs:
@@ -18,14 +18,14 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . --file Dockerfile-alerting --tag image
+        run: docker build . --file Dockerfile-worker-alerts --tag image
 
       - name: Log into registry
         run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}/alerting
+          IMAGE_ID=ghcr.io/${{ github.repository }}/worker-alerts
 
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')

@@ -50,7 +50,7 @@ export default defineComponent({
         find: false,
         clean: false
       },
-      queue: 'executeCheck'
+      queue: 'worker'
     }
   },
   async created () {

@@ -51,7 +51,7 @@ services:
       APP_REDIS_CONNECTION_HOST: srv-captain--$$cap_appname-redis
       APP_REDIS_CONNECTION_PORT: 6379
       APP_TOKEN: $$cap_APP_TOKEN
-      APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
+      APP_QUEUE_NAME_WORKER: worker
       APP_REDIS_SOCKETS_PASSWORD: $cap_APP_REDIS_SOCKETS_PASSWORD
     depends_on:
       - $$cap_appname-mongodb
@@ -86,7 +86,7 @@ services:
       APP_REDIS_HOST: srv-captain--$$cap_appname-redis
       APP_REDIS_PORT: 6379
       APP_API_URL: http://srv-captain--$$cap_appname-api:1337
-      APP_QUEUE_NAME_EXECUTE_CHECK: execute-check
+      APP_QUEUE_NAME_WORKER: worker
       APP_QUEUE_NAME_ALERTING: alerting
       APP_TOKEN: $$cap_APP_TOKEN
     depends_on:

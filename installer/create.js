@@ -19,14 +19,15 @@ const MONGODB_PORT = 27017
 const MONGODB_HOST = 'whoopsmonitor-mongodb'
 const APP_REDIS_CONNECTION_HOST = 'whoopsmonitor-redis'
 const APP_REDIS_CONNECTION_PORT = 6379
-const APP_QUEUE_NAME_EXECUTE_CHECK = 'execute-check'
+const APP_QUEUE_NAME_WORKER = 'worker'
 const APP_QUEUE_NAME_ALERTING = 'alerting'
 const APP_REDIS_SOCKETS_CONNECTION_HOST = 'whoopsmonitor-redis-sockets'
 const APP_REDIS_SOCKETS_CONNECTION_PORT = 6379
 const APP_SOCKETS_ALLOW_ORIGINS = 'http://localhost:9000'
 const APP_NAME_API = 'api'
 const APP_NAME_WORKER_AGGREGATE = 'worker-aggregate'
-const APP_NAME_WORKER_CHECKS = 'worker-checks';
+const APP_NAME_WORKER_CHECKS = 'worker-checks'
+const APP_NAME_WORKER_ALERTS = 'worker-alerts'
 const ADMIN_URL = 'http://localhost:9000'
 const APP_API_URL_WEB = 'http://localhost:1337'
 const APP_API_URL = 'http://whoopsmonitor-api:1337'
@@ -154,7 +155,7 @@ inquirer.prompt(questions).then((answers) => {
       MONGODB_HOST,
       APP_REDIS_CONNECTION_HOST,
       APP_REDIS_CONNECTION_PORT,
-      APP_QUEUE_NAME_EXECUTE_CHECK,
+      APP_QUEUE_NAME_WORKER,
       APP_QUEUE_NAME_ALERTING,
       APP_REDIS_SOCKETS_PASSWORD,
       APP_REDIS_SOCKETS_CONNECTION_HOST,
@@ -162,7 +163,8 @@ inquirer.prompt(questions).then((answers) => {
       APP_SOCKETS_ALLOW_ORIGINS,
       APP_NAME_API,
       APP_NAME_WORKER_AGGREGATE,
-      APP_NAME_WORKER_CHECKS
+      APP_NAME_WORKER_CHECKS,
+      APP_NAME_WORKER_ALERTS
     }, {}, function (err, str) {
       if (err) {
         console.error(err)

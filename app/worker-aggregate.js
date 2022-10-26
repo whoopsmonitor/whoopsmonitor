@@ -3,7 +3,7 @@ const { DateTime } = require('luxon')
 const { nextTick } = require('process');
 
 /**
- * app.js
+ * worker-aggregate.js
  *
  * Use `app.js` to run your app without `sails lift`.
  * To start the server, run: `node app.js`.

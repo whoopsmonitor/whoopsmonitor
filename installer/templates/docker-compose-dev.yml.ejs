@@ -45,6 +45,26 @@ services:
     networks:
       - <%= APP_NAME %>
 
+  <%= APP_NAME %>-worker-alerts:
+    container_name: <%= APP_NAME %>-worker-alerts
+    restart: unless-stopped
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker:alerts"]
+    build:
+      context: .
+      dockerfile: Dockerfile-worker-alerts
+    env_file:
+      - .env
+    environment:
+      - APP_NAME=${APP_NAME_WORKER_ALERTS}
+    depends_on:
+      - <%= APP_NAME %>-mongodb
+    networks:
+      - <%= APP_NAME %>
+
   <%= APP_NAME %>-worker-aggregate:
     container_name: <%= APP_NAME %>-worker-aggregate
     restart: unless-stopped
@@ -62,26 +82,6 @@ services:
       - APP_NAME=${APP_NAME_WORKER_AGGREGATE}
     depends_on:
       - <%= APP_NAME %>-mongodb
-    networks:
-      - <%= APP_NAME %>
-
-  <%= APP_NAME %>-alerting:
-    container_name: <%= APP_NAME %>-alerting
-    restart: unless-stopped
-    volumes:
-      - ./alerting:/app
-      - /app/node_modules
-      - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-api:1337", "--", "npm", "run" ,"dev"]
-    build:
-      context: .
-      dockerfile: Dockerfile-alerting
-    env_file:
-      - .env
-    depends_on:
-      - <%= APP_NAME %>-mongodb
-      - <%= APP_NAME %>-redis
-      - <%= APP_NAME %>-api
     networks:
       - <%= APP_NAME %>
 

@@ -42,8 +42,9 @@
     "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
     "custom-tests": "echo \"(No other custom tests yet.)\" && echo",
     "dev:api": "node --watch api.js",
-    "dev:worker:aggregate": "node --watch worker-aggregate.js",
-    "dev:worker:checks": "node --watch worker-checks.js"
+    "dev:worker:aggregate": "node --watch worker.js",
+    "dev:worker:checks": "node --watch worker.js",
+    "dev:worker:alerts": "node --watch worker.js"
   },
   "main": "api.js",
   "repository": {

@@ -1,5 +1,6 @@
+// only for stats purposes
 module.exports = {
-  queueName: 'status-queue',
+  queueName: 'status',
   process () {
     return true
   }

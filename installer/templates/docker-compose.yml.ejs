@@ -50,18 +50,18 @@ services:
     networks:
       - <%= APP_NAME %>
 
-  <%= APP_NAME %>-alerting:
-    container_name: <%= APP_NAME %>-alerting
+  <%= APP_NAME %>-worker-alerts:
+    container_name: <%= APP_NAME %>-worker-alerts
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/alerting:<%= DOCKER_IMAGE_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker-alerts:<%= DOCKER_IMAGE_VERSION %>
     env_file:
       - .env
+    environment:
+      - APP_NAME=${APP_NAME_WORKER_ALERTS}
     depends_on:
       - <%= APP_NAME %>-mongodb
-      - <%= APP_NAME %>-redis
-      - <%= APP_NAME %>-api
     networks:
       - <%= APP_NAME %>
 

@@ -32,7 +32,7 @@ module.exports = {
 
     // add to queue
     try {
-      await sails.hooks.bulljs.executeCheck.add({
+      await sails.hooks.bulljs.worker.add({
         checkId: check.id,
         cron: check.cron,
         environmentVariables: JSON.stringify(check.environmentVariables),

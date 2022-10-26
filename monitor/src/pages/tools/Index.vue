@@ -17,10 +17,10 @@
       <q-tab-panel name="queue" class="q-gutter-md">
         <div class="row q-mt-md q-col-gutter-sm">
           <div class="col-xs-12 col-sm-6 col-md-4">
-            <redis-queue name="executeCheck" description="check executions" />
+            <redis-queue name="worker" description="check executions" />
           </div>
           <div class="col-xs-12 col-sm-6 col-md-4">
-            <redis-queue name="alertingQueue" description="alerting queue" />
+            <redis-queue name="alerting" description="alerting queue" />
           </div>
         </div>
       </q-tab-panel>
