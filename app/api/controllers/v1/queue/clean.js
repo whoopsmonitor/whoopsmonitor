@@ -21,8 +21,8 @@ module.exports = {
     let count = 0
 
     try {
-      count = await sails.hooks.bull[inputs.name].count()
-      await sails.hooks.bull[inputs.name].empty()
+      count = await sails.hooks.bulljs[inputs.name].count()
+      await sails.hooks.bulljs[inputs.name].empty()
     } catch (err) {
       sails.log.error(err)
       return exits.badRequest()

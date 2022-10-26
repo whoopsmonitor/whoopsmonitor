@@ -26,6 +26,7 @@ const APP_REDIS_SOCKETS_CONNECTION_PORT = 6379
 const APP_SOCKETS_ALLOW_ORIGINS = 'http://localhost:9000'
 const APP_NAME_API = 'api'
 const APP_NAME_WORKER_AGGREGATE = 'worker-aggregate'
+const APP_NAME_WORKER_CHECKS = 'worker-checks';
 const ADMIN_URL = 'http://localhost:9000'
 const APP_API_URL_WEB = 'http://localhost:1337'
 const APP_API_URL = 'http://whoopsmonitor-api:1337'
@@ -160,7 +161,8 @@ inquirer.prompt(questions).then((answers) => {
       APP_REDIS_SOCKETS_CONNECTION_PORT,
       APP_SOCKETS_ALLOW_ORIGINS,
       APP_NAME_API,
-      APP_NAME_WORKER_AGGREGATE
+      APP_NAME_WORKER_AGGREGATE,
+      APP_NAME_WORKER_CHECKS
     }, {}, function (err, str) {
       if (err) {
         console.error(err)

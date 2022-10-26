@@ -21,7 +21,7 @@ module.exports = {
     let queue = {}
 
     try {
-      queue['count'] = await sails.hooks.bull[inputs.name].count()
+      queue['count'] = await sails.hooks.bulljs[inputs.name].count()
     } catch (err) {
       if (err) {
         sails.log.error(`Queue ${inputs.name} not found.`)

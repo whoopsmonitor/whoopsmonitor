@@ -18,8 +18,6 @@
     "sails-mongo": "^2.0.0",
     "execa": "^4.0.3",
     "strong-cryptor": "^2.2.0",
-    "sails-hook-bull": "^1.0.0",
-    "bull": "^4.10.0",
     "node-cron": "^3.0.2",
     "sails-hook-mongoat2": "^2.0.0",
     "luxon": "^3.0.4",
@@ -30,22 +28,24 @@
     "archiver": "^5.3.1",
     "sails-hook-uploads": "^0.4.3",
     "unzipper": "^0.10.11",
-    "async": "^3.2.4"
+    "async": "^3.2.4",
+    "sails-hook-bulljs": "^1.0.1"
   },
   "devDependencies": {
-    "eslint": "5.16.0",
-    "nodemon": "^2.0.20"
+    "eslint": "5.16.0"
   },
   "scripts": {
-    "start": "NODE_ENV=production node app.js",
+    "api": "NODE_ENV=production node api.js",
     "worker:aggregate": "NODE_ENV=production node worker-aggregate.js",
+    "worker:checks": "NODE_ENV=production node worker-checks.js",
     "test": "npm run lint && npm run custom-tests && echo 'Done.'",
     "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
     "custom-tests": "echo \"(No other custom tests yet.)\" && echo",
-    "dev": "nodemon -L app.js",
-    "dev:worker:aggregate": "nodemon -L worker-aggregate.js"
+    "dev:api": "node --watch api.js",
+    "dev:worker:aggregate": "node --watch worker-aggregate.js",
+    "dev:worker:checks": "node --watch worker-checks.js"
   },
-  "main": "app.js",
+  "main": "api.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:whoopsmonitor/whoopsmonitor.git"

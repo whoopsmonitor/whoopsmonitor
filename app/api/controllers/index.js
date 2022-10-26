@@ -49,9 +49,9 @@ module.exports = {
     }
 
     try {
-      await sails.hooks.bull.statusQueue.add()
-      queue.check = await sails.hooks.bull.executeCheck.count()
-      queue.alerting = await sails.hooks.bull.alertingQueue.count()
+      await sails.hooks.bulljs.statusQueue.add()
+      queue.check = await sails.hooks.bulljs.executeCheck.count()
+      queue.alerting = await sails.hooks.bulljs.alertingQueue.count()
       redis = true
     } catch (err) {
       if (err) {

@@ -9,16 +9,14 @@ RUN apk add --no-cache openssl=1.1.1q-r0 \
 
 WORKDIR /app
 
-COPY api/package.json .
+COPY app/package.json .
 RUN npm install --quiet
 
 # copy required app files
-COPY api/api ./api
-COPY api/config/ ./config
-COPY api/static/ ./static
-COPY api/app.js .
-COPY api/worker-aggregate.js .
-COPY api/.sailsrc .
+COPY app/api ./api
+COPY app/config/ ./config
+COPY app/worker-aggregate.js .
+COPY app/.sailsrc .
 
 # wait for container
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /opt/bin/

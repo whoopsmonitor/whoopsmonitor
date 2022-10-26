@@ -7,7 +7,7 @@ services:
     ports:
       - "1337:1337"
     volumes:
-      - ./api:/app
+      - ./app:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
     command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev"]
@@ -29,19 +29,19 @@ services:
     container_name: <%= APP_NAME %>-worker-checks
     restart: unless-stopped
     volumes:
-      - ./worker-checks:/app
+      - ./api:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-api:1337", "--", "npm", "run" ,"dev"]
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker:checks"]
     build:
       context: .
       dockerfile: Dockerfile-worker-checks
     env_file:
       - .env
+    environment:
+      - APP_NAME=${APP_NAME_WORKER_CHECKS}
     depends_on:
       - <%= APP_NAME %>-mongodb
-      - <%= APP_NAME %>-redis
-      - <%= APP_NAME %>-api
     networks:
       - <%= APP_NAME %>
 

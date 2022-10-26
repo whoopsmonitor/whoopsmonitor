@@ -40,7 +40,7 @@ module.exports = {
         }
 
         try {
-          await sails.hooks.bull.executeCheck.add({
+          await sails.hooks.bulljs.executeCheck.add({
             checkId: check.id,
             cron: check.cron,
             environmentVariables: JSON.stringify(check.environmentVariables)

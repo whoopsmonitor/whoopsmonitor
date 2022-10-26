@@ -9,22 +9,22 @@ RUN apk add --no-cache openssl=1.1.1q-r0 \
 
 WORKDIR /app
 
-COPY api/package.json .
+COPY app/package.json .
 RUN npm install --quiet
 
 # copy required app files
-COPY api/api ./api
-COPY api/config/ ./config
-COPY api/static/ ./static
-COPY api/app.js ./app.js
-COPY api/.sailsrc ./.sailsrc
+COPY app/api ./api
+COPY app/config/ ./config
+COPY app/static/ ./static
+COPY app/api.js ./api.js
+COPY app/.sailsrc ./.sailsrc
 
 # wait for container
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /opt/bin/
 RUN chmod +x /opt/bin/wait-for-it.sh
 
 # start Sails app
-CMD ["/opt/bin/wait-for-it.sh", "whoopsmonitor-mongodb:27017", "--", "npm", "start"]
+CMD ["/opt/bin/wait-for-it.sh", "whoopsmonitor-mongodb:27017", "--", "npm", "run", "api"]
 
 # expose port for Node
 EXPOSE 1337
