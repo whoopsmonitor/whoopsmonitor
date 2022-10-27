@@ -530,11 +530,9 @@ export default defineComponent({
     },
 
     async switchStatus (check) {
-      const updated = JSON.parse(JSON.stringify(check))
-      updated.enabled = !updated.enabled // must revert
-
       await checkSwitchStatus({
-        check: updated,
+        this: this,
+        check,
         onSuccess: () => {
           this.$whoopsNotify.positive({
             message: `Check "${check.name}" successfully ${check.enabled ? 'enabled' : 'disabled'}.`

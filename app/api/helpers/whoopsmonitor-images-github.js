@@ -38,19 +38,19 @@ module.exports = {
           // insert new ones
           await WhoopsMonitorImages.createEach(results)
 
-          sails.log('[whoopsmonitor-images-from-github] Done.')
+          sails.log.info('[whoopsmonitor-images-from-github] Done.')
 
           return exits.success(true)
         } catch (error) {
           sails.log.error(error)
 
-          sails.log('[whoopsmonitor-images-from-github] Done, error.')
+          sails.log.info('[whoopsmonitor-images-from-github] Done, error.')
           return exits.badRequest()
         }
       })
     }).on('error', err => {
       sails.log.error(err)
-      sails.log('[whoopsmonitor-images-from-github] Done, error.')
+      sails.log.info('[whoopsmonitor-images-from-github] Done, error.')
       return exits.badRequest()
     })
   }

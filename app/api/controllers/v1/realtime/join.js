@@ -17,7 +17,7 @@ module.exports = {
         return exits.badRequest()
       }
 
-      sails.log(`User joined 'realtime' events'.`)
+      sails.log.info(`User joined 'realtime' events'.`)
     })
   }
 }

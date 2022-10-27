@@ -72,10 +72,10 @@ module.exports = {
           image: image
         }).fetch()
 
-        sails.log(`[ok][model-docker-image] Destroyed DockerImage ${image} and ${results.length || 0} checks.`)
+        sails.log.info(`[ok][model-docker-image] Destroyed DockerImage ${image} and ${results.length || 0} checks.`)
       } catch (error) {
         sails.log.error(error)
-        sails.log(`[!][model-docker-image] Destroyed DockerImage ${image} but not related checks.`)
+        sails.log.info(`[!][model-docker-image] Destroyed DockerImage ${image} but not related checks.`)
       }
     }
 

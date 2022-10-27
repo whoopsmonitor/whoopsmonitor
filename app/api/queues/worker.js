@@ -47,6 +47,7 @@ const addToLog = async (checkId, status, output, duration) => {
     })
   } catch (originalError) {
     sails.log.error(originalError)
+
     const err = new Error()
     err.message = `[checkstatus] Check ${checkId} not found.`
     err.name = 404

@@ -17,7 +17,7 @@ module.exports = {
     }).decrypt()
 
     if (!checks.length) {
-      sails.log('[update-cron-jobs] There are no queues to create.')
+      sails.log.info('[update-cron-jobs] There are no queues to create.')
       return exits.success(true)
     }
 
@@ -31,7 +31,7 @@ module.exports = {
         check.image = dockerImage
 
         if (!check.cron && !check.every) {
-          sails.log(`[update-cron-jobs][${check.id}] Check "${check.name}" does not have an interval configured.`)
+          sails.log.info(`[update-cron-jobs][${check.id}] Check "${check.name}" does not have an interval configured.`)
           return exits.success(false)
         }
 
@@ -57,9 +57,9 @@ module.exports = {
         }
 
         if (check.cron) {
-          sails.log(`[update-cron-jobs][${check.id}] Check "${check.name}" registered with cronjob "${check.cron}".`)
+          sails.log.info(`[update-cron-jobs][${check.id}] Check "${check.name}" registered with cronjob "${check.cron}".`)
         } else {
-          sails.log(`[update-cron-jobs][${check.id}] Check "${check.name}" registered with interval "${check.every}" ms.`)
+          sails.log.info(`[update-cron-jobs][${check.id}] Check "${check.name}" registered with interval "${check.every}" ms.`)
         }
       } catch (err) {
         if (err) {

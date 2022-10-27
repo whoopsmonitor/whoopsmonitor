@@ -28,9 +28,9 @@ module.exports = {
       })
 
       if (items && items.length) {
-        sails.log(`[clean-up-alert-status] Removing older status records (${items.length}).`)
+        sails.log.info(`[clean-up-alert-status] Removing older status records (${items.length}).`)
       } else {
-        sails.log(`[clean-up-alert-status] There are no older records to remove.`)
+        sails.log.info(`[clean-up-alert-status] There are no older records to remove.`)
       }
 
       return exits.success(false)
@@ -39,7 +39,7 @@ module.exports = {
         sails.log.error(error)
       }
 
-      sails.log(`[clean-up-alert-status] Removing older rows failed.`)
+      sails.log.info(`[clean-up-alert-status] Removing older rows failed.`)
     }
 
     return exits.success(true)

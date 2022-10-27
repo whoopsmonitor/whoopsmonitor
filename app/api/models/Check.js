@@ -97,10 +97,10 @@ module.exports = {
           check: check
         }).fetch()
 
-        sails.log(`[ok][model-check] Destroyed check ${check} and ${results.length || 0} check status records.`)
+        sails.log.info(`[ok][model-check] Destroyed check ${check} and ${results.length || 0} check status records.`)
       } catch (error) {
         sails.log.error(error)
-        sails.log(`[!][model-check] Destroyed check ${check} but not the check statuses.`)
+        sails.log.info(`[!][model-check] Destroyed check ${check} but not the check statuses.`)
       }
     }
 

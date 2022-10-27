@@ -15,7 +15,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    sails.log(`[realtime-is-failing] Start.`)
+    sails.log.info(`[realtime-is-failing] Start.`)
 
     const checks = await Check.find({
       select: 'id',
@@ -44,12 +44,12 @@ module.exports = {
       }
     }
 
-    sails.log(`[realtime-is-failing] Broadcasting "isfailing" event with status: ${isFailing}`)
+    sails.log.info(`[realtime-is-failing] Broadcasting "isfailing" event with status: ${isFailing}`)
     sails.sockets.broadcast('realtime', 'isfailing', {
       isFailing
     })
 
-    sails.log(`[realtime-is-failing] Done.`)
+    sails.log.info(`[realtime-is-failing] Done.`)
 
     return exits.success(isFailing)
   }

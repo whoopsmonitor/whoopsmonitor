@@ -65,10 +65,10 @@ module.exports = {
           alert: alert
         }).fetch()
 
-        sails.log(`[ok][model-alert] Destroyed alert ${alert} and ${results.length || 0} alert status records.`)
+        sails.log.info(`[ok][model-alert] Destroyed alert ${alert} and ${results.length || 0} alert status records.`)
       } catch (error) {
         sails.log.error(error)
-        sails.log(`[!][model-alert] Destroyed alert ${alert} but not the alert statuses.`)
+        sails.log.info(`[!][model-alert] Destroyed alert ${alert} but not the alert statuses.`)
       }
     }
 

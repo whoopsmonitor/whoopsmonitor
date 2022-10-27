@@ -201,6 +201,7 @@ export default defineComponent({
     runNow,
     async switchStatus (check) {
       await checkSwitchStatus({
+        this: this,
         check,
         onBefore: () => {
           this.enabled[check.id] = this.enabled[check.id]

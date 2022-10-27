@@ -46,13 +46,13 @@ module.exports = {
       const collections = sails.config.backup.collections
 
       for (const collection of collections) {
-        sails.log(`[restore][?] Restoring collection: ${collection}`)
+        sails.log.info(`[restore][?] Restoring collection: ${collection}`)
 
         const model = sails.models[collection]
         const content = fs.readFileSync(`${restorePath}/${collection}.json`).toString()
 
         if (!content) {
-          sails.log(`[restore][!] No content specified for collection: ${collection}`)
+          sails.log.info(`[restore][!] No content specified for collection: ${collection}`)
           continue
         }
 
@@ -62,13 +62,13 @@ module.exports = {
         const data = JSON.parse(content)
 
         if (!data.length) {
-          sails.log(`[restore][!] No data specified for collection: ${collection}`)
+          sails.log.info(`[restore][!] No data specified for collection: ${collection}`)
           continue
         }
 
         await model.createEach(data)
 
-        sails.log(`[restore][ok] Data for collection '${collection}' imported, ${data.length} records.`)
+        sails.log.info(`[restore][ok] Data for collection '${collection}' imported, ${data.length} records.`)
       }
 
       return exits.success(true)
