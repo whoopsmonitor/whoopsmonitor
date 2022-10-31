@@ -62,7 +62,7 @@ sails.load(rc('sails'), async (err, sails) => {
 
   const date = DateTime.local()
 
-  // every 5 minutes
+  // every minute
   cron.schedule('*/1 * * * *', async () => {
     const startOfDay = date.minus({ days: 1 }).startOf('day').valueOf()
     const endOfDay = date.endOf('day').valueOf()

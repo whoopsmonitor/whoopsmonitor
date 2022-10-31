@@ -85,23 +85,23 @@ services:
     networks:
       - <%= APP_NAME %>
 
-  <%= APP_NAME %>-image-metadata:
-    container_name: <%= APP_NAME %>-image-metadata
+  <%= APP_NAME %>-worker-image-metadata:
+    container_name: <%= APP_NAME %>-worker-image-metadata
     restart: unless-stopped
     volumes:
-      - ./image-metadata:/app
+      - ./api:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-api:1337", "--", "npm", "run" ,"dev"]
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker:image-metadata"]
     build:
       context: .
-      dockerfile: Dockerfile-image-metadata
+      dockerfile: Dockerfile-worker-aggregate
     env_file:
       - .env
+    environment:
+      - APP_NAME=${APP_NAME_WORKER_IMAGE_METADATA}
     depends_on:
       - <%= APP_NAME %>-mongodb
-      - <%= APP_NAME %>-redis
-      - <%= APP_NAME %>-api
     networks:
       - <%= APP_NAME %>
 

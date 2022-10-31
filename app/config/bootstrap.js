@@ -54,35 +54,8 @@ module.exports.bootstrap = async function () {
     fs.mkdirSync(bckDir)
   }
 
-  // scan for all cronjobs in every 30 seconds
-  cron.schedule('0 0 * * *', async () => {
-    sails.log('[cleaning-up-logs] Clean up old records in check status table.')
-    await sails.helpers.cleanupOldCheckStatus()
-    await sails.helpers.cleanupOldAlertStatus()
-  })
-
-  // scan for all cronjobs in every 30 seconds
-  cron.schedule('*/30 * * * * *', async () => {
-    sails.log('[update-cron-jobs] Run cronjob to setup repeating jobs.')
-    await sails.helpers.updateCronJobs()
-  })
-
-  cron.schedule('*/30 * * * * *', async () => {
-    sails.log('[realime-is-failing] Run cronjob to setup realtime events.')
-    await sails.helpers.realtimeIsFailing()
-  })
-
-  // every 30 minutes
-  cron.schedule('*/30 * * * *', async () => {
-    sails.log('[whoopsmonitor-images-from-github] Load Whoops Monitor images from GitHub.')
-    await sails.helpers.whoopsmonitorImagesGithub()
-  })
-
   async.nextTick(async () => {
-    sails.log('[whoopsmonitor-images-from-github] Load Whoops Monitor images from GitHub.')
-    await sails.helpers.whoopsmonitorImagesGithub()
+    // reorder "0" checks
+    await sails.helpers.reorderZeroChecks()
   })
-
-  // reorder "0" checks
-  await sails.helpers.reorderZeroChecks()
 };

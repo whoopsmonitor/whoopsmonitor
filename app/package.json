@@ -29,7 +29,8 @@
     "sails-hook-uploads": "^0.4.3",
     "unzipper": "^0.10.11",
     "async": "^3.2.4",
-    "sails-hook-bulljs": "^1.0.1"
+    "sails-hook-bulljs": "^1.0.1",
+    "sails-hook-cronjob": "^1.0.5"
   },
   "devDependencies": {
     "eslint": "5.16.0"
@@ -38,13 +39,15 @@
     "api": "NODE_ENV=production node api.js",
     "worker:aggregate": "NODE_ENV=production node worker-aggregate.js",
     "worker:checks": "NODE_ENV=production node worker-checks.js",
+    "worker:image-metadata": "NODE_ENV=production node worker.js",
     "test": "npm run lint && npm run custom-tests && echo 'Done.'",
     "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
     "custom-tests": "echo \"(No other custom tests yet.)\" && echo",
     "dev:api": "node --watch api.js",
-    "dev:worker:aggregate": "node --watch worker.js",
+    "dev:worker:aggregate": "node --watch worker-aggregate.js",
     "dev:worker:checks": "node --watch worker.js",
-    "dev:worker:alerts": "node --watch worker.js"
+    "dev:worker:alerts": "node --watch worker.js",
+    "dev:worker:image-metadata": "node --watch worker.js"
   },
   "main": "api.js",
   "repository": {

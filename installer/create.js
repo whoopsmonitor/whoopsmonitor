@@ -28,6 +28,7 @@ const APP_NAME_API = 'api'
 const APP_NAME_WORKER_AGGREGATE = 'worker-aggregate'
 const APP_NAME_WORKER_CHECKS = 'worker-checks'
 const APP_NAME_WORKER_ALERTS = 'worker-alerts'
+const APP_NAME_WORKER_IMAGE_METADATA = 'worker-image-metadata'
 const ADMIN_URL = 'http://localhost:9000'
 const APP_API_URL_WEB = 'http://localhost:1337'
 const APP_API_URL = 'http://whoopsmonitor-api:1337'
@@ -164,7 +165,8 @@ inquirer.prompt(questions).then((answers) => {
       APP_NAME_API,
       APP_NAME_WORKER_AGGREGATE,
       APP_NAME_WORKER_CHECKS,
-      APP_NAME_WORKER_ALERTS
+      APP_NAME_WORKER_ALERTS,
+      APP_NAME_WORKER_IMAGE_METADATA
     }, {}, function (err, str) {
       if (err) {
         console.error(err)
