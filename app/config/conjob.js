@@ -39,9 +39,20 @@ module.exports.cronjob = {
     on: 'hooks:builtIn:ready',
     schedule: '* * * * *',
     onTick: async function () {
-      console.log(`[${APP_NAME}] (START) Reloading docker images metadata.`)
+      sails.log.info(`[${APP_NAME}] (START) Reloading docker images metadata.`)
       await sails.helpers.workerImageMetadata()
-      console.log(`[${APP_NAME}] (END) Reloading docker images metadata.`)
+      sails.log.info(`[${APP_NAME}] (END) Reloading docker images metadata.`)
+    }
+  },
+  workerAggregate: {
+    guard: async () => {
+      return APP_NAME === 'worker-aggregate'
+    },
+    runOnInit: true,
+    on: 'hooks:builtIn:ready',
+    schedule: '* * * * *',
+    onTick: async function () {
+      await sails.helpers.workerAggregate()
     }
   }
 }

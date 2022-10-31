@@ -93,15 +93,15 @@ module.exports = {
     ]
 
     try {
-      sails.log.info('[whoopsmonitor-worker-aggregate] (START) Gathering all checks.')
+      sails.log.info('(START) Gathering all checks.')
       const checks = await Check.find({})
-      sails.log.info('[whoopsmonitor-worker-aggregate] (DONE) Gathering all checks.')
+      sails.log.info('(DONE) Gathering all checks.')
 
       for (const check of checks) {
         const checkId = check.id
         const checkName = check.name
 
-        sails.log.info(`[whoopsmonitor-worker-aggregate] (START) Aggregating data for check "${checkName}.`)
+        sails.log.info(`(START) Aggregating data for check "${checkName}.`)
 
         for (const queryKey in query) {
           if (query[queryKey].hasOwnProperty('$match')) {
@@ -119,7 +119,7 @@ module.exports = {
               return exits.failed()
             }
 
-            sails.log.info(`[whoopsmonitor-worker-aggregate] (START) Update stats in DB for check "${checkName}".`)
+            sails.log.info(`(START) Update stats in DB for check "${checkName}".`)
 
             for (const result of results) {
               result.check = checkId
@@ -132,10 +132,10 @@ module.exports = {
               await AggregateDaily.create(result).tolerate('E_UNIQUE')
             }
 
-            sails.log.info(`[whoopsmonitor-worker-aggregate] (DONE) Update stats in DB for check "${checkName}".`)
+            sails.log.info(`(DONE) Update stats in DB for check "${checkName}".`)
           })
 
-        sails.log.info(`[whoopsmonitor-worker-aggregate] (DONE) Aggregating data for check "${checkName}".`)
+        sails.log.info(`(DONE) Aggregating data for check "${checkName}".`)
       }
     } catch (error) {
       sails.log.error(error)

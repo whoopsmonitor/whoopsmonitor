@@ -32,10 +32,10 @@ services:
       - ./api:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker:checks"]
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker"]
     build:
       context: .
-      dockerfile: Dockerfile-worker-checks
+      dockerfile: Dockerfile-worker
     env_file:
       - .env
     environment:
@@ -52,10 +52,10 @@ services:
       - ./api:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker:alerts"]
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker"]
     build:
       context: .
-      dockerfile: Dockerfile-worker-alerts
+      dockerfile: Dockerfile-worker
     env_file:
       - .env
     environment:
@@ -72,10 +72,10 @@ services:
       - ./api:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker:aggregate"]
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker"]
     build:
       context: .
-      dockerfile: Dockerfile-worker-aggregate
+      dockerfile: Dockerfile-worker
     env_file:
       - .env
     environment:
@@ -92,10 +92,10 @@ services:
       - ./api:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker:image-metadata"]
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker"]
     build:
       context: .
-      dockerfile: Dockerfile-worker-aggregate
+      dockerfile: Dockerfile-worker
     env_file:
       - .env
     environment:

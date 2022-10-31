@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker-aggregate:<%= DOCKER_IMAGE_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker:<%= DOCKER_IMAGE_VERSION %>
     env_file:
       - .env
     environment:
@@ -40,7 +40,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker-checks:<%= DOCKER_IMAGE_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker:<%= DOCKER_IMAGE_VERSION %>
     env_file:
       - .env
     environment:
@@ -55,7 +55,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker-alerts:<%= DOCKER_IMAGE_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker:<%= DOCKER_IMAGE_VERSION %>
     env_file:
       - .env
     environment:
@@ -70,7 +70,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker-image-metadata:<%= DOCKER_IMAGE_VERSION %>
+    image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/worker:<%= DOCKER_IMAGE_VERSION %>
     env_file:
       - .env
     environment:
