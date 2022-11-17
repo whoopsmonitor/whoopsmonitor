@@ -30,8 +30,7 @@ const APP_NAME_WORKER_CHECKS = 'worker-checks'
 const APP_NAME_WORKER_ALERTS = 'worker-alerts'
 const APP_NAME_WORKER_IMAGE_METADATA = 'worker-image-metadata'
 const ADMIN_URL = 'http://localhost:9000'
-const APP_API_URL_WEB = 'http://localhost:1337'
-const APP_API_URL = 'http://whoopsmonitor-api:1337'
+const APP_API_URL = 'http://localhost:1337'
 
 const dockerImageVersion = require('./package.json').dockerImageVersion
 
@@ -147,7 +146,6 @@ inquirer.prompt(questions).then((answers) => {
       APP_DATA_ENCRYPTION_KEY,
       APP_TOKEN,
       APP_API_URL,
-      APP_API_URL_WEB,
       MONGODB_ROOT_PASSWORD,
       MONGODB_DATABASE,
       MONGODB_USERNAME,

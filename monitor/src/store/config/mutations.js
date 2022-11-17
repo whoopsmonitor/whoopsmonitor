@@ -1,9 +1,9 @@
-export function setApiToken (state, API_TOKEN) {
-  state.API_TOKEN = API_TOKEN
+export function setApiToken (state, token) {
+  state.API_TOKEN = token
 }
 
-export function setApiUrl (state, APP_API_URL) {
-  state.APP_API_URL = APP_API_URL
+export function setApiUrl (state, url) {
+  state.APP_API_URL = url
 }
 
 export function setSelectedTags (state, tags) {

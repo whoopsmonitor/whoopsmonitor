@@ -9,7 +9,7 @@ API_TOKEN=${APP_TOKEN}
 APP_API_URL=${APP_API_URL}
 
 echo "API_TOKEN=$API_TOKEN" >> ./.env
-echo "APP_API_URL_WEB=$APP_API_URL_WEB" >> ./.env
+echo "APP_API_URL=$APP_API_URL" >> ./.env
 
 export NODE_OPTIONS=--openssl-legacy-provider
 

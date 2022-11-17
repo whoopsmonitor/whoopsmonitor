@@ -1,4 +1,4 @@
-const APP_API_URL = process.env.APP_API_URL_WEB
+const APP_API_URL = process.env.APP_API_URL
 const API_TOKEN = process.env.APP_TOKEN
 
 export default ({ app }) => {
