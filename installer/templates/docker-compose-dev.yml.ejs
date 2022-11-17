@@ -107,7 +107,6 @@ services:
 
   <%= APP_NAME %>-mongodb:
     container_name: <%= APP_NAME %>-mongodb
-    <!-- image: ghcr.io/<%= APP_NAME %>/<%= APP_NAME %>/bitnami/mongodb:6.0.2 -->
     image: ghcr.io/zcube/bitnami-compat/mongodb:6.0.2
     ports:
       - "27017:27017"

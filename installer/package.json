@@ -13,10 +13,10 @@
   "license": "ISC",
   "dependencies": {
     "log-symbols": "^4.0.0",
-    "ejs": "^3.1.5",
-    "generate-password": "^1.5.1",
-    "boxen": "^4.2.0",
-    "inquirer": "^7.3.3",
-    "execa": "^4.0.3"
+    "ejs": "^3.1.8",
+    "generate-password": "^1.7.0",
+    "boxen": "^5.0.0",
+    "inquirer": "^8.2.4",
+    "execa": "^5.1.1"
   }
 }
