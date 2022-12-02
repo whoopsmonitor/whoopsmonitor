@@ -1,8 +1,8 @@
-FROM node:19.0.0-alpine3.16
+FROM node:19.2-alpine3.16
 LABEL maintainer="Daniel Rataj <info@whoopsmonitor.app>"
 LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
 
-RUN apk add --no-cache openssl=1.1.1q-r0 \
+RUN apk add --no-cache openssl=1.1.1s-r0 \
     docker-cli=20.10.20-r0 \
     docker-compose=1.29.2-r2 \
     curl=7.83.1-r4 && \

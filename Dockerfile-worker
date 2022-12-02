@@ -1,4 +1,4 @@
-FROM node:19.0.0-alpine3.16
+FROM node:19.2-alpine3.16
 LABEL maintainer="Daniel Rataj <info@whoopsmonitor.app>"
 LABEL org.opencontainers.image.source="https://github.com/whoopsmonitor/whoopsmonitor"
 
@@ -14,10 +14,11 @@ COPY app/package.json .
 RUN npm install --quiet
 
 # copy required app files
-COPY app/api .
-COPY app/config/ .
-COPY app/worker.js .
-COPY app/.sailsrc .
+COPY app/api ./api
+COPY app/config/ ./config
+COPY app/static/ ./static
+COPY app/api.js ./api.js
+COPY app/.sailsrc ./.sailsrc
 
 # wait for container
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /opt/bin/

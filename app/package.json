@@ -37,12 +37,12 @@
   },
   "scripts": {
     "api": "NODE_ENV=production node api.js",
-    "worker": "NODE_ENV=production node worker.js",
+    "worker": "NODE_ENV=production node api.js",
     "test": "npm run lint && npm run custom-tests && echo 'Done.'",
     "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
     "custom-tests": "echo \"(No other custom tests yet.)\" && echo",
     "dev:api": "node --watch api.js",
-    "dev:worker": "node --watch worker.js"
+    "dev:worker": "node --watch api.js"
   },
   "main": "api.js",
   "repository": {
