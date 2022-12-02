@@ -28,7 +28,7 @@ jobs:
 
       - name: Push Bitnami Redis 7.0.5
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}/redis
+          IMAGE_ID=ghcr.io/${{ github.repository }}/bitnami/redis
           VERSION=7.0.5
           PULL_IMAGE=bitnami/redis:$VERSION
 
