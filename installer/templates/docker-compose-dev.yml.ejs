@@ -10,7 +10,7 @@ services:
       - ./app:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
-    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev"]
+    command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:api"]
     build:
       context: .
       dockerfile: Dockerfile-api
@@ -29,7 +29,7 @@ services:
     container_name: <%= APP_NAME %>-worker-checks
     restart: unless-stopped
     volumes:
-      - ./api:/app
+      - ./app:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
     command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker"]
@@ -49,7 +49,7 @@ services:
     container_name: <%= APP_NAME %>-worker-alerts
     restart: unless-stopped
     volumes:
-      - ./api:/app
+      - ./app:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
     command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker"]
@@ -69,7 +69,7 @@ services:
     container_name: <%= APP_NAME %>-worker-aggregate
     restart: unless-stopped
     volumes:
-      - ./api:/app
+      - ./app:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
     command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker"]
@@ -89,7 +89,7 @@ services:
     container_name: <%= APP_NAME %>-worker-image-metadata
     restart: unless-stopped
     volumes:
-      - ./api:/app
+      - ./app:/app
       - /app/node_modules
       - /var/run/docker.sock:/var/run/docker.sock:rw
     command: ["/opt/bin/wait-for-it.sh", "<%= APP_NAME %>-mongodb:27017", "--", "npm", "run" ,"dev:worker"]
