@@ -88,8 +88,6 @@ services:
       - "9000:9000"
     env_file:
       - .env
-    environment:
-      API_TOKEN: ${APP_TOKEN}
     depends_on:
       - <%= APP_NAME %>-mongodb
       - <%= APP_NAME %>-redis

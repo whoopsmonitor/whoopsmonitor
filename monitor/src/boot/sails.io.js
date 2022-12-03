@@ -1,5 +1,5 @@
 const APP_API_URL = process.env.APP_API_URL
-const API_TOKEN = process.env.API_TOKEN
+const API_TOKEN = process.env.APP_TOKEN
 
 export default ({ app }) => {
   return new Promise((resolve, reject) => {
